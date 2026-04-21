@@ -1,0 +1,317 @@
+\chapter{Progettazione}
+\label{cap:progettazione}
+
+\intro{In questo capitolo si esporranno le caratteristiche tecniche della soluzione prodotta, descrivendo la progettazione e l'architettura adottata}\\
+
+
+\section{Osservabilit\`a nei sistemi distribuiti}
+
+L'osservabilità è la proprietà di un sistema software che permette di comprenderne
+lo stato interno esaminando esclusivamente i dati prodotti in output. Nel contesto delle
+applicazioni web distribuite, questa proprietà è resa possibile dalla produzione
+sistematica di tre categorie di segnali:
+\begin{itemize}
+\item \textbf{Logs}: rappresentano eventi discreti generati dal sistema durante la sua esecuzione. Contengono informazioni dettagliate su operazioni svolte, errori, stati e messaggi diagnostici, risultando fondamentali per attività di debugging e analisi puntuale di anomalie.
+
+\item \textbf{Traces}: descrivono il flusso di esecuzione di una richiesta all’interno del sistema, tracciandone il percorso attraverso i vari componenti e servizi. Sono particolarmente utili in architetture distribuite, in quanto permettono di analizzare le dipendenze tra servizi e individuare eventuali colli di bottiglia o punti di errore.
+
+\item \textbf{Metriche}: rappresentano misurazioni numeriche aggregate nel tempo, utilizzate per monitorare lo stato e le prestazioni del sistema. Si distinguono in:
+\begin{itemize}
+    \item \textit{Metriche di performance}: raccolte automaticamente tramite strumenti come OpenTelemetry, includono informazioni quali tempi di risposta, utilizzo delle risorse, throughput e latenza, utili per valutare le prestazioni del sistema.
+    \item \textit{Metriche di business}: definite a livello applicativo, riguardano aspetti funzionali del dominio, come numero di operazioni effettuate, utenti attivi o eventi specifici, e consentono di monitorare l’utilizzo e il valore del sistema dal punto di vista aziendale.
+\end{itemize}
+
+\end{itemize}
+
+La forza di un sistema di osservabilità moderno non risiede nell'utilizzo isolato di
+questi segnali, bensì nella loro correlazione: poter passare da una metrica
+anomala alla trace corrispondente, e da questa ai log emessi durante quella specifica
+richiesta, costituisce uno strumento diagnostico di grande efficacia.
+
+\section{Lo standard OpenTelemetry}
+
+\gls{otel} \`e un framework open-source, oggi standard de facto nel settore, che fornisce
+un modello unificato e vendor-neutral per la produzione, la raccolta e l'esportazione di
+segnali di osservabilit\`a. \`E il risultato della fusione tra i progetti \emph{OpenCensus}
+e \emph{OpenTracing}, avvenuta nel 2019 sotto l'egida della Cloud Native Computing
+Foundation (CNCF).
+
+I principi fondamentali di \gls{otel} rilevanti per questo progetto sono:
+
+\begin{itemize}
+  \item \textbf{Separazione tra produzione ed esportazione.} Le \gls{api} applicative sono
+        indipendenti dal backend di storage scelto: lo stesso codice pu\`o inviare dati a
+        Grafana, Jaeger, Zipkin o qualsiasi altro sistema compatibile.
+  \item \textbf{Instrumentazione automatica.} Per i framework pi\`u diffusi (ASP.NET Core,
+        HttpClient, SqlClient), \gls{otel} fornisce librerie che non richiedono modifiche
+        al codice applicativo.
+  \item \textbf{Estensibilit\`a.} \`E possibile aggiungere attributi custom, definire
+        metriche applicative proprie e configurare sampler e processor personalizzati.
+\end{itemize}
+
+\section{Architettura della telemetria}
+
+Il sistema di telemetria sviluppato si basa su una distinzione tra due macro-componenti principali: la \textbf{produzione dei dati} lato applicazione e la \textbf{raccolta e visualizzazione} lato infrastruttura.
+
+L’applicazione backend, sviluppata in ambiente \textit{.NET}, utilizza lo standard open-source OpenTelemetry per generare i tre principali segnali di osservabilità: \textit{trace}, \textit{metriche} e \textit{log}. Questi dati vengono successivamente inviati a un’infrastruttura centralizzata basata sullo stack Grafana, che ne consente l’analisi e la visualizzazione.
+
+\subsection{Produzione dei dati di telemetria}
+
+La generazione dei dati avviene direttamente all’interno dell’applicazione backend tramite diverse tecnologie integrate.
+
+Le \textbf{trace} vengono prodotte utilizzando OpenTelemetry, che si appoggia alle API native di .NET (\texttt{ActivitySource} e \texttt{Activity}) per rappresentare le operazioni eseguite dal sistema sotto forma di \textit{span}. Ogni richiesta viene quindi tracciata lungo tutto il suo ciclo di vita, includendo chiamate HTTP, operazioni sui database e logica applicativa.
+
+Le \textbf{metriche} vengono generate attraverso due approcci distinti:
+\begin{itemize}
+\item metriche di \textit{performance}, raccolte automaticamente da OpenTelemetry (ad esempio durata delle richieste HTTP o utilizzo delle risorse);
+\item metriche di \textit{business}, definite manualmente tramite le API \texttt{Meter} di .NET, per monitorare aspetti specifici del dominio applicativo.
+\end{itemize}
+
+I \textbf{log} vengono invece gestiti tramite la libreria Serilog, che consente la produzione di log strutturati e la loro esportazione verso l’infrastruttura di osservabilità. Grazie all’integrazione con OpenTelemetry, i log risultano automaticamente correlati alle trace tramite identificativi condivisi (\textit{TraceId} e \textit{SpanId}).
+
+\subsection{Integrazione con OpenTelemetry Collector ed ecosistema Grafana}
+
+Per la gestione e la visualizzazione dei dati di telemetria è stata adottata un’architettura basata su OpenTelemetry Collector e sullo stack Grafana (LGTM: Loki, Grafana, Tempo e Prometheus).
+I dati di telemetria generati dall’applicazione backend, vengono inizialmente prodotti tramite le librerie OpenTelemetry, .NET Meters e Serilog, e poi vengono esportati in formato compatibile OpenTelemetry.
+Tutti questi dati vengono inviati a un componente intermedio, l’\textit{OpenTelemetry Collector}, tramite protocollo OTLP (OpenTelemetry Protocol). Il Collector svolge un ruolo centrale nell’architettura di osservabilità, fungendo da punto di raccolta e smistamento dei dati. Le sue principali responsabilità includono:
+\begin{itemize}
+\item \textbf{Ricezione dei dati}: acquisizione di trace, metriche e log dall’applicazione tramite endpoint OTLP;
+\item \textbf{Elaborazione}: possibilità di applicare trasformazioni, filtri o arricchimenti ai dati raccolti;
+\item \textbf{Esportazione}: inoltro dei dati verso i sistemi di destinazione tramite specifici \textit{exporter}.
+\end{itemize}
+
+Nel progetto, il Collector è configurato per instradare i diversi tipi di dati verso componenti distinti dello stack Grafana:
+\begin{itemize}
+\item le \textbf{trace} vengono esportate verso Tempo, permettendo l’analisi dei flussi di esecuzione e delle dipendenze tra servizi;
+\item le \textbf{metriche} vengono inviate a Prometheus, rendendo possibile il monitoraggio delle prestazioni e la creazione di dashboard;
+\item i \textbf{log} vengono esportati verso Loki, consentendo la consultazione centralizzata e la correlazione con trace e metriche .
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{../images/architectures/ArchitetturaOtelCollector.png}
+    \caption{Architettura OTel Collector}
+    \label{fig:placeholder}
+\end{figure}
+
+Grafana rappresenta il punto di accesso unificato a queste informazioni, offrendo strumenti per la visualizzazione e l’analisi dei dati di telemetria. In particolare, permette di costruire dashboard personalizzate basate su metriche, esplorare i log e navigare le trace, abilitando una visione completa e correlata del comportamento del sistema.
+Questa architettura consente di separare la raccolta dei dati dalla loro visualizzazione, migliorando la scalabilità e la flessibilità del sistema di monitoraggio, oltre a facilitare eventuali estensioni future.
+
+\subsection{Scelte architetturali}
+
+\subsubsection{Adozione di OpenTelemetry}
+
+La scelta di \gls{otel}, come richiesto dal requisito RNF5, permette flessibilità nella scelta
+del backend di visualizzazione. 
+Le alternative considerate, soluzioni proprietarie come Azure Application Insights o Datadog APM,
+avrebbero introdotto un accoppiamento stretto con un singolo fornitore, limitando la
+flessibilità nella scelta del backend e rendendo difficoltosa la migrazione futura.
+
+\subsubsection{Architettura opt-in}
+
+L'intero sistema è progettato come \emph{opt-in}: la telemetria è attiva solo se\\
+\texttt{OpenTelemetry:Enabled = true} in appsettings, rispettando così il requisito RNF6. 
+Questo consente di abilitarla esclusivamente negli ambienti che la richiedono, evitando overhead in sviluppo locale.
+
+\subsubsection{Centralizzazione della configurazione}
+
+Tutta la configurazione \gls{otel} è centralizzata in \texttt{BaseApplicationBuilder},
+componente condiviso da tutti i prodotti \emph{Sia.Web}. I singoli moduli si limitano a
+registrare il proprio \texttt{ActivitySource} e \texttt{Meter} nel provider gi\`a
+costruito, senza conoscere i dettagli del pipeline.
+
+\subsubsection{Campionamento a due livelli}
+
+Una limitazione del \gls{sdk} \gls{otel} .NET, è l'impossibilità di identificare la
+source dello span al momento dell'invocazione del sampler, ciò ha richiesto la progettazione
+di un meccanismo a due livelli:
+
+\begin{enumerate}
+  \item Un \emph{sampler globale} (\texttt{GlobalRatioParentBasedSampler}) decide se
+        campionare le root span applicando il ratio globale.
+  \item Un \emph{processor} (\texttt{PerSourceFilterProcessor}), attivo nell'hook
+        \texttt{OnStart}, applica gli override per-source dopo che l'Activity \`e
+        inizializzata e la source \`e identificabile con certezza.
+\end{enumerate}
+
+\section{Modello dei segnali e utilizzo degli attributi}
+\subsection{Modello dei log}
+
+I log sono prodotti da Serilog con l'interfaccia \texttt{ILogger<T>} e arricchiti
+automaticamente con \texttt{TraceId} e \texttt{SpanId} quando emessi nel contesto di una
+richiesta tracciata. Questo abilita la navigazione bidirezionale tra log e trace in Grafana.
+
+\subsection{Modello delle trace}
+
+Una \emph{trace} \`e l'insieme completo di un'operazione end-to-end, identificata da un
+unico \texttt{trace\_id}. \`E composta da una gerarchia di \emph{span}, ciascuno con un
+proprio \texttt{span\_id} e, ad eccezione della root, un \texttt{parent\_span\_id}.
+
+Nel sistema, le trace sono prodotte da tre tipologie di sorgenti: instrumentazione
+automatica HTTP (richieste in ingresso via AspNetCore, chiamate in uscita via HttpClient);
+instrumentazione automatica database (query SQL Server via SqlClient, query PostgreSQL via
+Npgsql); instrumentazione manuale dei moduli Auth, Base e Grid tramite le classi
+\texttt{Sia[NomeModulo]Diagnostics}.
+
+\subsection{Modello delle metriche}
+
+Sono impiegati due tipi di strumento metrico:
+
+\begin{description}
+  \item[Counter] Contatore monotono crescente per eventi cumulativi (es.\ login riusciti,
+    query eseguite). In Prometheus acquisisce il suffisso \texttt{\_total}.
+  \item[Histogram] Distribuzione statistica per latenze e percentili (p50, p95, p99).
+    In Prometheus genera tre serie: \texttt{\_bucket}, \texttt{\_sum}, \texttt{\_count}.
+\end{description}
+
+La progettazione delle metriche ha seguito due criteri guida. Il primo \`e la \emph{bassa
+cardinalit\`a}: i tag con alta variabilit\`a (es.\ identificatori numerici di record) sono
+applicati solo agli span, mai alle metriche, per evitare un'esplosione del numero di serie
+temporali in Prometheus. Il secondo \`e la \emph{pre-aggregazione}: le metriche vengono
+aggregate lato applicazione prima dell'esportazione, con overhead nettamente inferiore
+rispetto alla raccolta di trace complete.
+
+\newpage
+\subsection{Tassonomia degli attributi}
+
+\subsubsection{Resource attributes (comuni a tutti i segnali)}
+Attributi presenti in tutte le metriche, trace e log di tutti i moduli.
+
+\begin{table}[h]
+\centering
+\caption{Resource attributes comuni a trace, metriche e log}
+\label{tab:resource-attrs}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Attributo} & \textbf{Chiave appsettings} & \textbf{Scopo} \\
+\hline
+\texttt{service.name}       & \texttt{ServiceName}  & Identifica l'installazione \\
+\hline
+\texttt{sia.product\_type}  & \texttt{ProductType}  & Linea di prodotto \\
+\hline
+\texttt{sia.customer\_name} & \texttt{CustomerName} & Nome del cliente \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Attributi del modulo Sia.Base}
+Tutti i tag utilizzati nel modulo Sia.Base, modulo che si occupa delle chiamate CRUD al database, sono i medesimi sia per le trace che per le metriche.
+
+\begin{table}[h]
+\centering
+\caption{Tag del modulo Sia.Base (operazioni \gls{crud})}
+\label{tab:tags-base}
+\begin{tabular}{|C{3.5cm}|C{4.5cm}|C{4.5cm}|}
+\hline
+\textbf{Tag} & \textbf{Significato} & \textbf{Valori esempio} \\
+\hline
+\texttt{sia.operation}
+  & Tipo di operazione \gls{crud}
+  & \texttt{insert}, \texttt{update}, \texttt{delete},
+    \texttt{find\_one}, \texttt{find\_many},
+    \texttt{relaz\_check}, \texttt{custom} \\
+\hline
+\texttt{sia.method}
+  & Metodo infrastrutturale
+  & \texttt{InsertSiaEntity}, \texttt{UpdateSiaEntity},
+    \texttt{FindSiaEntities} \\
+\hline
+\texttt{sia.caller\_method}
+  & Metodo business chiamante
+  & \texttt{CreateOrder}, \texttt{SaveInvoice} \\
+\hline
+\texttt{sia.entity}
+  & Tipo C\# dell'entit\`a
+  & \texttt{OrderEntity}, \texttt{UserEntity} \\
+\hline
+\texttt{sia.repository}
+  & Classe repository
+  & \texttt{OrdersRepository}, \texttt{CatalogRepository} \\
+\hline
+\texttt{sia.relaz.kind}
+  & Tipo di controllo relazione
+  & \texttt{relaz}, \texttt{view-relaz} \\
+\hline
+\texttt{exception.type}
+  & Tipo eccezione (solo errori)
+  & \texttt{SqlException}, \texttt{TimeoutException} \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Attributi del modulo Sia.Auth}
+I tag nelle metriche del modulo Sia.Auth sono a bassa cardinalità, di fatto solo la metrica \texttt{sia.auth.login.failure} contiene il tag \texttt{reason} che decrive il motivo dell'errore.
+\\
+Mentre le trace, contengono i seguenti attributi:
+\begin{table}[h]
+\centering
+\caption{Tag degli span del modulo Sia.Auth}
+\label{tab:tags-auth}
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Tag} & \textbf{Valori possibili} \\
+\hline
+\texttt{auth.method}                & \texttt{credentials} \\
+\hline
+\texttt{auth.result}                & \makecell{\texttt{success}, \texttt{unauthorized}, \texttt{error},\\
+                                      \texttt{bad\_request}, \texttt{two\_factor\_required}} \\
+\hline
+\texttt{auth.two\_factor\_required} & \texttt{true} (solo se 2FA richiesto) \\
+\hline
+\texttt{auth.two\_factor\_type}     & \texttt{email}, \texttt{totp} \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsubsection{Attributi del modulo Sia.Grid}
+Le metriche, come le trace del modulo Sia.Grid, contengono tutte l'attributo \texttt{componentId}.
+
+\begin{table}[h]
+\centering
+\caption{Tag degli span del modulo Sia.Grid}
+\label{tab:tags-grid}
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Span} & \textbf{Tag} \\
+\hline
+\texttt{sia.grid.page}            & \texttt{componentId}, \texttt{hasSpName} \\
+\hline
+\texttt{sia.grid.summary}         & \texttt{componentId} \\
+\hline
+\texttt{sia.grid.massive\_delete} & \texttt{componentId}, \texttt{spName} \\
+\hline
+\end{tabular}
+\end{table}
+
+\subsection{Strategie di campionamento}
+
+La strategia di campionamento deve bilanciare visibilit\`a diagnostica e costi di storage.
+I criteri adottati sono:
+
+\begin{itemize}
+  \item \textbf{Campionamento globale ridotto:} In produzione, un ratio del 10\% \`e sufficiente
+    per una rappresentazione statistica affidabile.
+  \item \textbf{Campionamento pieno per eventi critici:} I moduli con impatto sulla sicurezza devono essere campionati al 100\% per garantire tracciabilit\`a completa.
+  \item \textbf{Soppressione selettiva del rumore:} Sorgenti ad alto volume e basso valore
+    diagnostico possono essere campionate a ratio bassissimi o soppresse tramite filtri.
+  \item \textbf{Cardinalit\`a controllata:} I tag delle metriche devono escludere identificatori
+    ad alta variabilit\`a per mantenere il numero di serie temporali entro limiti
+    accettabili.
+\end{itemize}
+% \section{Sviluppo telemetria}
+% \label{sec:sviluppo-telemetria}
+% Lo sviluppo della telemetria
+
+% \subsubsection{Namespace 1} %**************************
+% Descrizione namespace 1.
+
+% \begin{namespacedesc}
+%     \classdesc{Classe 1}{Descrizione classe 1}
+%     \classdesc{Classe 2}{Descrizione classe 2}
+% \end{namespacedesc}
+
+% \section{Sviluppo test}
+% \label{sec:sviluppo-test}
+
+
+% \section{Design Pattern utilizzati}

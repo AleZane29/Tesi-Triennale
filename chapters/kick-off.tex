@@ -1,0 +1,206 @@
+\chapter{Descrizione dello stage}
+\label{cap:descrizione-stage}
+
+\intro{Il presente capitolo descrive gli obiettivi del progetto di stage, la pianificazione delle attività in termini di ore di lavoro e l’analisi preventiva dei principali rischi che potrebbero insorgere nel corso del suo svolgimento.}\\
+
+\section{Introduzione al progetto}
+
+Nel contesto dello sviluppo software moderno, le applicazioni tendono ad assumere
+un'architettura sempre pi\`u distribuita e complessa. La capacit\`a di monitorare il
+comportamento di tali sistemi in tempo reale, diagnosticare anomalie e analizzare le
+prestazioni costituisce un requisito fondamentale per garantire la qualit\`a del servizio.
+
+Il concetto di \emph{osservabilità} (\emph{observability}) si riferisce alla
+possibilità di inferire lo stato interno di un sistema a partire dai dati che esso emette
+verso l'esterno. In ambito applicativo, i principali vettori di osservabilit\`a sono tre:
+le \emph{trace distribuite}, che tracciano il percorso di una richiesta attraverso il
+sistema; le \emph{metriche}, che forniscono misure aggregate nel tempo; i \emph{log}, che
+registrano gli eventi discreti generati dall'applicazione. La convergenza di questi tre
+segnali in un'unica piattaforma \`e oggi indicata come \emph{observability stack} o, pi\`u
+informalmente, con l'acronimo \emph{MELT} (Metrics, Events, Logs, Traces).
+
+Il progetto \emph{Sia.Web} ha richiesto la progettazione e l'implementazione di un sistema
+di telemetria completo, in grado di raccogliere e correlare questi tre tipi di segnale per
+offrire una visione unificata del comportamento delle applicazioni in produzione.
+
+\section{Requisiti e obiettivi}
+
+\subsection{Obiettivi}
+\begin{enumerate}[label=\arabic*.]
+  \item Analizzare i requisiti di osservabilit\`a dell'ecosistema \emph{Sia.Web} e
+        identificare le soluzioni tecnologiche adeguate.
+  \item Progettare un'architettura di telemetria basata sullo standard \gls{otel},
+        integrando il framework con le tecnologie .NET esistenti.
+  \item Definire le strategie di campionamento delle trace e di gestione delle metriche
+        in ottica di scalabilit\`a verso ambienti di produzione.
+  \item Implementare gli strumenti di instrumentazione per i moduli applicativi principali
+        (autenticazione, accesso ai dati, griglia).
+  \item Configurare la piattaforma di visualizzazione Grafana e i relativi backend di
+        storage.
+\end{enumerate}
+
+\subsection{Requisiti funzionali}
+
+\begin{enumerate}[label=RF\arabic*.]
+  \item Il sistema deve tracciare il percorso completo di ogni richiesta HTTP in ingresso,
+        incluse le operazioni di accesso al database.
+    \item Le operazioni CRUD verso il database devono essere riconoscibili tramite attributi 
+        che espongono il metodo e la repository da cui è stata scatenata la richiesta.
+  \item Il sistema deve esporre metriche operative per i moduli di autenticazione, accesso
+        ai dati e gestione della griglia.
+  \item I log devono essere correlabili alle trace tramite \texttt{TraceId} e
+        \texttt{SpanId}.
+  \item Il sistema deve essere attivabile e disattivabile tramite configurazione, senza
+        richiedere modifiche al codice.
+  \item Deve essere possibile configurare indipendentemente il campionamento per ciascuna
+        sorgente di trace.
+    \item Deve essere possibile visualizzare i valori di trace e metriche raggruppate in dashboard
+        Grafana.
+    \item Le dashboard di Grafana devono raccogliere i dati da più servizi e installazioni diverse 
+        di ciascun cliente, e permettere di filtrare per gli stessi.
+    \item Sviluppo di Claude skill per permettere la propagazione della telemetria in tutto il sistema.
+\end{enumerate}
+
+\subsection{Requisiti non funzionali}
+
+\begin{enumerate}[label=RNF\arabic*.]
+    \item Identificazione delle tecnologie più adatte allo sviluppo del progetto.
+    \item Identificazione dei moduli più importanti da tracciare tramite telemetria.
+  \item La telemetria non deve degradare sensibilmente le prestazioni in produzione.
+  \item Le metriche devono essere progettate per non generare un numero eccessivo di serie temporali in Prometheus.
+  \item I segnali prodotti devono essere compatibili con qualsiasi backend \gls{otel}-compatibile.
+  \item Le impostazioni devono essere modificabili per ambiente (sviluppo, staging, produzione) tramite appsettings.
+    \end{enumerate}
+
+
+\section{Analisi preventiva dei rischi}
+Durante la fase iniziale di analisi, sono stati individuati i principali rischi che sarebbero potuti emergere nel corso dello stage. 
+Per ciascun rischio identificato, è stata definita una possibile strategia di mitigazione, al fine di ridurne l’impatto e garantire il corretto avanzamento delle attività previste.
+\\
+\begin{risk}{Tecnologie sconosciute}
+    \riskdescription{alcune delle tecnologie previste nel progetto risultano totalmente o parzialmente sconosciute, con il rischio di rallentare le attività nelle fasi iniziali dello stage}
+    \risksolution{pianificazione di un’attività strutturata di studio e approfondimento, attraverso l’utilizzo di documentazione ufficiale, tutorial online, corsi forniti dall’azienda e lo sviluppo di piccoli progetti di consolidamento, al fine di acquisire rapidamente le competenze necessarie}
+    \label{risk:unknown-tecnologies} 
+\end{risk}
+\vspace{0.2cm}
+\begin{risk}{Gestione del tempo}
+    \riskdescription{la pianificazione delle attività potrebbe risultare non accurata, soprattutto a causa della presenza di tecnologie nuove e della componente sperimentale legata all’uso dell’intelligenza artificiale, con il rischio di ritardi rispetto alle scadenze previste}
+    \risksolution{adottare il modello agile \gls{scrumg} per definire obiettivi intermedi settimanali, monitoraggio continuo dello stato di avanzamento e revisione periodica della pianificazione, in modo da adattare le attività in base alle difficoltà riscontrate}
+    \label{risk:time-administration} 
+\end{risk}
+\vspace{0.2cm}
+\begin{risk}{Allucinazioni \gls{llm}}
+    \riskdescription{i modelli di intelligenza artificiale utilizzati per la generazione automatica di test possono produrre risultati non corretti, incoerenti o non aderenti alle specifiche (fenomeno noto come “allucinazione”), compromettendo l’affidabilità del codice generato}
+    \risksolution{adozione di tecniche di verifica e validazione dei risultati prodotti, affiancate da un’attenta progettazione dei\emph{ prompt }e dall’utilizzo di specifiche strutturate. Inoltre, iterazioni successive e revisioni manuali consentono di migliorare progressivamente la qualità dell’output generato}
+    \label{risk:LLM-hallucinations} 
+\end{risk}
+\vspace{0.2cm}
+\begin{risk}{Integrazione tra tecnologie}
+    \riskdescription{l’integrazione tra strumenti diversi, quali \emph{\emph{Spec-Kit}, \emph{OpenTelemetry} e \emph{Grafana}}, può presentare difficoltà legate a compatibilità e interfacciabilità, con il rischio di rallentare lo sviluppo o compromettere il corretto flusso dei dati}
+    \risksolution{utilizzo di un approccio incrementale all’integrazione, partendo da configurazioni di base e aumentando progressivamente la complessità. Consultazione della documentazione, utilizzo di ambienti di sviluppo locali per test e validazione, e confronto con il team aziendale per la risoluzione di eventuali criticità}
+    \label{risk:tecnologies-integration} 
+\end{risk}
+\vspace{0.2cm}
+\begin{risk}{Qualità dei test generati automaticamente}
+    \riskdescription{i test generati tramite modelli di intelligenza artifutilizzo di un approccio incrementale all’integrazione, partendo da coiciale potrebbero risultare incompleti, non corretti o con copertura insufficiente, compromettendo l’efficacia del processo di \emph{testing}}
+    \risksolution{introduzione di attività di validazione e revisione dei test generati, utilizzo di metriche di copertura del codice e iterazione sui \emph{prompt} per migliorare progressivamente la qualità dei risultati}
+    \label{risk:test-quality} 
+\end{risk}
+\vspace{0.2cm}
+\begin{risk}{Differenze di comportamento tra ambiente di sviluppo e produzione}
+    \riskdescription{il sistema potrebbe presentare comportamenti differenti tra ambiente di sviluppo, test e produzione, a causa di differenze nella configurazione, nei dati o nell’infrastruttura. Ciò può portare a malfunzionamenti non rilevati durante le fasi di sviluppo e \emph{testing}}
+    \risksolution{utilizzo di ambienti di \emph{staging} il più possibile allineati alla produzione, esecuzione di test approfonditi prima del rilascio e monitoraggio continuo tramite strumenti di telemetria, al fine di individuare e risolvere tempestivamente eventuali anomalie}
+    \label{risk:production-problems} 
+\end{risk}
+\vspace{0.2cm}
+\begin{risk}{Overfitting dei prompt per modelli \gls{llm}}
+    \riskdescription{i \emph{prompt} progettati per la generazione automatica dei test potrebbero risultare troppo specifici rispetto ai casi inizialmente considerati, adattandosi eccessivamente al codice analizzato nelle prime fasi. 
+    Questo fenomeno può portare a una ridotta capacità di generalizzazione, con conseguente inefficacia nella generazione di test corretti o completi per nuove porzioni di codice introdotte successivamente}
+    \risksolution{progettazione dei \emph{prompt} in modo generale e modulare, evitando eccessiva specializzazione su casi specifici. Introduzione di test su scenari diversi e codice non visto durante le fasi iniziali, accompagnata da iterazioni e revisioni periodiche dei \emph{prompt}, al fine di migliorarne la capacità di generalizzazione}
+    \label{risk:prompt-overfitting} 
+\end{risk}
+
+\section{Pianificazione}
+L’attività di stage è stata pianificata su una durata complessiva di 8 settimane, per un totale di 300 ore.
+\\
+La pianificazione è stata strutturata in modo progressivo, suddividendo il lavoro in fasi settimanali, ciascuna con obiettivi specifici e attività mirate, al fine di garantire un apprendimento graduale e un’integrazione efficace delle tecnologie coinvolte.
+\subsection{Pianificazione settimanale}
+\subsubsection{Settimane 1 e 2: Studio dell’architettura del sistema}
+Le prime due settimane sono state dedicate all’analisi dell’architettura dell’applicazione Sia.Core, con particolare attenzione alla separazione tra componente \emph{client-side} e \emph{server-side}.
+\begin{itemize}
+    \item Analisi della struttura del progetto \emph{Angular}: moduli, componenti, servizi, \emph{routing}
+    \item Studio delle convenzioni e pattern architetturali adottati (\emph{lazy loading, state management})
+    \item Revisione del codice esistente con supporto del team di sviluppo
+    \item Analisi della struttura del progetto \emph{.NET 9}: \emph{layer, \gls{api}, middleware, dependency injection}
+    \item Studio dei pattern architetturali utilizzati (\emph{Clean Architecture, CQRS, repository pattern})
+    \item Comprensione dei flussi di dati tra \emph{client} e \emph{server}: \emph{\gls{api} REST}, contratti, autenticazione
+    \item Mappatura dei componenti critici candidati all'integrazione di test e telemetria
+\end{itemize}
+
+\subsubsection{Settimana 3: Studio dell’architettura del sistema}
+La terza settimana è stata dedicata all’apprendimento degli strumenti chiave del progetto: \emph{Spec-Kit}, \emph{OpenTelemetry} e \emph{Grafana}.\\
+\begin{itemize}
+    \item \emph{Spec-Kit}: studio della documentazione, comprensione del modello di specifica \emph{AI-driven},
+esercitazioni pratiche
+    \item \emph{OpenTelemetry}: studio dei concetti fondamentali (\emph{traces, metrics, logs}), integrazione con
+\emph{Angular} e \emph{.NET}
+    \item \emph{Grafana}: configurazione istanza locale, connessione alle sorgenti dati \emph{OpenTelemetry},
+dashboard di base
+    \item Realizzazione di un ambiente di sviluppo locale integrato con tutti e tre gli strumenti
+\end{itemize}
+
+\subsubsection{Settimana 4: Strategia di testing e selezione del modello AI}
+Durante la quarta settimana è stata definita la strategia di \emph{testing} da adottare, identificando le principali tipologie di test (unitari, di integrazione, \emph{end-to-end} e di performance).
+\\
+Parallelamente, è stata effettuata un’analisi comparativa tra diversi modelli di intelligenza artificiale, con l’obiettivo di selezionare quello più adatto alla generazione automatica di test in integrazione con \emph{Spec-Kit}.
+\begin{itemize}
+    \item Identificazione delle tipologie di test: \emph{unit test, integration test, E2E test, performance test}
+    \item Valutazione comparativa dei modelli \gls{ai} disponibili (\emph{GPT-4o, Claude, Gemini}) per qualità e
+integrazione con \emph{Spec-Kit}
+    \item Selezione e motivazione del modello \gls{ai} adottato
+    \item Stesura del documento di strategia condiviso con il team
+\end{itemize}
+
+\subsubsection{Settimana 5: Prompt engineering e prima generazione di test}
+La quinta settimana è stata dedicata allo studio delle tecniche di \emph{prompt engineering} e alla prima generazione di test tramite intelligenza artificiale.
+\begin{itemize}
+    \item Studio delle tecniche di \emph{prompt engineering}: \emph{chain-of-thought, few-shot, context injection}
+    \item Definizione delle specifiche tramite \emph{Spec-Kit} per i componenti individuati nella settimana 4
+    \item Stesura dei \emph{prompt} per la generazione di test lato \emph{client} (\emph{Angular}) e lato \emph{server} (\emph{.NET 9})
+    \item Prima esecuzione dei\emph{ prompt }sul modello \gls{ai} selezionato
+    \item Raccolta, analisi e valutazione del codice generato
+\end{itemize}
+
+\subsubsection{Settimana 6: Iterazione e integrazione della telemetria}
+Nella sesta settimana il lavoro si è concentrato sul miglioramento iterativo dei test generati e sull’integrazione della telemetria nel sistema.
+\begin{itemize}
+    \item Analisi dei risultati: identificazione di test mancanti, errati o incompleti
+    \item Raffinamento dei\emph{ prompt }e nuove iterazioni di generazione
+    \item Integrazione di \emph{OpenTelemetry} nei componenti server-side: trace e metrics sulle \gls{api}
+principali
+    \item Prima configurazione delle dashboard \emph{Grafana} per la visualizzazione dei dati
+    \item Esecuzione dei test e verifica dei risultati su ambiente di sviluppo
+    \item Documentazione delle iterazioni e delle decisioni prese
+\end{itemize}
+
+\subsubsection{Settimana 7: Iterazione e integrazione della telemetria}
+La settima settimana ha previsto l’esecuzione di una campagna completa di test e la validazione dell’intero sistema integrato.
+\begin{itemize}
+    \item Esecuzione della suite completa di test su ambiente di \emph{staging}
+    \item Analisi della copertura del codice e identificazione delle aree scoperte
+    \item Verifica della telemetria \emph{end-to-end}: dall'evento applicativo alla dashboard \emph{Grafana}
+    \item Ottimizzazione delle dashboard \emph{Grafana}: alert, soglie, visualizzazioni avanzate
+    \item Correzione dei test falliti e ulteriore iterazione sui\emph{ prompt }se necessario
+    \item Stesura del report di qualità intermedio
+
+\end{itemize}
+
+\subsubsection{Settimana 8: Iterazione e integrazione della telemetria}
+L’ultima settimana è stata dedicata alla messa in produzione della soluzione e alla redazione della documentazione finale.
+\begin{itemize}
+    \item Preparazione e revisione finale dell'ambiente di produzione
+    \item Deploy della configurazione \emph{OpenTelemetry} e \emph{Grafana} in produzione
+    \item Stesura della documentazione tecnica finale (architettura, \emph{prompt}, modello \gls{ai}, risultati)
+    \item Stesura della relazione di stage con analisi critica del lavoro svolto
+    \item Presentazione finale dei risultati al team aziendale
+\end{itemize}

@@ -1,0 +1,62 @@
+\chapter{Introduzione}
+\label{cap:introduzione}
+
+\intro{Il capitolo seguente descrive l'azienda ospitante e l'idea alla base del progetto di stage}\\
+
+\section{L'azienda}
+Sia Informatica S.r.l. è una società con sede a Vigonza (PD) che, dal 1996, opera nel settore dello sviluppo software e della consulenza 
+informatica per aziende di diversi comparti produttivi. Il \emph{core business} dell'azienda è la progettazione e l'implementazione di
+soluzioni tecnologiche personalizzate, pensate per rispondere alle specifiche esigenze operative di ciascun cliente.
+L'offerta comprende sistemi \gls{erp} verticali, declinati per i settori del packaging, dell'arredamento e della moda sotto il nome 
+commerciale \emph{Job3 ERP}, servizi web tra cui un \gls{crm} (\emph{Sales Connect}) e strumenti per la gestione logistica, soluzioni 
+di gestione documentale (fatturazione elettronica, firma digitale e conservazione sostitutiva), nonché sistemi di integrazione 
+avanzata come la tecnologia \gls{rfid}, per la gestione intelligente della logistica e la tracciabilità aziendale, e un assistente basato 
+sull'intelligenza artificiale denominato \emph{Kitsune}. 
+La filosofia aziendale si ispira al principio giapponese del Kintsugi, ovvero l'arte di valorizzare le imperfezioni trasformandole in punti di forza: 
+in modo analogo, Sia Informatica non si limita a fornire strumenti software isolati, ma costruisce connessioni profonde tra i 
+processi aziendali, puntando all'armonizzazione e all'ottimizzazione dei flussi operativi. Con oltre vent'anni di esperienza nel 
+mercato, l'azienda rappresenta un partner tecnologico consolidato per le imprese del Nord-Est Italia che cercano soluzioni 
+scalabili, integrate e su misura.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.2\linewidth]{../images/technologies/Sia.png}
+    \caption{Logo Sia Informatica}
+    \label{fig:placeholder}
+\end{figure}
+
+\section{L'idea}
+
+Il progetto di stage nasce dall’esigenza, da parte di Sia Informatica, di migliorare la qualità e il monitoraggio delle applicazioni \emph{web enterprise} sviluppate internamente. 
+In particolare, l’applicazione Sia.Core rappresenta un sistema complesso, basato su architettura \emph{full-stack} (\emph{Angular} per il \emph{client} e \emph{.NET 9} per il \emph{server}), per il quale risulta fondamentale garantire elevati standard di affidabilità, manutenibilità e prestazioni.
+\\
+In questo contesto, le attività di \emph{testing} e di monitoraggio risultano cruciali ma, allo stesso tempo, onerose se svolte manualmente o con strumenti tradizionali. 
+La crescente complessità del sistema e il numero sempre maggiore di componenti rendono infatti difficile mantenere una copertura di test adeguata e individuare tempestivamente eventuali anomalie o malfunzionamenti.
+\\
+Per rispondere a queste criticità, il progetto propone un approccio innovativo basato sull’utilizzo dell’intelligenza artificiale, con l’obiettivo di automatizzare e migliorare sia la generazione dei test sia l’analisi del comportamento dell’applicazione in esercizio. 
+In particolare, l’uso dello strumento \emph{Spec-Kit} consente di definire in modo strutturato le specifiche e guidare la generazione automatica del codice di test, rendendo il processo più efficiente, riproducibile e scalabile.
+\\
+Parallelamente, il progetto affronta il tema della telemetria e dell’osservabilità del sistema, attraverso l’integrazione di \emph{OpenTelemetry} per la raccolta di metriche, \emph{log} e \emph{trace}, e di \emph{Grafana} per la loro visualizzazione. 
+Questo permette di ottenere una visione completa e in tempo reale dello stato dell’applicazione, facilitando l’individuazione di problemi e il monitoraggio delle prestazioni.
+
+\section{Organizzazione del testo}
+
+\begin{description}
+    \item[{\hyperref[cap:descrizione-stage]{Il secondo capitolo}}] descrive gli obiettivi del periodo di stage, la pianificazione del lavoro ed eventuali rischi preventivati.
+    
+    \item[{\hyperref[cap:analisi-requisiti]{Il terzo capitolo}}] approfondisce le funzionalità del prodotto, tramite requisiti e casi d'uso implementati.
+    
+    \item[{\hyperref[cap:tecnologie-adottate]{Il quarto capitolo}}] presenta le tecnologie e gli strumenti utilizzati durante il periodo di stage e adottati per lo sviluppo del prodotto.
+    
+    \item[{\hyperref[cap:progettazione]{Il quinto capitolo}}] affronta le caratteristiche tecniche del prodotto, con particolare riferimento alle scelte progettuali e architetturali.
+    
+    \item[{\hyperref[cap:codifica]{Il sesto capitolo}}] espone ...
+    
+    \item[{\hyperref[cap:conclusioni]{Nel settimo capitolo}}] descrive ...
+\end{description}
+
+Riguardo la stesura del testo, relativamente al documento sono state adottate le seguenti convenzioni tipografiche:
+\begin{itemize}
+	\item gli acronimi, le abbreviazioni e i termini ambigui o di uso non comune menzionati vengono definiti nel glossario, situato alla fine del presente documento;
+	\item per la prima occorrenza dei termini riportati nel glossario viene utilizzata la nomenclatura "parola(abbreviazione)", mentre per ogni successiva occorrenza verrà utilizzata solamente l’abbreviazione di tale termine;
+	\item i termini in lingua straniera e facenti parti del gergo tecnico sono evidenziati con il carattere \emph{corsivo}.
+\end{itemize}
