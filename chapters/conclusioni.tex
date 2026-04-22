@@ -11,10 +11,49 @@
 
 
 \chapter{Roba da organizzare}
+\section{Model Context Protocol (MCP)}
 
+\intro{Il presente capitolo descrive il protocollo \gls{mcp}, utilizzato durante lo stage per integrare un agente di codifica basato su modelli linguistici con i sistemi di osservabilità, in particolare Grafana.}
 
------------------------------------------------------
+\subsection{Introduzione}
 
-Suddivisione grafana in 3 database
-Cosa viene tracciato -> SQL (riconoscimento per repository e metodi), endpoint API (chiamate al server)
-Scelte progettuali fatte: sampling ratio, retention dati, componenti fondamentali da tracciare
+Nel contesto dello sviluppo software assistito da modelli di intelligenza artificiale, emerge la necessità di fornire agli agenti informazioni aggiornate, contestualizzate e provenienti da sistemi esterni. I modelli linguistici di grandi dimensioni (\gls{llm}), infatti, non hanno accesso diretto allo stato runtime delle applicazioni o ai dati di monitoraggio, limitando la loro capacità di analisi e decisione.
+
+Per superare tale limite, è stato adottato il \gls{mcp}, un protocollo progettato per consentire a un agente AI di interagire in modo strutturato con servizi esterni, ottenendo dati dinamici e contestuali.
+
+Nel progetto di stage, \gls{mcp} è stato utilizzato per collegare l'agente di sviluppo \emph{Claude Code} con il sistema di osservabilità basato su \emph{Grafana}, permettendo all'agente di accedere alla gestione delle dashboard in Grafana.
+
+\subsection{Obiettivi del protocollo}
+
+L'introduzione di MCP risponde ai seguenti obiettivi:
+
+\begin{itemize}
+    \item \textbf{Accesso a dati runtime}: consentire all'agente AI di interrogare dati di telemetria in tempo reale
+    \item \textbf{Contesto dinamico}: fornire informazioni aggiornate sul comportamento dell'applicazione
+    \item \textbf{Integrazione modulare}: permettere l'aggiunta di nuovi servizi senza modificare l'agente
+    \item \textbf{Standardizzazione}: definire un'interfaccia comune per la comunicazione tra agenti e strumenti esterni
+\end{itemize}
+
+\subsection{Uso del protocollo nel progetto}
+Collegando l'agente sviluppato per l'integrazione della telemetria nel progetto \emph{Sia.Core}, all'applicativo Grafana
+tramite \gls{mcp}, è stato possibile migliorare l'accuratezza dell'agente nello sviluppo delle dashboard e dei relativi widget
+per la visualizzazione dei dati di telemetria.
+Dopo l'introduzione del protocollo, si è notato immediatamente un miglioramento nella qualità delle dashboard create,
+nonostante ciò è stato comunque necessario correggere l'elaborato dell'agente, introducendo nuove direttive per prevenire
+eventuali allucinazioni come l'uso di metriche e/o trace non esistenti e filtraggio di metriche tramite attributi che non fossero 
+presenti nelle metriche interessate. Inoltre si è presentata la necessità di istruire l'agente sulla creazione di widget: elencando
+quali tipi di grafico usare per determinate metriche, quali variabili assegnare alle dashboard per ottimizzare il filtraggio e 
+come organizzare la distribuzione dei widget nella dashboard.
+
+\subsection{Vantaggi}
+
+L'utilizzo del Model Context Protocol ha introdotto diversi benefici:
+
+\begin{itemize}
+    \item \textbf{Maggiore accuratezza}: l'agente può basarsi su dati reali anziché su ipotesi
+    \item \textbf{Riduzione delle allucinazioni}: l'accesso a fonti affidabili limita la generazione di informazioni errate
+    \item \textbf{Automazione e propagazione avanzata}: possibilità di automatizzare la gestione della visualizzazione dei dati di telemetria, facilitando così la propagazione di tale integrazione in tutto il progetto \emph{Sia.Core} ed eventuali servizi ulteriori.
+\end{itemize}
+
+----------------------------------------------
+Retention dati telemetria

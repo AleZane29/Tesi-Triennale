@@ -11,9 +11,10 @@ Esempio di citazione nel pie' di pagina citazione\footcite{womak:lean-thinking}
   i pro e contro di ogni tecnologia
 - Togliere RFID dal glossario e metterlo a piè di pagina con una breve
   spiegazione
-- Introdurre skill claude code
+- Introdurre skill claude code (e spiegarle una a una)
 - Sostituire immagine architettura otel collector con una generale con loghi
   delle tecnologie
+- Introdurre immagini delle dashboard per far capire
 
 - Capire se reintrodurre sezione verifica e validazione (\intro{Il presente
   capitolo illustra le attività di verifica e validazione condotte durante lo
