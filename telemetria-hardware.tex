@@ -1,0 +1,223 @@
+\chapter{Telemetria hardware: il modulo \texttt{Sia.HealthChecks.Servers}}
+\label{cap:telemetria-hardware}
+
+\intro{Il presente capitolo descrive l'applicazione concreta delle convenzioni di istrumentazione descritte nei capitoli precedenti al modulo \texttt{Sia.HealthChecks.Servers}, dedicato al monitoraggio delle risorse hardware dei server di installazione (CPU, temperatura, RAM, spazio su disco, connessioni SQL). Vengono illustrate le scelte di progetto specifiche per la telemetria hardware, i diagrammi delle classi coinvolte e la dashboard Grafana risultante.}\\
+
+\section{Contesto e obiettivo}
+
+Il modulo \texttt{Sia.HealthChecks.Servers} è parte del framework \emph{Sia.Server.Framework}
+ed è responsabile della raccolta periodica di indicatori sullo stato del server che ospita
+l'applicazione, con successiva notifica ad un \emph{manager} centrale delle installazioni.
+Prima dell'intervento di telemetria, il modulo esponeva già i dati tramite:
+\begin{itemize}
+    \item cinque implementazioni di \texttt{IHealthCheck} (\texttt{CpuUsageHealthCheck},
+        \texttt{CpuTemperatureHealthCheck}, \texttt{RamHealthCheck}, \texttt{DiskHealthCheck},
+        \texttt{SqlHealthCheck}), invocate dall'endpoint \texttt{/health} di ASP.NET Core;
+    \item un \texttt{BackgroundService} (\texttt{HealthCheckServerHostedService}) che, ad
+        intervallo configurabile (\texttt{HealthNotifyDelayMinutes}), aggrega i risultati e
+        invia il report al \emph{manager} tramite un \texttt{HttpClient} dedicato
+        (\texttt{HealthCheckServerToServerApi}).
+\end{itemize}
+
+L'obiettivo dell'istrumentazione è trasformare questi dati in segnali di osservabilità
+standard (\emph{trace}, metriche, \emph{log}), permettendone la visualizzazione unificata
+su Grafana e la correlazione con le altre trace applicative tramite \texttt{TraceId}.
+
+\section{Scelte specifiche per la telemetria hardware}
+
+Il modulo presenta caratteristiche peculiari che hanno richiesto scelte progettuali diverse
+rispetto agli altri moduli instrumentati:
+
+\begin{description}
+    \item[Assenza di controller.] Il modulo non espone un proprio \texttt{BaseApiController}:
+        gli \texttt{IHealthCheck} sono invocati dall'infrastruttura ASP.NET Core e
+        l'\texttt{HttpClient} produce trace automatiche. Di conseguenza, come previsto
+        dalla regola del framework, la classe \texttt{SiaHealthChecksServersDiagnostics} non
+        implementa l'interfaccia \texttt{IControllerDiagnostics} e non espone il
+        \emph{counter} \texttt{ControllerErrors}.
+    \item[Valori di stato e non cumulativi.] La maggior parte delle informazioni esposte
+        (CPU\%, temperatura, GB di RAM liberi, GB su disco, connessione SQL \emph{up}/\emph{down})
+        sono grandezze \emph{istantanee}, non cumulative. L'uso di \texttt{Counter} o
+        \texttt{Histogram} sarebbe improprio: serve lo strumento \texttt{ObservableGauge}.
+    \item[Aggiornamento on-demand.] Le letture hardware avvengono solo quando l'endpoint
+        \texttt{/health} viene invocato (probe esterno, polling del \emph{manager}). Non
+        esiste un ciclo interno che campioni i sensori a intervallo fisso. Le
+        \texttt{ObservableGauge} devono quindi leggere un valore
+        \textbf{cached} in memoria, aggiornato dagli \texttt{IHealthCheck} alla loro
+        esecuzione, evitando di esporre valori \emph{stantii} quando nessuna lettura è mai
+        stata effettuata.
+    \item[Cardinalità controllata.] I \emph{tag} delle metriche hanno domini piccoli e
+        chiusi: \texttt{sia.check} $\in\{cpu, cpu\_temperature, ram, disk, sql\}$,
+        \texttt{sia.status} $\in\{Healthy, Unhealthy\}$, \texttt{sia.result}
+        $\in\{ok, http\_error, exception\}$. I \emph{tag} \texttt{sia.drive} e
+        \texttt{sia.connection} sono limitati ai dischi e alle connessioni effettivamente
+        configurate (tipicamente $\le 5$).
+\end{description}
+
+\section{Segnali di telemetria prodotti}
+
+\subsection{Trace}
+
+Il modulo espone tre \texttt{ActivitySource} custom, tutti dalla stessa classe
+\texttt{Sia\-Health\-Checks\-Servers\-Diagnostics}:
+
+\begin{table}[h]
+\centering
+\caption{Span prodotte dal modulo \texttt{Sia.HealthChecks.Servers}}
+\label{tab:span-healthchecks}
+\begin{tabularx}{\textwidth}{|l|X|X|}
+\hline
+\textbf{Span} & \textbf{Contesto} & \textbf{Tag principali} \\
+\hline
+\texttt{sia.healthchecks.servers.cycle} &
+\emph{Root span} di ogni iterazione del \texttt{HostedService} di notifica &
+\texttt{sia.operation=notify\_cycle}, \texttt{sia.enabled}, \texttt{sia.delay\_minutes}, \texttt{sia.success}, \texttt{exception.type} \\
+\hline
+\texttt{sia.healthchecks.servers.check} &
+\emph{Child span} per ciascuna invocazione di un \texttt{IHealthCheck} &
+\texttt{sia.operation=check}, \texttt{sia.check}, \texttt{sia.status}, \texttt{sia.caller\_method} \\
+\hline
+\texttt{sia.healthchecks.servers.send} &
+Span attorno alla chiamata \texttt{HealthCheckServerToServerApi.SendHealthCheckResult} &
+\texttt{sia.operation=send}, \texttt{sia.server\_id}, \texttt{sia.http.status\_code}, \texttt{sia.result}, \texttt{exception.type} \\
+\hline
+\end{tabularx}
+\end{table}
+
+Le trace HTTP generate automaticamente da \texttt{HttpClient} restano figlie di
+\texttt{sia.healthchecks.servers.send}, permettendo di ispezionare nella stessa trace sia la
+logica applicativa sia il dettaglio del POST verso il \emph{manager}.
+
+\subsection{Metriche}
+
+Il modulo espone tre categorie di metriche: \emph{cumulative} (\texttt{Counter},
+\texttt{Histogram}) per \emph{throughput} e durate; \emph{istantanee}
+(\texttt{ObservableGauge}) per i valori delle risorse hardware.
+
+\begin{table}[h]
+\centering
+\caption{Metriche custom del modulo \texttt{Sia.HealthChecks.Servers}}
+\label{tab:metrics-healthchecks}
+\begin{tabularx}{\textwidth}{|l|l|l|X|}
+\hline
+\textbf{Metrica} & \textbf{Tipo} & \textbf{Unit} & \textbf{Tag} \\
+\hline
+\texttt{cycle.count} & Counter & -- & \texttt{sia.success} \\
+\hline
+\texttt{cycle.duration} & Histogram & \texttt{ms} & \texttt{sia.success} \\
+\hline
+\texttt{check.count} & Counter & -- & \texttt{sia.check}, \texttt{sia.status} \\
+\hline
+\texttt{check.duration} & Histogram & \texttt{ms} & \texttt{sia.check}, \texttt{sia.status} \\
+\hline
+\texttt{check.errors} & Counter & -- & \texttt{sia.check}, \texttt{exception.type} \\
+\hline
+\texttt{send.count} & Counter & -- & \texttt{sia.result} \\
+\hline
+\texttt{send.duration} & Histogram & \texttt{ms} & \texttt{sia.result} \\
+\hline
+\texttt{sql.checks} & Counter & -- & \texttt{sia.connection}, \texttt{sia.result} \\
+\hline
+\texttt{cpu.usage} & ObservableGauge & \texttt{\%} & -- \\
+\hline
+\texttt{cpu.temperature} & ObservableGauge & \texttt{Cel} & -- \\
+\hline
+\texttt{ram.available} & ObservableGauge & \texttt{GBy} & -- \\
+\hline
+\texttt{ram.total} & ObservableGauge & \texttt{GBy} & -- \\
+\hline
+\texttt{disk.free} & ObservableGauge & \texttt{GBy} & \texttt{sia.drive} \\
+\hline
+\texttt{disk.total} & ObservableGauge & \texttt{GBy} & \texttt{sia.drive} \\
+\hline
+\end{tabularx}
+\end{table}
+
+I nomi sono prefissati con \texttt{sia.healthchecks.servers.} (omesso dalla tabella per
+compattezza). All'esportazione su Prometheus i punti vengono sostituiti con trattini bassi
+e l'\texttt{unit} viene espansa nel nome (es.\ \texttt{sia\_healthchecks\_servers\_cpu\_temperature\_celsius}).
+
+\subsection{Log}
+
+I log prodotti dal \texttt{HostedService} (avvio, iterazione abilitata/disabilitata,
+esito invio) sono già propagati via \emph{sink} OTLP di Serilog e correlati alle trace
+tramite \texttt{TraceId} e \texttt{SpanId}. Nessuna modifica infrastrutturale è stata
+richiesta sul logging; l'intervento si è limitato a sostituire alcune
+\emph{string interpolation} con template strutturati per migliorare la ricercabilità su
+Loki.
+
+\section{Struttura del modulo}
+
+Il modulo è organizzato attorno alla classe statica
+\texttt{SiaHealthChecksServersDiagnostics}, che concretizza il pattern
+\texttt{Sia\{Modulo\}Diagnostics} illustrato nella sezione~\ref{sec:design-patterns} e
+nella figura~\ref{fig:diag-diagnostics-pattern}. Rispetto al pattern generico, la specializzazione
+rilevante per questo modulo è l'utilizzo massiccio degli strumenti \texttt{ObservableGauge}
+per esporre i valori \emph{istantanei} delle letture hardware (CPU\%, temperatura, GB,
+stato SQL) e il meccanismo di \emph{cache} che disaccoppia la lettura (effettuata dagli
+\texttt{IHealthCheck} quando il probe ASP.NET Core chiama \texttt{/health}) dalla
+pubblicazione al \emph{Meter} (effettuata on-demand dalla \emph{callback} della \emph{gauge}
+al momento dello \emph{scrape} di Prometheus).
+
+I cinque \texttt{IHealthCheck} e il \texttt{HostedService} dipendono dalla classe
+\texttt{Diagnostics} per:
+\begin{itemize}
+    \item creare le \emph{span} tramite l'\texttt{ActivitySource} condiviso (\texttt{cycle},
+        \texttt{check}, \texttt{send});
+    \item incrementare i \texttt{Counter}/\texttt{Histogram} di esecuzione e durata;
+    \item aggiornare la cache dei valori correnti tramite i metodi
+        \texttt{UpdateCpuUsage}, \texttt{UpdateRam}, \texttt{UpdateDisk} ecc., che vengono
+        poi letti dalle \texttt{ObservableGauge} al prossimo \emph{scrape}.
+\end{itemize}
+La classe \texttt{HealthCheckServerToServerApi} invocata dal \texttt{HostedService} per
+l'invio al \emph{manager} non richiede \emph{span} custom: l'istrumentazione automatica di
+\texttt{HttpClient} produce già la \emph{child span} \texttt{http.client} come discendente
+della span \texttt{send} creata dal \texttt{HostedService}, preservando la gerarchia
+parent/child descritta nel modello delle trace della sezione~\ref{sec:design-patterns}.
+
+\section{Configurazione e attivazione}
+
+Come gli altri moduli, \texttt{Sia.HealthChecks.Servers} è \emph{opt-in} tramite
+\emph{appsettings}. Nel pipeline condiviso (\texttt{BaseApplicationBuilder}) è sufficiente
+la registrazione del \texttt{Meter} e dell'\texttt{ActivitySource} tramite il
+\texttt{ContainerExtensions} del modulo; la configurazione dichiarativa è:
+
+\begin{verbatim}
+"OpenTelemetry": {
+  "SamplingRatios": {
+    "Sia.HealthChecks.Servers": 1.0
+  },
+  "Instrumentation": {
+    "SiaHealthChecksServers": { "Metrics": true }
+  }
+}
+\end{verbatim}
+
+\section{Dashboard Grafana}
+
+La dashboard \texttt{sia-healthchecks-servers.dashboard.json} è versionata insieme al codice
+del modulo, nella cartella \texttt{Sia.HealthChecks.Servers/Diagnostics/}. Segue lo schema
+standard descritto nel capitolo~\ref{cap:progettazione}, con le \emph{template variable}
+obbligatorie \texttt{service\_name}, \texttt{customer\_name}, \texttt{enduser\_id},
+\texttt{enduser\_name}, \texttt{bucket}, e i pannelli organizzati nell'ordine:
+\emph{overview} $\rightarrow$ durate $\rightarrow$ \emph{throughput} $\rightarrow$ risorse $\rightarrow$ trace $\rightarrow$
+log.
+
+La novità rispetto alle altre dashboard di modulo è la riga \emph{Risorse}, dedicata alle
+\texttt{ObservableGauge} specifiche del modulo:
+\begin{itemize}
+    \item andamento CPU\% e temperatura CPU nel tempo;
+    \item RAM disponibile e totale con confronto a soglia;
+    \item spazio disco libero per drive;
+    \item \emph{state timeline} della metrica \texttt{sql.checks} con \emph{break-down} per
+        \texttt{sia.connection} e \texttt{sia.result}, per visualizzare a colpo d'occhio gli
+        intervalli in cui una connessione SQL è risultata \emph{down}.
+\end{itemize}
+
+------------------AGGIUNGERE IMMAGINE DASHBOARD ---------------------------------
+
+I pannelli \emph{trace} e \emph{logs} consentono, a partire da un picco anomalo sulle
+metriche \emph{hardware}, di navigare alla trace del ciclo di notifica corrispondente
+e ai \emph{log} emessi nell'iterazione, chiudendo il percorso diagnostico
+metrica $\rightarrow$ trace $\rightarrow$ log descritto in generale nei
+capitoli~\ref{cap:progettazione} e~\ref{cap:codifica}.
