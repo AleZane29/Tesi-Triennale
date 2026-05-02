@@ -1,0 +1,473 @@
+\chapter{Implementazione dei test automatici}
+\label{cap:test-implementazione}
+
+\intro{Il presente capitolo descrive l'introduzione di una strategia di testing automatico nel framework \emph{Sia.Server.Framework}, fino a quel momento privo di una struttura di test versionata. Vengono illustrati il modello a due livelli adottato (\emph{unit test} sul controller isolato ed \emph{integration test} end-to-end con database reale), le scelte di stack tecnologico, le convenzioni di scaffolding stabilite per i moduli futuri, e i bug applicativi emersi grazie ai test stessi.}\\
+
+\section{Cosa sono i test automatici e perché contano}
+
+Prima di entrare nel dettaglio tecnico, è utile chiarire — anche per chi non lavora quotidianamente con la scrittura di codice — \emph{di cosa stiamo parlando} quando si parla di ``test automatici'' e \emph{perché} dedicare tempo a scriverli rappresenta un investimento e non un costo.
+
+\subsection{Il problema che i test risolvono}
+
+Un'applicazione software è un edificio fatto di migliaia di pezzi che si parlano fra loro. Ogni volta che uno sviluppatore modifica un pezzo — anche per una correzione apparentemente innocua — esiste il rischio concreto che da qualche altra parte, magari in un punto distante e all'apparenza non collegato, qualcosa smetta di funzionare. Si chiama \emph{regressione}: un comportamento che prima funzionava e che dopo una modifica si rompe.
+
+Senza una rete di sicurezza, l'unico modo per accorgersi di una regressione è che qualcuno la incontri sul campo: o lo sviluppatore stesso facendo una prova manuale, o un collega in fase di revisione, oppure — caso peggiore — un cliente in produzione. La prima opzione è lenta e parziale (un essere umano non può ricontrollare tutto a ogni modifica); la seconda dipende dall'attenzione del singolo; la terza ha conseguenze concrete: incidenti, ticket, danni di immagine.
+
+Un \emph{test automatico} è semplicemente \textbf{un piccolo programma che verifica un altro programma}. Lo si scrive una volta, e da quel momento in poi il computer lo esegue al posto nostro, ogni volta che vogliamo, in pochi secondi. Se la modifica appena fatta ha rotto qualcosa, il test fallisce e segnala il problema \emph{prima} che il codice esca dalla macchina dello sviluppatore.
+
+\subsection{A cosa servono concretamente}
+
+\begin{description}
+    \item[Catturare le regressioni.] È l'uso primario. Ogni \emph{bug} che è stato risolto in passato dovrebbe avere un test che lo descrive, in modo che se in futuro qualcuno lo reintroduce inavvertitamente, il test fallisce subito.
+    \item[Documentare il comportamento atteso.] Un test ben scritto è una specifica eseguibile: leggendolo si capisce cosa il sistema dovrebbe fare in una determinata situazione. È documentazione che non può andare fuori sincrono col codice, perché se lo fa si rompe e qualcuno se ne accorge.
+    \item[Permettere di modificare con fiducia.] È il vero valore strategico. Un sistema con buona copertura di test si può rifattorizzare, ottimizzare, ripulire, perché c'è un modo veloce di verificare che le modifiche non abbiano rotto nulla. Senza test, ogni modifica ``rischiosa'' viene rimandata all'infinito e il debito tecnico cresce.
+    \item[Guidare il design del codice.] Scrivere test richiede di pensare a come il codice viene usato dall'esterno. Codice difficile da testare è di solito codice mal disegnato; obbligarsi a scrivere test produce codice migliore.
+    \item[Velocizzare lo sviluppo nel medio periodo.] Sembra controintuitivo (i test sono codice in più), ma il tempo perso a scriverli è ampiamente compensato dal tempo risparmiato nel non dover fare debug manuale ripetuto, nel ricevere meno segnalazioni dai clienti, nel non temere di toccare aree del codice ormai sconosciute.
+\end{description}
+
+\subsection{Cosa comportano in pratica}
+
+Un test automatico è un blocco di codice che:
+\begin{enumerate}
+    \item \textbf{Prepara una situazione} (es.\ ``immagina di avere un utente con queste informazioni e una richiesta di vedere la lista degli ordini'').
+    \item \textbf{Esegue un'azione} (es.\ ``chiamiamo la funzione che recupera gli ordini'').
+    \item \textbf{Verifica l'esito} (es.\ ``il risultato dovrebbe contenere esattamente $42$ ordini'').
+\end{enumerate}
+
+Se l'esito atteso e quello ottenuto coincidono, il test è \emph{verde} e silenzioso. Se non coincidono, il test è \emph{rosso} e produce un messaggio chiaro che dice cosa si aspettava e cosa ha trovato. I test si lanciano con un singolo comando (\texttt{dotnet test} nel nostro caso) e in pochi secondi forniscono un riepilogo.
+
+Una conseguenza pratica importante: i test diventano parte del codice del progetto. Vengono versionati insieme al resto, eseguiti automaticamente prima di ogni \emph{merge} su \emph{main}, e mantenuti nel tempo come qualunque altro pezzo di codice.
+
+\subsection{Vantaggi concreti per il progetto Sia.Web}
+
+Nel caso specifico del framework \emph{Sia.Server.Framework}, l'introduzione dei test ha portato vantaggi misurabili e concreti, spiegabili anche senza conoscere il codice nel dettaglio:
+
+\begin{description}
+    \item[Scoperta di difetti latenti.] Iterare automaticamente su tutti i $138$ componenti di tipo griglia presenti nel \emph{database} di produzione ha portato alla luce due punti del codice in cui certe combinazioni di dati causavano un \emph{crash} con messaggio criptico. Erano \emph{bug} che si sarebbero manifestati solo nell'ambiente di un cliente specifico, magari mesi dopo: trovati e corretti in laboratorio prima di causare un incidente.
+    \item[Possibilità di rifattorizzare con sicurezza.] Modifiche prima rimandate per timore di rompere qualcosa diventano possibili: chi modifica può lanciare i test, vedere immediatamente se sta introducendo problemi, e in caso correggere prima di chiedere una revisione.
+    \item[Onboarding più rapido.] Un nuovo sviluppatore che entra nel team trova nei test una documentazione viva del comportamento atteso del sistema. Per capire ``cosa fa questo modulo'' non deve più leggere centinaia di righe di codice o intervistare i colleghi: legge i test e ottiene esempi concreti.
+    \item[Contratto fra moduli.] Ogni \emph{controller} pubblico ha ora una serie di test che descrivono cosa accetta in ingresso, cosa restituisce, come reagisce agli errori. Modificare un controller senza prima aggiornare i test è un'operazione visibile e tracciabile.
+    \item[Convenzione replicabile.] La struttura del progetto di test è stata formalizzata come regola: ogni nuovo modulo creato in futuro nascerà con il proprio progetto di test gemello, evitando il debito tecnico di doverli aggiungere a posteriori.
+\end{description}
+
+\subsection{Limiti e cosa i test \emph{non} sono}
+
+Per onestà intellettuale è importante chiarire anche cosa i test \emph{non} fanno:
+
+\begin{itemize}
+    \item \textbf{Non garantiscono l'assenza di \emph{bug}.} Un test verifica solo gli scenari che lo sviluppatore ha pensato di verificare. Esistono sempre angoli oscuri non coperti.
+    \item \textbf{Non sostituiscono la revisione del codice.} Un test può essere scritto male, verificare la cosa sbagliata, o mancare il punto. Serve comunque l'occhio di un secondo sviluppatore.
+    \item \textbf{Non sono gratis.} Scriverli costa tempo, mantenerli costa tempo, eseguirli costa tempo (anche se poco). Vanno trattati come una scelta strategica: si copre con priorità ciò che cambia spesso e ciò che, se si rompe, fa il danno maggiore.
+    \item \textbf{Non testano l'esperienza utente.} Verificare che un \emph{endpoint} restituisca i dati corretti non equivale a verificare che l'interfaccia sia comprensibile, accessibile o piacevole. Quella resta una valutazione separata.
+\end{itemize}
+
+In sintesi, i test automatici introdotti nel framework non sono un esercizio formale, ma una \textbf{rete di sicurezza} che cambia il modo in cui il team può lavorare sul codice: rendono possibile modificare con confidenza, scoprono difetti prima che escano dalla macchina di sviluppo, e trasformano la conoscenza ``orale'' del sistema in qualcosa di scritto, eseguibile e verificabile in pochi secondi.
+
+\section{Contesto e obiettivo}
+
+Prima dell'intervento, nessun progetto di test era versionato: l'unica forma di verifica in essere era la prova manuale lato \emph{frontend} e l'osservazione del comportamento in ambienti di sviluppo. Le conseguenze pratiche erano:
+\begin{itemize}
+    \item assenza di una rete di sicurezza in fase di \emph{refactor};
+    \item impossibilità di esercitare cambiamenti nei moduli \emph{core} (\texttt{Sia.Base}, \texttt{Sia.Grid}, \texttt{Sia.Devextreme.Crud}) senza confidare interamente nell'attenzione del revisore;
+    \item nessuna \emph{baseline} oggettiva per misurare il comportamento atteso degli endpoint pubblici al variare dei dati di configurazione.
+\end{itemize}
+
+L'obiettivo dell'intervento è stato duplice: (i) impostare una convenzione di testing replicabile su tutti i moduli del framework, e (ii) fornire una prima copertura concreta sui moduli con maggiore superficie pubblica (\texttt{Sia.Grid} e \texttt{Sia.Devextreme.Crud}), comprensiva di \emph{unit test} e \emph{integration test}.
+
+\section{Modello a due livelli}
+
+La strategia adottata distingue nettamente due livelli, con responsabilità complementari e nessuna sovrapposizione.
+
+\subsection{Unit test sul controller isolato}
+
+\paragraph{Domanda di verifica.} \emph{Il controller fa la cosa giusta dato un service mockato?}
+
+I \emph{unit test} esercitano il singolo controller con tutte le sue dipendenze (\texttt{ISiaLogger}, \texttt{ISessionService}, service di dominio, \texttt{ISignalrService}, \texttt{IPermissionCheckService}) sostituite da \emph{mock}. Il loro scopo è verificare:
+\begin{itemize}
+    \item il tipo del risultato (\texttt{OkObjectResult} \emph{vs.}\ throw di \texttt{SiaLoggerException} \emph{bad-request}/\emph{error});
+    \item gli argomenti passati al \emph{service} di dominio;
+    \item i \emph{side-effect} attesi: invocazione di \texttt{IPermissionCheckService.CheckPermission} con il \texttt{PermissionType} corretto, invio di \texttt{ISignalrService.SendMessage} sulle mutazioni, log di \emph{start}/\emph{ok}/\emph{error};
+    \item la \emph{non}-invocazione del service e di \emph{signalr} sui rami di errore di validazione.
+\end{itemize}
+
+I \emph{unit test} sono deterministici, veloci ($\sim 500$\,ms per progetto), non dipendono da rete o database e girano senza prerequisiti.
+
+\subsection{Integration test end-to-end con database reale}
+
+\paragraph{Domanda di verifica.} \emph{L'intera pipeline (routing, middleware, controller, service, repository) e il database insieme rispondono correttamente per ogni configurazione presente in produzione?}
+
+Gli \emph{integration test} avviano l'host ASP.NET Core in-process tramite \texttt{WebApplicationFactory<Program>}, eseguono richieste HTTP sintetiche contro il \texttt{TestServer} (senza aprire \emph{socket} reali) e lasciano che il flusso attraversi tutti gli strati fino al database vero. Per ogni componente di tipo griglia presente nella tabella \texttt{component.Components} viene fatta una chiamata reale all'endpoint \texttt{POST /api/grid-core/page} e si asserisce che la risposta sia \texttt{200 OK} con un \texttt{totalCount} numerico $\ge 0$.
+
+Questo livello esercita ciò che gli \emph{unit test} per costruzione non possono toccare:
+\begin{itemize}
+    \item \emph{routing}, \emph{model binding}, middleware di autenticazione/autorizzazione e di \emph{problem-details};
+    \item esecuzione reale delle \emph{stored procedure} su MSSQL;
+    \item integrazione con il sistema di permessi e la sessione utente (sostituiti da un \texttt{TestAuthHandler} che impersona un utente noto del DB);
+    \item correttezza della configurazione \emph{per-componente} memorizzata nelle tabelle \texttt{component.Components}, \texttt{component.Layouts}, ecc.
+\end{itemize}
+
+\section{Stack tecnologico}
+
+Le decisioni di stack sono state condivise tra i due livelli per ridurre il \emph{context switch} dello sviluppatore:
+
+\begin{description}
+    \item[Test framework: xUnit.] Standard \emph{de facto} per .NET, già supportato nativamente da \texttt{dotnet test} e da Visual Studio. Viene usato il \emph{pattern} \texttt{[Fact]}/\texttt{[Theory]} con \texttt{[MemberData]} per la parametrizzazione.
+    \item[Mocking: NSubstitute.] Scelto per la sintassi più leggibile rispetto a Moq (\texttt{Returns}/\texttt{Received} \emph{extension methods} su istanze tipizzate, niente \texttt{It.IsAny<T>()} verboso). Il framework non aveva precedenti, quindi la scelta è stata libera.
+    \item[Asserzioni: FluentAssertions.] Migliora la leggibilità degli \emph{assert} (\texttt{Should().BeOfType()}, \texttt{Should().BeSameAs()}, \texttt{ThrowAsync()}) e produce messaggi di errore esplicativi senza richiedere setup aggiuntivo.
+    \item[\emph{Test host}: \texttt{Microsoft.AspNetCore.Mvc.Testing}.] Usato esclusivamente nel livello \emph{integration} per sollevare l'host ASP.NET Core in-process.
+    \item[\emph{Skip} condizionale: \texttt{Xunit.SkippableFact}.] Permette di marcare come \emph{skipped} (e non \emph{failed}) un test quando una pre-condizione ambientale non è soddisfatta (database non raggiungibile, nessun componente di tipo griglia, ecc.).
+\end{description}
+
+\section{Convenzione di scaffolding}
+
+Per garantire consistenza tra moduli è stata definita una struttura standard, formalizzata come regola dell'agente di sviluppo \texttt{sia-server-developer} in \texttt{.claude/agents/sia-server-developer.md}: \emph{ogni nuovo modulo creato in \texttt{Sia.Server.Framework/Core/} deve essere accompagnato dalla creazione di un progetto di test gemello in \texttt{Sia.Server.Framework/Test/Unit/\{ModuloX\}.Tests/}}.
+
+\begin{verbatim}
+Test/
++-- Unit/
+|   +-- Sia.Grid.Tests/
+|   |   +-- Sia.Grid.Tests.csproj
+|   |   +-- Usings.cs
+|   |   +-- README.md
+|   |   +-- Controllers/
+|   |       +-- GridControllerTestBase.cs
+|   |       +-- GridDataControllerTests.cs
+|   +-- Sia.Devextreme.Crud.Tests/
+|       +-- ... (stessa struttura)
++-- Integration/
+    +-- Sia.Grid.IntegrationTests/
+        +-- Sia.Grid.IntegrationTests.csproj
+        +-- Usings.cs
+        +-- README.md
+        +-- GridDataEndpointTests.cs
+        +-- Fixtures/
+            +-- SiaWebApplicationFactory.cs
+            +-- TestAuthHandler.cs
+            +-- AllowAllPermissionCheckService.cs
+            +-- GridComponentIdsProvider.cs
+\end{verbatim}
+
+\section{Caso pilota: unit test del modulo \texttt{Sia.Grid}}
+
+Il modulo \texttt{Sia.Grid} è stato scelto come pilota per la sua superficie pubblica significativa: il \texttt{GridDataController} espone dieci \emph{endpoint} (\texttt{page}, \texttt{summary}, \texttt{insert}, \texttt{header-filter}, \texttt{update}, \texttt{delete}, \texttt{star}, \texttt{massive-delete}, \texttt{find-selected-index}, \texttt{cancel/\{requestId\}}) coprendo i pattern di \emph{read}, mutazione, validazione, cancellazione di richieste in corso.
+
+\subsection{Helper condiviso: \texttt{GridControllerTestBase}}
+
+Tutte le classi di test ereditano da una \texttt{TestBase} che concentra il \emph{setup} dei \emph{mock} delle sei dipendenze (\texttt{Logger}, \texttt{SessionService}, \texttt{ComponentService}, \texttt{GridDataService}, \texttt{SignalrService}, \texttt{PermissionService}) e degli \emph{helper} ricorrenti per simulare le eccezioni del \emph{logger}:
+\begin{itemize}
+    \item \texttt{ConfigureLoggerBadRequest(string)}: fa ritornare al \emph{logger} la \texttt{SiaLoggerException} \emph{bad-request} attesa quando il controller invoca \texttt{LogBadRequest}, e ne restituisce l'istanza per la verifica con \texttt{Should().BeSameAs(...)};
+    \item \texttt{ConfigureLoggerErrorException(Exception)}: analogo per \texttt{LogErrorException}, con possibilità di passare l'eccezione interna originale.
+\end{itemize}
+La \texttt{TestBase} prepara inoltre il \texttt{ControllerContext} con \texttt{HttpContext}, \texttt{ClaimsPrincipal} e \texttt{RequestServices}, evitando duplicazione \emph{boilerplate} tra i test.
+
+\subsection{Pattern di copertura}
+
+Per ogni endpoint si applicano almeno due test, tre per le mutazioni:
+
+\begin{description}
+    \item[\texttt{\{Method\}\_WithValidInput\_ReturnsOk\dots}:] esercita il ramo positivo. Verifica il tipo di \texttt{IActionResult}, l'identità del \emph{payload} ritornato, l'invocazione del service con i parametri corretti, le chiamate a \texttt{Logger.LogRequestStart}/\texttt{LogRequestOk}, l'invocazione di \texttt{PermissionService.CheckPermission} con il giusto \texttt{PermissionType} e — sulle mutazioni — l'invio di \texttt{SignalrService.SendMessage}.
+    \item[\texttt{\{Method\}\_With\{Empty|Null\}ComponentId\_ThrowsBadRequest\dots}:] esercita il ramo di validazione. Verifica che il \emph{logger} abbia ricevuto \texttt{LogBadRequest}, che il service \emph{non} sia invocato e che \emph{signalr} \emph{non} venga notificato.
+    \item[\texttt{\{Method\}\_WhenServiceThrows\_PropagatesLoggerException\dots}:] esercita il ramo eccezionale. Configura il service per lanciare un'eccezione interna, verifica che il controller la riavvolga in \texttt{SiaLoggerException} (o la rilanci, a seconda del pattern \texttt{catch} usato dal singolo endpoint), e che \emph{signalr} \emph{non} sia chiamato sui percorsi di errore di mutazione.
+\end{description}
+
+\subsection{Test della cancellazione richieste}
+
+Un test in particolare esercita il meccanismo statico \texttt{\_activeCancellationTokens} di \texttt{BaseApiController}: viene avviata una \texttt{GetPageItems} \emph{mockata} che si blocca su \texttt{Task.Delay(Timeout.Infinite, token)}, quindi viene invocata in parallelo \texttt{CancelRequest("req-cancel-1")}; il test verifica che il primo \texttt{Task} si risolva con \texttt{ObjectResult} di status \texttt{499}, validando di fatto il branch \texttt{OperationCanceledException} del controller e l'integrazione con il \emph{token store} statico.
+
+\subsection{Replica sul modulo \texttt{Sia.Devextreme.Crud}}
+
+Lo stesso schema è stato replicato sul \texttt{CrudDataController}, con copertura completa dei dieci \emph{endpoint} (\texttt{Get}, \texttt{Insert}, \texttt{Update}, \texttt{MassiveUpdate}, \texttt{Merge}, \texttt{Delete}, \texttt{FindPossibleMatch}, \texttt{GenerateCrudStoredProcedure}, \texttt{GetNotificationUsers}, \texttt{InsertImages}). La sola differenza significativa è la presenza di un meccanismo di \emph{impersonation} (\texttt{ImpersonatedUserId}) letto da una \emph{claim} ad hoc: la \texttt{TestBase} espone \texttt{BuildSutWithImpersonatedUser(int)} che inietta una \texttt{Claim("impersonatedUserId", value)} sul \texttt{ClaimsIdentity}.
+
+L'esercizio ha portato all'emersione di alcune asimmetrie del modulo (di per sé non bug, ma scelte non documentate): due \emph{pattern} di \texttt{catch} usati distintamente nei diversi \emph{endpoint}, un overload nascosto di \texttt{InsertImages}, due \emph{overload} di \texttt{ISignalrService.SendMessage} usati in modo non uniforme. Ciascuna di queste è stata annotata nei commenti dei test e nel \texttt{README.md} del progetto, fornendo un punto di riferimento per chi modificherà in futuro quel controller.
+
+\section{Integration test del modulo \texttt{Sia.Grid}}
+
+Il livello \emph{integration} è stato esercitato sul medesimo modulo \texttt{Sia.Grid} per chiudere il cerchio fra logica isolata e sistema vero. Il progetto \texttt{Sia.Grid.IntegrationTests} avvia l'host \texttt{Sia.Devs} in-process e itera con \texttt{[Theory]} su tutti i \emph{componentId} di tipo \texttt{sia-grid} letti dinamicamente dal database locale.
+
+\subsection{Sfide affrontate e soluzioni adottate}
+
+L'attivazione del \texttt{WebApplicationFactory} su un'app pre-esistente ha richiesto l'aggiramento di tre ostacoli specifici del framework, di cui il primo non documentato in letteratura.
+
+\paragraph{1. \texttt{HostAbortedException} ingoiata dal \texttt{Program.cs}.}
+
+Il \texttt{Program.cs} di \texttt{Sia.Devs} avvolge l'avvio in un \texttt{try/catch (Exception)} che cattura ogni eccezione, inclusa la \texttt{HostAbortedException} che il meccanismo \texttt{HostFactoryResolver} di ASP.NET Core lancia per ``rubare'' l'\texttt{IHost} costruito durante la chiamata di test. Il risultato era il messaggio \texttt{The server has not been started or no web application was configured} ad ogni \texttt{CreateClient()}. La soluzione canonica (aggiungere \texttt{when (ex is not HostAbortedException)} al \emph{catch}) avrebbe richiesto di modificare il \texttt{Program.cs}; per evitare un \emph{change} invasivo, la \texttt{SiaWebApplicationFactory} sostituisce completamente il flusso ricostruendo l'\texttt{IHost} a partire da una replica controllata di \texttt{BaseApplicationBuilder.ConfigureAndStartApplication}, con \texttt{builder.WebHost.UseTestServer()} al posto del server reale.
+
+\paragraph{2. \emph{Application parts} non scoperte in modalità test.}
+
+Una volta avviato l'host, \texttt{app.MapControllers()} falliva con \texttt{Reporting\-Configuration\-Exception:Cannot find a custom WebDocumentViewerController class descendant} — \texttt{DevExpress.Reporting} cercava un \emph{controller} fra le \texttt{ApplicationParts} ma queste, in modalità test, includevano solo l'assembly di \texttt{Sia.Devs} e non gli assembly dei moduli referenziati. La \emph{factory} aggiunge esplicitamente come \texttt{ApplicationPart} gli assembly di tutti gli \texttt{IBaseContainerExtensions} usati dall'host, risolvendo simultaneamente il \emph{report viewer} e l'\emph{eventuale} 404 sui controller dei moduli.
+
+\paragraph{3. Autenticazione e permessi.}
+
+Gli \emph{endpoint} sono decorati con \texttt{[Authorize]} e ogni \texttt{BaseApiController} chiama \texttt{IPermissionCheckService.CheckPermission}. La \emph{factory} registra uno schema di autenticazione \texttt{Test} (\texttt{TestAuthHandler}) che impersona un utente con \texttt{userId} fisso configurabile, e sostituisce \texttt{IPermissionCheckService} con una implementazione \texttt{AllowAll} (test-only, mai compilata in produzione) per evitare di toccare le tabelle utenti del database con un id sintetico.
+
+\subsection{Recupero dinamico dei \emph{componentId}}
+
+La fixture \texttt{GridComponentIdsProvider} interroga il database locale al momento della raccolta dei dati per \texttt{[Theory]}:
+
+\begin{verbatim}
+SELECT [Id], [ConnectionName]
+FROM   [component].[V_Components]
+WHERE  [TypeId] = 'sia-grid'
+ORDER BY [Id]
+\end{verbatim}
+
+I \emph{componentId} con \texttt{ConnectionName} non risolvibile nel sistema di test vengono filtrati a monte, evitando fallimenti dovuti a \emph{connection} non configurate localmente. Se il database non è raggiungibile o il filtro non produce alcun \emph{componentId}, la \emph{theory} emette un singolo elemento \emph{sentinella} che fa skippare tutti i test con messaggio chiaro, senza far fallire la \emph{suite}.
+
+\section{Integration test del modulo \texttt{Sia.Devextreme.Crud}}
+
+L'esperienza maturata sugli \emph{integration test} di \texttt{Sia.Grid} è stata replicata sul modulo \texttt{Sia.Devextreme.Crud}, che gestisce la lettura e la scrittura dei singoli \emph{record} associati a un componente di tipo CRUD. La sfida è qui significativamente maggiore: mentre il \texttt{GridDataController} è essenzialmente di sola lettura (l'iterazione su $138$ griglie produce solo \texttt{SELECT}), il \texttt{CrudDataController} effettua mutazioni (\texttt{INSERT}, \texttt{UPDATE}, \texttt{DELETE}) sulle tabelle di dominio, con tutti i conseguenti problemi di isolamento, idempotenza e \emph{cleanup}.
+
+Per affrontare questa complessità in modo graduale è stato adottato un approccio a due fasi.
+
+\subsection{Fase 1: smoke test sul Get di tutti i componenti}
+
+In analogia a quanto fatto per \texttt{Sia.Grid}, è stato creato il progetto \texttt{Sia.Devextreme.Crud.IntegrationTests} che riusa per intero le \emph{fixture} di \texttt{Sia.Grid.IntegrationTests} (\texttt{SiaWebApplicationFactory}, \texttt{TestAuthHandler}, \texttt{AllowAllPermissionCheckService}) tramite un \texttt{ProjectReference} dedicato — un solo punto di manutenzione per l'infrastruttura di test condivisa.
+
+Il provider \texttt{CrudComponentIdsProvider} interroga il database con il filtro \texttt{TypeId = 'crud'} ed enumera tutti i componenti CRUD presenti. Per ciascuno, una \texttt{[Theory]} esegue una chiamata \texttt{GET /api/CrudData/page} con \texttt{jsonData} a stringa vuota e asserisce che la risposta sia \texttt{200 OK} oppure \texttt{204 NoContent} con \emph{payload} JSON \emph{parseable}.
+
+\paragraph{Decisione tecnica: accettare \texttt{204 NoContent}.} Il controller invoca \texttt{Ok((object?)null)} quando il record richiesto risulta vuoto; ASP.NET Core serializza questa forma come \texttt{204 NoContent} anziché \texttt{200 OK}. Senza accettare entrambe le forme, $40$ test su $65$ sarebbero falliti su una \emph{shape} legittima del payload. Si è optato per un'asserzione tollerante che riconosca entrambi i codici come ``successo''.
+
+\paragraph{Mitigazione di un NRE noto.} Durante l'esplorazione del modulo è emerso che il metodo \texttt{CrudDataService.Get} esegue \texttt{crudRequest.Filter.Equals(\textquotedbl test\textquotedbl)} senza verificare che \texttt{Filter} sia diverso da \texttt{null}. Coerentemente con il vincolo di non applicare \emph{fix} ``al volo'' sul codice di produzione durante la stesura dei test, la mitigazione è stata circoscritta al payload del test: passando \texttt{Filter = ""} (stringa vuota) il \emph{branch} problematico diventa inerte, evitando il \emph{NullReferenceException} senza alterare il comportamento dell'eseguibile.
+
+\paragraph{Esito.} $56$ test su $65$ \emph{green} al primo \texttt{dotnet test}; i $9$ fallimenti residui ricalcano il pattern già osservato per \texttt{Sia.Grid}: $4$ componenti puntano alla \texttt{ConnectionName} \texttt{ai} (PostgreSQL non disponibile localmente) e $5$ presentano \emph{stored procedure} con sintassi malformata sul \emph{database} di sviluppo (\texttt{Incorrect syntax near the keyword 'FROM'}). Tutti i fallimenti sono diagnostici, con messaggio HTTP $500$ chiaramente attribuibile a problemi di configurazione o di dati, non al codice del controller.
+
+\paragraph{Skip list dei componenti non testabili.} A valle dei primi run è emersa la necessità di distinguere i \emph{componentId} legittimamente non eseguibili lato test (es.\ form action-only privi di sorgente di lettura, componenti che richiedono una \emph{connection} non configurata localmente, \emph{stored procedure} malformate sul DB di sviluppo) dai veri fallimenti. È stata quindi introdotta una \emph{skip list} dichiarativa, file \texttt{SkippedComponents.json} caricato come risorsa \emph{embedded} dell'assembly di test, con struttura per \emph{componentId} che riporta motivazione e categoria (\texttt{no-get}, \texttt{missing-connection}, \texttt{malformed-sp}). Il \emph{loader} viene interrogato dal test prima di ogni asserzione e produce uno \texttt{Skip.If} esplicito (con motivo nel report xUnit), trasformando esiti rumorosi in \emph{skipped} tracciati e revisionabili in un unico punto.
+
+\subsection{Fase 2: test del ciclo di vita CRUD completo}
+
+Il livello successivo verifica non solo la lettura ma l'intero ciclo \emph{Create $\rightarrow$ Get $\rightarrow$ Update $\rightarrow$ Delete} su un \emph{set} curato di componenti rappresentativi. Estendere questo approccio a tutti i ${\sim}\!150$ componenti CRUD del framework sarebbe impraticabile: ciascuno ha schema, vincoli di integrità, \emph{foreign key} e \emph{stored procedure} specifiche, e scrivere \emph{payload} validi richiede conoscenza puntuale di ogni singolo dominio.
+
+È stato inizialmente scelto un \emph{set} pilota di quattro componenti che coprono altrettanti pattern strutturali distinti del framework:
+\begin{description}
+    \item[\texttt{crud-actions}] tabella diretta senza \emph{stored procedure} CRUD: il \texttt{BaseCrudDataRepository} esegue \texttt{INSERT}/\texttt{UPDATE}/\texttt{DELETE} sulla tabella \texttt{action.Actions} con generazione \texttt{IDENTITY} dell'\texttt{Id}.
+    \item[\texttt{crud-menu}] \emph{stored procedure} \texttt{component.SP\_CrudMenu} con chiave primaria di tipo \texttt{varchar} (l'\texttt{Id} è specificato dall'utente, non auto-generato).
+    \item[\texttt{crud-user}] \emph{stored procedure} \texttt{user.SP\_CrudUsers} con \texttt{IDENTITY} numerica e numerose \emph{foreign key} verso tabelle di lookup (\texttt{Languages}, \texttt{Roles}, \texttt{Departments}).
+    \item[\texttt{crud-companyprofile}] \emph{stored procedure} \texttt{profile.SP\_CrudCompanyProfiles} con \emph{soft-delete} (la \texttt{DELETE} imposta \texttt{Active=0} anziché rimuovere fisicamente la riga).
+\end{description}
+
+A valle del consolidamento dell'infrastruttura, il \emph{set} è stato esteso a \textbf{12 componenti} per coprire ulteriori pattern strutturali del framework, in particolare le \emph{primary key composite}: \texttt{crud-annotation}, \texttt{crud-components}, \texttt{crud-department}, \texttt{crud-excel-procedure}, \texttt{crud-modules}, \texttt{crud-userdefaults}, \texttt{crud-user-profile} (vari pattern intermedi su SP standard) e \texttt{crud-signalr} (PK composita \texttt{(SenderId, MessageTypeId, RecepientId)}). L'estensione ha richiesto di generalizzare il campo \texttt{keyFields} dello \emph{scenario} JSON da \texttt{string} singolo a \texttt{IList<string>}, in modo che la stessa pipeline supportasse trasparentemente sia chiavi singole sia composite.
+
+\paragraph{Configurazione \emph{data-driven}.} Ogni componente è descritto da un file JSON in \texttt{Scenarios/<componentId>.json}, \emph{embedded} come risorsa nell'\emph{assembly} di test, con la struttura:
+
+\begin{verbatim}
+{
+  "componentId": "crud-companyprofile",
+  "create":  { "payload": { /* campi minimi richiesti */ } },
+  "get":     { "expectedFields": [ /* asserzioni shape */ ] },
+  "update":  { "modifiedFields": { /* delta da applicare */ } },
+  "delete":  {
+    "byField": "Id",
+    "deleteMode": "soft",
+    "softDeleteExpectedFields": { "active": false }
+  }
+}
+\end{verbatim}
+
+I campi obbligatori per \texttt{crud-menu} sono stati ricavati direttamente dal file di \emph{perspective} del componente (\texttt{Configurations/perspectives/core/crud/crud-menu/all/unprocessed\_*.json}), garantendo che il \emph{payload} di test rifletta esattamente i vincoli dichiarati dalla configurazione del frontend.
+
+\paragraph{Esecuzione.} La classe \texttt{CrudLifecycleTests} esegue per ogni \emph{scenario}:
+\begin{enumerate}
+    \item \texttt{POST /api/CrudData/insert} con il \emph{payload} di create $\rightarrow$ verifica del codice di stato e cattura dell'\texttt{Id} generato;
+    \item \texttt{GET /api/CrudData/page} sul record appena creato $\rightarrow$ verifica della \emph{shape};
+    \item \texttt{PUT /api/CrudData/update} con \emph{merge} dei \texttt{modifiedFields} sul record corrente (simulando il comportamento del frontend);
+    \item \texttt{GET} di verifica intermedia con asserzione che i campi modificati riflettano il nuovo valore;
+    \item \texttt{DELETE /api/CrudData/delete} sul record;
+    \item \texttt{GET} finale con asserzione differenziata in base alla modalità di \emph{delete} dichiarata nello scenario JSON: per \texttt{deleteMode=hard} il record deve essere assente, per \texttt{deleteMode=soft} il record deve essere ancora presente ma con i campi specificati in \texttt{softDeleteExpectedFields} (es. \texttt{active=false}).
+\end{enumerate}
+
+In caso di fallimento intermedio, un blocco \texttt{try/finally} esegue una \texttt{DELETE} \emph{best-effort} sul record creato, evitando di lasciare residui in caso di errore al passo $3$ o $4$.
+
+\paragraph{Isolamento.} La classe è marcata con \texttt{[Collection("CrudWriteSerial")]} e la \emph{collection} è definita con \texttt{DisableParallelization = true}: i test che scrivono nel database vengono eseguiti in serie, evitando \emph{race condition} e violazioni di \emph{unique constraint} fra esecuzioni concorrenti.
+
+\paragraph{Supporto soft-delete come pattern riutilizzabile.} Il \emph{branch} \texttt{deleteMode=soft} non è specifico di \texttt{crud-companyprofile}: è stato implementato in \texttt{CrudLifecycleScenario.cs} e \texttt{CrudLifecycleTests.cs} come funzionalità del \emph{framework} di test, riutilizzabile per qualsiasi entità con cancellazione logica (utenti disattivati, contatti archiviati, ecc.). L'asserzione di confronto è tollerante: i bit SQL ($0$/$1$) vengono trattati come equivalenti ai \emph{boolean} JSON ($\mathit{false}$/$\mathit{true}$) per evitare falsi negativi dovuti a serializzazione.
+
+\subsection{Blocker scoperto: i synonym dell'audit log}
+
+Al primo tentativo di esecuzione, tutti e quattro i \emph{lifecycle test} fallivano allo step \texttt{INSERT} con un errore SQL identico:
+
+\begin{verbatim}
+Synonym 'X_Log' refers to an invalid object.
+\end{verbatim}
+
+L'investigazione sul database di sviluppo (\texttt{10.1.1.122\textbackslash WEB.SviluppiPez}) ha rivelato che ogni tabella di dominio ha associato un \emph{trigger} di audit \texttt{TR\_LOG\_<Tabella>} che inserisce una riga in una tabella \texttt{<schema>.<tabella>\_Log}. Su quel server, $316$ di queste tabelle di log erano in realtà \emph{synonym} che puntavano al database \texttt{[CoreDBLog]}, il quale tuttavia \emph{non esisteva} sul server. Il risultato era che ogni \texttt{INSERT}/\texttt{UPDATE}/\texttt{DELETE} sulle tabelle di dominio falliva sulla risoluzione del \emph{synonym}, indipendentemente dal fatto che il \emph{trigger} contenesse una guardia \texttt{IF OBJECT\_ID('...Log', 'SN') IS NOT NULL}: l'errore di metadati propaga prima dell'esecuzione del corpo del \emph{trigger}.
+
+Il blocker era preesistente e indipendente dai test (riproducibile da \emph{SQL Server Management Studio}), ma colpiva ogni operazione di scrittura. Sono state proposte due opzioni:
+\begin{description}
+    \item[Opzione minimale.] \texttt{DROP} dei $316$ \emph{synonym} \texttt{*\_Log}. Conseguenza: gli \texttt{INSERT}/\texttt{UPDATE}/\texttt{DELETE} smettono di provare a scrivere sull'audit log (la guardia \texttt{OBJECT\_ID} del trigger ora cattura l'assenza dell'oggetto); l'audit di fatto non era comunque attivo, dato che scriveva su un database inesistente.
+    \item[Opzione completa.] Creazione del database \texttt{CoreDBLog} con tutte le $316$ tabelle \texttt{*\_Log}. L'audit funzionerebbe correttamente, al costo di mantenere un database aggiuntivo che produce log non utilizzati dal flusso di sviluppo.
+\end{description}
+
+È stata scelta l'opzione minimale per ragioni di rischio (modifica reversibile, nessuna creazione di nuovi oggetti) e di onestà (l'audit non era mai stato attivo realmente sul server di sviluppo).
+
+\paragraph{Esito finale dei \emph{lifecycle test}.} Dopo il \texttt{DROP} dei \emph{synonym} tutti i \emph{lifecycle test} passano in modo deterministico: i quattro pilota originari (\texttt{crud-user}, \texttt{crud-companyprofile}, \texttt{crud-actions}, \texttt{crud-menu}) e i successivi otto introdotti con l'estensione (fra cui \texttt{crud-signalr} con PK composita), per un totale di $12/12$ \emph{green}. Il caso di \texttt{crud-companyprofile} ha validato sul campo l'estensione \texttt{deleteMode=soft} del \emph{framework} di test, che da quel momento è disponibile per i futuri scenari con cancellazione logica; il caso di \texttt{crud-signalr} ha validato il supporto a \texttt{keyFields} multipli, anch'esso reso parte stabile dell'infrastruttura.
+
+\subsection{Lifecycle test del modulo \texttt{Sia.Grid}}
+
+Lo stesso schema \emph{data-driven} è stato successivamente replicato anche sul modulo \texttt{Sia.Grid}, nonostante il \texttt{GridDataController} sia primariamente di lettura: gli \emph{endpoint} \texttt{insert}, \texttt{update} e \texttt{delete} esistono e meritano una verifica end-to-end indipendente da quella già coperta lato \texttt{Sia.Devextreme.Crud}. È stato selezionato un \emph{set} di sei griglie pilota su \emph{lookup table} semplici, scelte per minimizzare le \emph{foreign key} richieste dal \emph{payload} di test: \texttt{grid-languages}, \texttt{grid-discount-types}, \texttt{grid-companies-types}, \texttt{grid-receipt-categories}, \texttt{grid-todo-priorities} e \texttt{grid-lead-statuses}. La pipeline è la medesima dei \emph{lifecycle CRUD} (INSERT $\rightarrow$ PAGE $\rightarrow$ UPDATE $\rightarrow$ PAGE $\rightarrow$ DELETE $\rightarrow$ PAGE), eseguita in \emph{collection} serializzata (\texttt{[Collection("GridWriteSerial")]}) per evitare \emph{race condition} sulle scritture. Esito: $6/6$ \emph{green}.
+
+\subsection{Summary test del modulo \texttt{Sia.Grid}}
+
+Un terzo livello di \emph{integration test}, specifico del modulo \texttt{Sia.Grid}, è stato dedicato all'endpoint \texttt{POST /api/grid-core/summary}, responsabile del calcolo aggregato (\texttt{sum}, \texttt{avg}, \texttt{count}, \texttt{min}, \texttt{max}) sui dati paginati. La \emph{theory} è completamente \emph{data-driven}: il provider \texttt{GridSummaryColumnsProvider} scansiona a \emph{runtime} le \emph{perspective} JSON in \texttt{Configurations/perspectives/core/grid/} e individua le griglie che dichiarano almeno una colonna con \texttt{summaryColEnable: true} e \texttt{summaryType} valorizzato; per ciascuna, costruisce dinamicamente il \emph{payload} di summary e asserisce \texttt{200 OK} con risposta serializzabile. Esito tipico: $9/10$ \emph{green}, $1$ \emph{skipped} (\texttt{grid-scheduled-splitted-jobs} dichiara \texttt{summaryType=sum} su una colonna \texttt{varchar} — \emph{misconfiguration} non risolvibile lato test, ma correttamente segnalata e tracciata).
+
+\section{Test del frontend Angular}
+
+Parallelamente all'introduzione dei test sul \emph{backend}, è stata avviata una baseline di test automatici anche sul lato \emph{frontend} (\texttt{Sia.Angular.Framework}). Anche qui, prima dell'intervento, nessun progetto di test era versionato: l'unica forma di verifica era la prova manuale dell'interfaccia. La strategia adottata ricalca il modello a due livelli del \emph{backend}, con stack diversi ma divisione delle responsabilità analoga.
+
+\subsection{Modello a due livelli sul frontend}
+
+\begin{description}
+    \item[\emph{Unit test} con \textbf{Vitest}.] Verificano in isolamento la logica TypeScript pura di servizi, \emph{API client}, \emph{directive} e componenti senza \emph{render} pesante del template (HTTP \emph{client} sostituito da \emph{mock}, \emph{signal input} settati direttamente sull'istanza). Sono deterministici, veloci ($\sim$secondi sull'intero \emph{workspace}) e non richiedono \emph{browser} né \emph{backend} attivo. \emph{Domanda di verifica:} ``il singolo modulo TypeScript fa la cosa giusta dato \emph{input} controllati?''.
+    \item[\emph{End-to-end test} con \textbf{Playwright}.] Esercitano il portale realmente avviato (\emph{frontend} \texttt{ng serve} + \emph{backend} \texttt{Sia.Devs}) tramite browser \emph{headless} Chromium, navigando come un utente reale: \emph{login} via UI, click sul menu, attesa del \emph{render} della tabella, interazione con paginatore e filtri, \emph{download} \emph{file}, intercettazione di richieste HTTP. \emph{Domanda di verifica:} ``il sistema completo (DOM, routing Angular, chiamate al \emph{backend}, dati reali del database) si comporta come atteso quando un utente lo usa?''.
+\end{description}
+
+I due livelli sono complementari e non si sovrappongono: ciò che gli \emph{unit test} verificano in isolamento (logica di trasformazione, costruzione \emph{payload}, gestione \emph{observable}) non è ri-verificato dagli E2E; ciò che gli E2E esercitano sul DOM e sull'integrazione HTTP non è simulabile via Vitest senza un costo di \emph{set-up} sproporzionato.
+
+\subsection{Stack tecnologico frontend}
+
+\begin{description}
+    \item[\textbf{Vitest 2.x}] come \emph{test runner} \emph{unit}: integrazione nativa con il \emph{toolchain} Vite usato dal \emph{workspace}, sintassi compatibile con Jest, esecuzione parallela, \emph{coverage} via \texttt{v8} con \emph{report} \texttt{text}/\texttt{html}/\texttt{lcov}. La risoluzione dei \emph{path mappings} di \texttt{tsconfig.json} è gestita da \texttt{vite-tsconfig-paths}; l'ambiente di test è \texttt{jsdom} per simulare il DOM del \emph{browser} senza avviarne uno reale.
+    \item[\textbf{Playwright 1.x}] come \emph{test runner} E2E: \emph{auto-wait} integrato sui \emph{locator} (riduce drasticamente la \emph{flakiness} rispetto a Selenium), API \emph{first-class} per intercettazione richieste HTTP (\texttt{page.route}), \emph{download}, \emph{trace} interattivo con replay temporale di ogni \emph{step} su \emph{failure}, \emph{video} \emph{retain-on-failure}.
+\end{description}
+
+\subsection{Unit test del modulo \texttt{sia-grid} (Vitest)}
+
+Come modulo pilota è stato scelto \texttt{sia-grid}, la libreria responsabile del \emph{rendering} delle griglie dati nel portale, in simmetria con il modulo pilota lato \emph{backend} (\texttt{Sia.Grid}). La copertura iniziale, distribuita su circa una decina di file \texttt{*.spec.ts} accanto al codice di produzione (convenzione standard Angular/Vitest), include:
+
+\begin{description}
+    \item[\texttt{SiaGridApi} e \texttt{GridConfApi}] (\emph{API client}): verifica della costruzione corretta delle \texttt{HttpRequest}, dei \emph{path}, dei \emph{query parameters}, della serializzazione del \emph{payload} e della propagazione degli errori.
+    \item[\texttt{SiaGridService}, \texttt{GridConfigService}] (servizi): logica di stato e di trasformazione sui dati delle colonne, gestione della cache delle configurazioni, comportamento sugli \emph{observable}.
+    \item[\texttt{ResizeColumnsDirective}] (\emph{directive}): comportamento del \emph{drag} sulle \emph{handle} di resize, calcolo del delta, propagazione dell'evento di salvataggio.
+    \item[\texttt{SiaMatGridConfiguratorColumn}, \texttt{Columns}, \texttt{General}] (componenti del configuratore): logica di binding dei form e validazione, esercitata senza \emph{render} pesante del template DevExpress.
+    \item[\texttt{SiaMultiGridComponent}] (componente): logica pubblica del \emph{wrapper} multi-griglia.
+\end{description}
+
+\paragraph{Debito tecnico tracciato.} Il componente \texttt{SiaMatGridComponent} (oltre $4900$ righe, accoppiato a \emph{DevExtreme}, \texttt{exceljs}, \texttt{mark.js}, \texttt{jquery}, \emph{dialog} Material e SignalR) non è stato testato \emph{a tappeto} nella baseline: il costo di \emph{set-up} con \emph{stub} massicci non è giustificato finché la logica pura (costruzione del \texttt{WHERE} SQL dai filtri colonna, costruzione dell'\texttt{ORDER BY} con \emph{group columns}, \texttt{processRowStyle} con cache su \texttt{rowIndex}) non sarà estratta in moduli \emph{stand-alone}. Il file \texttt{sia-mat-grid.component.spec.ts} esiste come \emph{placeholder} con tre \texttt{it.skip} che fungono da contratto del \emph{follow-up} di refactoring, evitando che il debito si dissolva nella memoria del team.
+
+\paragraph{Vincolo di compatibilità della \emph{toolchain}.} Vitest 2.x e \texttt{@analogjs/vite-plugin-angular} 2.5 risultano incompatibili (il \emph{plugin} richiede Vite 6+, Vitest 2.x usa Vite 5). Per la baseline si è scelto di eseguire gli \emph{spec} con il \emph{transformer} standard di Vite (\texttt{esbuild}) senza il \emph{plugin} Angular, restringendo gli \emph{spec} a logica pura, \emph{API HTTP}, \emph{directive} e componenti senza \emph{fixture}/\texttt{detectChanges}. La nota è documentata nel \texttt{vitest.config.mts} per essere ripresa al prossimo \emph{bump} della \emph{toolchain}.
+
+\subsection{Cos'è Playwright}
+
+Playwright è un \emph{framework} \emph{open-source} sviluppato da Microsoft (rilasciato pubblicamente nel $2020$) per l'automazione di \emph{browser}. In una sola frase: è uno strumento che permette di scrivere programmi che \textbf{guidano un \emph{browser} reale come farebbe un utente umano}, ma in modo deterministico, riproducibile e velocissimo. Il programma scritto dallo sviluppatore dice: ``apri il portale a questo indirizzo, clicca su \emph{Elenco Componenti}, attendi che la tabella compaia, conta quante righe ci sono''; Playwright esegue letteralmente queste azioni dentro un \emph{browser} Chromium (o Firefox, o WebKit) e riferisce se l'esito coincide con l'atteso.
+
+Per inquadrarlo nel panorama: Playwright appartiene alla famiglia degli strumenti di \emph{browser automation}, di cui i due esponenti storici più noti sono Selenium (esistente da oltre un decennio) e Cypress (più recente). Rispetto a Selenium, Playwright nasce con due vantaggi strutturali: gestione nativa del \emph{tab management} e dei \emph{download}, \emph{auto-wait} integrato sui \emph{locator} (vedi più sotto). Rispetto a Cypress, supporta \emph{out-of-the-box} test multi-tab, multi-origine e tre motori \emph{browser} differenti.
+
+\subsection{Cosa testano i test E2E con Playwright}
+
+I test \emph{end-to-end} (E2E) si distinguono dagli \emph{unit test} per il livello a cui osservano il sistema:
+
+\begin{description}
+    \item[\emph{Unit test}] esercitano \emph{un singolo modulo} di codice in isolamento — una funzione, un servizio, una classe — sostituendo le sue dipendenze con \emph{mock}. Domanda: ``\emph{questo modulo, dato un input controllato, produce l'output atteso?}''.
+    \item[\emph{End-to-end test}] esercitano \emph{l'intero sistema} dal punto di vista di chi lo usa. Niente \emph{mock}: il \emph{frontend} è quello vero (\texttt{ng serve} che serve l'app Angular compilata), il \emph{backend} è quello vero (\texttt{Sia.Devs} avviato in \emph{locale}), il \emph{database} è quello vero. Domanda: ``\emph{quando un utente apre il portale e fa una sequenza di azioni, vede il risultato che dovrebbe vedere?}''.
+\end{description}
+
+Concretamente, un test E2E sulla griglia \texttt{components} verifica simultaneamente decine di pezzi che cooperano: il routing Angular instrada correttamente la URL del menu, il componente \texttt{sia-mat-grid} costruisce il \emph{payload} HTTP, il \emph{client} HTTP allega il \emph{token} di autenticazione, il \emph{backend} riceve la \emph{call}, il middleware autorizza, il \emph{controller} delega al \emph{service}, il \emph{repository} esegue la \emph{stored procedure}, il \emph{database} ritorna le righe, la pipeline inversa serializza il \emph{response}, il \emph{client} HTTP lo deserializza, il componente Angular aggiorna il modello, il \emph{template} renderizza il DOM, il \emph{browser} disegna i \emph{pixel} sullo schermo. Un singolo \emph{assert} di Playwright (``la prima riga della tabella è visibile e contiene del testo'') copre questo intero \emph{stack}. È esattamente ciò che gli \emph{unit test} per costruzione \emph{non} possono coprire — e simmetricamente, ciò che gli \emph{unit test} verificano in isolamento (logica pura, casi limite di una funzione) un test E2E non può raggiungere agevolmente perché parte sempre dall'\emph{input} dell'utente.
+
+In sintesi, i test E2E rispondono a un'unica grande domanda: ``\emph{dato un utente che usa il portale come previsto, le funzionalità funzionano?}''. Il loro pregio è essere fedeli alla realtà; il loro costo è essere più lenti (un singolo test impiega secondi, non millisecondi), più \emph{fragili} (qualsiasi modifica al \emph{markup} può invalidare un selettore) e più ``rumorosi'' (richiedono \emph{frontend} e \emph{backend} avviati). Per questo \emph{unit} ed \emph{E2E} sono complementari: si scrivono molti \emph{unit test} (alta copertura sulla logica) e pochi E2E mirati (verifica che le strade principali dell'utente funzionino).
+
+\subsection{Come funziona Playwright}
+
+A livello architetturale, Playwright è composto da tre strati:
+
+\begin{enumerate}
+    \item \textbf{Una libreria client} (in TypeScript/JavaScript, ma anche Python, .NET, Java) che lo sviluppatore importa nei suoi \emph{spec} di test. Questa libreria espone l'API ad alto livello: \texttt{browser}, \texttt{page}, \texttt{locator}, \texttt{expect}, ecc.
+    \item \textbf{Un \emph{driver}} che converte le chiamate dell'API in messaggi del protocollo nativo del \emph{browser} (Chrome DevTools Protocol per Chromium, protocolli equivalenti per Firefox e WebKit). Questo è il pezzo che fa la differenza rispetto a Selenium: Playwright parla direttamente con il \emph{browser} via \emph{web\-socket}, senza passare per il \emph{layer} WebDriver, ottenendo controllo più fine e latenza minore.
+    \item \textbf{Un \emph{test runner}} (\texttt{@playwright/test}) che orchestra l'esecuzione: scopre i file \texttt{*.spec.ts}, gestisce \emph{retries}, parallelismo, \emph{fixtures}, \emph{report}, \emph{trace} e \emph{video}.
+\end{enumerate}
+
+\paragraph{Ciclo di vita di un test.} Quando il \emph{runner} esegue un singolo test, la sequenza è:
+
+\begin{enumerate}
+    \item Lancia un'istanza di Chromium in modalità \emph{headless} (senza finestra grafica visibile, per default — opzionalmente \emph{headed} per il \emph{debug}).
+    \item Crea un \emph{browser context}: è una sorta di profilo \emph{browser} isolato (\emph{cookie}, \emph{cache}, \emph{permissions} indipendenti) che vive solo per la durata del test. Diversi test usano contesti diversi, evitando interferenze.
+    \item Apre una \texttt{page} (una \emph{tab}) dentro il \emph{context}, opzionalmente iniettando uno \emph{storage state} pre-salvato (in questa \emph{suite}: lo stato di un utente già autenticato).
+    \item Esegue il codice dello \emph{spec}: ogni chiamata API (\texttt{page.goto}, \texttt{locator.click}, \texttt{expect(\dots).toBeVisible()}) viene serializzata sul protocollo \emph{browser}, attesa fino a soddisfacimento o \emph{timeout}, e validata.
+    \item Alla fine del test, distrugge il \emph{context} (e tutto ciò che conteneva).
+    \item Se il test è fallito e l'opzione è abilitata, salva sul disco un \emph{trace} (timeline di eventi, screenshot di ogni \emph{step}, \emph{snapshot} del DOM, richieste di rete) e un \emph{video} dell'esecuzione.
+\end{enumerate}
+
+\paragraph{Locator e auto-wait: la differenza rispetto a Selenium.} L'oggetto centrale dell'API è il \texttt{Locator}: una \emph{descrizione} di un elemento del DOM (es.\ ``il \emph{button} con testo \emph{Log In}'', oppure ``la \emph{textbox} con \emph{label} \emph{Username}''), \textbf{non} un riferimento puntuale come l'\texttt{Element} di Selenium. Quando il test invoca \texttt{locator.click()}, Playwright \emph{ri-risolve} il \emph{locator} sul DOM al momento dell'azione, e prima di cliccare verifica una serie di \emph{actionability checks}: l'elemento è collegato al DOM, è visibile, è stabile (non sta animando), riceve gli eventi \emph{pointer} (non è coperto da altro), è abilitato. Se non lo è, ritenta entro il \emph{timeout} configurato (default $30$\,s).
+
+Questo design è la singola innovazione che ha più impatto sulla qualità dei test: con Selenium, era prassi inserire \texttt{Thread.sleep(2000)} arbitrari per ``aspettare che la pagina si stabilizzi'' — generando test lenti e comunque \emph{flaky}. Con Playwright lo \emph{sleep} non è mai necessario: l'attesa è puntuale, automatica e ottimale (l'azione parte appena l'elemento è pronto, mai prima, mai dopo). Lo stesso meccanismo si applica agli \texttt{expect} (\texttt{expect(locator).toBeVisible()} ricontrolla periodicamente fino al \emph{timeout}) e a \texttt{expect.poll(\dots)} per condizioni custom.
+
+\paragraph{Selettori semantici: \texttt{getByRole}.} Per descrivere i \emph{locator}, Playwright incoraggia selettori basati sul \emph{ruolo} ARIA dell'elemento (\texttt{getByRole('button', \{ name: /log in/i \})}) o sul testo visibile (\texttt{getByText}), invece dei classici \emph{CSS selector} legati alla struttura del \emph{markup}. Il vantaggio: i test diventano una specifica leggibile (``c'è un \emph{button} che si chiama \emph{Log In}'') e sopravvivono a \emph{refactor} che rinominano classi CSS o ristrutturano il DOM, purché il significato semantico per l'utente resti invariato. Quando il \emph{markup} non offre \emph{role} o testi affidabili (come nel caso di \texttt{sia-mat-grid}, che usa \emph{custom element} senza ARIA), si ricade su \emph{CSS selector} su \texttt{id}/classi stabili.
+
+\paragraph{Intercettazione del traffico di rete.} Una capacità che gli \emph{unit test} non hanno e che Playwright espone in modo nativo è l'intercettazione delle richieste HTTP del \emph{browser} via \texttt{page.route(pattern, handler)}. Lo \emph{handler} riceve ogni richiesta che matcha il pattern e può: lasciarla passare (\texttt{continue}), rispondere con un \emph{payload} sintetico (\texttt{fulfill}), modificarla, o farla fallire. È il meccanismo che il test \texttt{error-500.spec.ts} sfrutta per simulare un \emph{backend} in errore senza spegnere davvero il \emph{server}. Simmetricamente, \texttt{waitForRequest} e \texttt{waitForResponse} permettono di asserire che una specifica richiesta sia stata effettuata — utile quando si vuole verificare un \emph{side-effect} di rete (es.\ il pulsante \emph{refresh} ha davvero ricaricato i dati dal \emph{backend}).
+
+\paragraph{Trace e diagnostica.} Quando un test fallisce, Playwright salva (se configurato) un \emph{trace file} apribile nel \emph{viewer} ufficiale (\texttt{npx playwright show-trace}). Il \emph{viewer} mostra una \emph{timeline} di tutti gli \emph{step} del test, con per ognuno: lo \emph{snapshot} interattivo del DOM (esplorabile con i DevTools come se fosse una pagina viva), la \emph{console} log del \emph{browser}, le richieste HTTP partite, gli \emph{eventi} di rete in attesa, lo \emph{screenshot} pre- e post-azione. Questa diagnostica trasforma il \emph{debug} di un test fallito da ``aggiungo \texttt{console.log} a tappeto e rilancio'' a ``apro il \emph{trace} e vedo esattamente cosa è successo al \emph{millisecondo}'': è una capacità che da sola giustifica la scelta di Playwright per chi viene da Selenium.
+
+\subsection{Test E2E del modulo \texttt{sia-grid}}
+
+Anche per gli E2E è stato adottato \texttt{sia-grid} come modulo pilota — la \emph{grid} è il componente più ricco di interazione utente del portale, e quindi quello su cui ha più senso investire copertura comportamentale.
+
+\paragraph{Come si traducono questi concetti negli \emph{spec}.} Ogni \emph{spec} dichiara uno o più test che ricevono in \emph{input} un oggetto \texttt{page} (e i \emph{fixture} custom della \emph{suite}) e descrivono in modo procedurale le azioni dell'utente. Il \emph{runner} si occupa di:
+\begin{itemize}
+    \item \textbf{lanciare un'istanza di Chromium} \emph{headless} (senza finestra visibile) e crearne un \emph{browser context} isolato per il test;
+    \item \textbf{iniettare lo \emph{storage state} pre-autenticato} (vedi più sotto), così il test parte già loggato senza ripetere la \emph{form} di \emph{login};
+    \item \textbf{risolvere ogni \emph{locator}} (\texttt{page.getByRole}, \texttt{page.locator(\dots)}) con un meccanismo di \emph{auto-wait}: Playwright attende automaticamente che l'elemento sia presente nel DOM, visibile, stabile e abilitato prima di eseguire l'azione, riducendo drasticamente la \emph{flakiness} tipica di Selenium;
+    \item \textbf{tracciare} (se richiesto) ogni \emph{step}, schermata e richiesta di rete, producendo un \emph{trace} interattivo che permette di ripercorrere il test \emph{frame-by-frame} in caso di \emph{failure};
+    \item \textbf{cleanup} automatico del \emph{context} alla fine del test.
+\end{itemize}
+
+L'\emph{auto-wait} merita una nota perché risolve un problema strutturale dei test E2E: tradizionalmente un test che faceva click su un pulsante che non era ancora pronto falliva intermittentemente (\emph{flaky test}), e gli sviluppatori tappavano il problema con \texttt{sleep(N)} arbitrari. Playwright, prima di ogni \texttt{click()}, verifica autonomamente che l'elemento sia \emph{actionable} (visibile, abilitato, stabile, in primo piano) e ritenta il \emph{retry} entro un \emph{timeout} configurabile. Risultato: zero \texttt{sleep} nel codice e un livello di stabilità sostanzialmente superiore.
+
+\paragraph{Autenticazione: \texttt{globalSetup} + \texttt{storageState}.} Tutti gli \emph{endpoint} del portale sono dietro autenticazione. Eseguire un \emph{login} UI in \texttt{beforeAll} di ogni \emph{spec} sarebbe lento (decine di secondi $\times$ \emph{n} \emph{spec}) e ridondante. È stato adottato il pattern canonico di Playwright: un \texttt{global-setup.ts} esegue il \emph{login} una sola volta all'avvio della \emph{suite}, naviga a \texttt{/\#/auth/login}, compila i campi \emph{username}/\emph{password} (letti da \texttt{.env.e2e}, \emph{gitignored}), attende la \emph{redirect} fuori dalla \emph{login page} e salva lo \emph{storage state} (\emph{cookie} + \emph{localStorage} + \emph{sessionStorage}) in \texttt{playwright/.auth/user.json}. Tutti gli \emph{spec} ereditano lo stato via \texttt{use.storageState} nella configurazione: il \emph{browser} viene aperto già autenticato. Il \texttt{globalSetup} aggiunge un'ottimizzazione pratica: se il file di stato esiste e ha meno di un'ora, il \emph{login} viene saltato; il flag \texttt{E2E\_FORCE\_LOGIN=1} forza la rigenerazione.
+
+Una sottigliezza scoperta sul portale: il \emph{token} di accesso viene memorizzato in \texttt{sessionStorage} (non in \texttt{localStorage}), e Playwright per default \emph{non} lo persiste nel \emph{file} di \emph{storage state}. La soluzione adottata è estrarre manualmente il \texttt{sessionStorage} via \texttt{page.evaluate} alla fine del \texttt{globalSetup}, salvarlo in un \emph{file} parallelo, e re-iniettarlo prima di ogni navigazione tramite il \texttt{addInitScript} di un \emph{fixture} custom (\texttt{auth.fixture.ts}).
+
+\paragraph{Strategia di \emph{discovery} delle griglie sotto test.} La \emph{grid} oggetto della \emph{suite} di smoke è \texttt{components} (\emph{Elenco Componenti}), accessibile dal menu omonimo: è una \emph{grid} ricca di righe, presente in qualsiasi installazione \emph{core}, con colonne \emph{string} adatte al test del filtro per \emph{prefix}. La multi-grid usata per il caso \emph{multi-grid} è \texttt{multi-grid-scheduled-jobs} (almeno tre \emph{grid} figlie). Entrambi gli identificatori sono \emph{override}-abili via env var (\texttt{E2E\_GRID\_SMOKE\_ID}, \texttt{E2E\_MULTI\_GRID\_ID}), così la stessa \emph{suite} può girare su installazioni \emph{customer}-specifiche senza modifiche al codice.
+
+\paragraph{Page Object Model.} Le interazioni con la \emph{grid} sono incapsulate in tre \emph{page object} sotto \texttt{e2e/pages/}: \texttt{LoginPage} (la sola \emph{form} di \emph{login}), \texttt{GridPage} (l'API di alto livello sulla griglia: \texttt{gotoViaMenu}, \texttt{rowCount}, \texttt{paginatorRangeLabel}, \texttt{firstHeaderDataField}, \texttt{clickHeaderToSort}, \texttt{setColumnFilter}, \texttt{resizeFirstColumn}, \texttt{openQuickActionsMenu}\dots) e \texttt{MultiGridPage}. Ogni \emph{spec} consuma metodi semantici anziché \emph{locator} crudi: i selettori vivono in un solo punto, e una modifica al \emph{markup} di \texttt{sia-mat-grid} richiede un singolo aggiornamento anziché \emph{n} interventi distribuiti. Il \emph{factory} \texttt{makeGrid(gridId)} esposto via \emph{fixture} costruisce una \texttt{GridPage} legata al \emph{component id} richiesto.
+
+\paragraph{Selettori senza \texttt{data-testid}.} Il \emph{markup} di \texttt{sia-mat-grid} non espone attributi \texttt{data-testid}; introdurli in modo capillare avrebbe richiesto modifiche al \emph{template} estranee allo \emph{scope} dell'intervento. La strategia adottata si basa su selettori già robusti per loro natura: \texttt{table[id\textasciicircum="siaTable"]} per la \emph{grid container} (l'\texttt{id} è deterministico, \texttt{siaTable\{gridId\}}), \texttt{mat-paginator} per la paginazione (etichette ARIA standard di Material), \texttt{.resize-holder} per le \emph{handle} di resize, \texttt{.dx-toast} e \texttt{mat-mdc-snack-bar-container} per le notifiche di errore. Un \emph{follow-up} dedicato è stato annotato per introdurre \texttt{data-testid} stabili sui \emph{nodi} chiave (\texttt{grid-toolbar-search}, \texttt{grid-action-\{actionId\}}, \texttt{grid-row-\{rowIndex\}}, \texttt{grid-resize-handle-\{column\}}, \texttt{multi-grid-section-\{id\}}).
+
+\paragraph{Strategia esecutiva e \emph{flakiness}.} La configurazione esegue la \emph{suite} con \texttt{workers: 1} e \texttt{fullyParallel: false}: il portale autentica per utente e \emph{worker} paralleli condividerebbero la stessa sessione, generando conflitti su \emph{token} e \emph{refresh}. \texttt{retries} è fissato a $0$ in entrambi gli ambienti: si è preferito un \emph{fail} visibile a un \emph{retry} che maschera \emph{flakiness} reale. \texttt{trace}, \texttt{screenshot} e \texttt{video} sono in modalità \texttt{retain-on-failure}, fornendo materiale diagnostico immediato per ogni regressione.
+
+\subsection{Cosa fa ogni \emph{spec} E2E in dettaglio}
+
+La \emph{suite} è organizzata in nove \emph{spec} sotto \texttt{e2e/tests/grid/}, ciascuno focalizzato su un singolo aspetto del comportamento utente. Per ognuno descriviamo cosa il test simula e come l'asserzione viene formulata.
+
+\paragraph{\texttt{smoke.spec.ts} — la \emph{grid} carica.} È il test più elementare e funge da \emph{canary}: se questo fallisce, qualsiasi altro test sarebbe inutile. Il test apre il menu \emph{Elenco Componenti} (via \texttt{gotoViaMenu}, che simula il click sulla voce di sidebar), attende che la tabella \texttt{table[id="siaTablecomponents"]} sia visibile, verifica che la \emph{header row} sia presente, conta le righe del \emph{body} e asserisce che siano $> 0$, infine controlla che il paginatore Material sia visibile e mostri una \emph{label} di \emph{range} non vuota (es. ``$1 - 25$ di $342$''). Una sola \emph{failure} qui significa che la pagina non è stata renderizzata correttamente, che l'autenticazione è fallita, o che il \emph{backend} non sta servendo i dati.
+
+\paragraph{\texttt{sort.spec.ts} — il click sull'\emph{header} riordina la colonna.} Il portale non usa il \texttt{mat-sort-header} di Material per il sort — \texttt{sia-mat-grid} ha una propria implementazione — quindi il test non può asserire su \texttt{aria-sort}. La verifica è quindi \emph{behavioural}: identifica la prima colonna con un \emph{data field} (\texttt{firstHeaderDataField}), legge la sequenza dei valori della colonna prima del click (\texttt{columnTextValues}), clicca sull'\emph{header} per innescare il \emph{sort}, attende (via \texttt{expect.poll}, che ricontrolla periodicamente fino a soddisfare la condizione o scadere il \emph{timeout}) che la lunghezza della colonna sia ancora coerente, rilegge i valori e verifica che siano ordinati ascendentemente o discendentemente confrontandoli con \texttt{Array.sort}. La tolleranza ad \emph{asc}-o-\emph{desc} è intenzionale: alcune colonne potrebbero già essere ordinate, e il primo click invertirebbe il verso.
+
+\paragraph{\texttt{filtering.spec.ts} — filtro per-colonna.} Sul \emph{toolbar} live di \texttt{sia-mat-grid} non è esposto un \emph{global filter} (un \texttt{test.skip} documenta il debito di \emph{discovery}); il filtro testato è quello per-colonna disponibile nella \emph{filter row}. Il test individua la prima colonna filtrabile (\texttt{firstFilterableDataField}), legge il numero iniziale di righe, cambia l'operatore di filtro a ``\emph{Inizia con}'' tramite il menu dell'operatore, immette il valore \texttt{V} nell'\texttt{input} di filtro, verifica che tutti i valori della colonna ora inizino con \texttt{V}, infine pulisce il filtro e attende (\texttt{expect.poll}) che il numero di righe torni esattamente a quello iniziale. È un \emph{round-trip} completo che esercita sia l'applicazione del filtro sia il suo \emph{cleanup}.
+
+\paragraph{\texttt{pagination.spec.ts} — paginatore.} Il primo test legge la \emph{label} di \emph{range} del \texttt{mat-paginator} (es.\ ``$1 - 25$ di $342$''), clicca \emph{next page} (\texttt{goToNextPage}), \emph{poll} sulla \emph{label} finché diventa diversa da quella iniziale, clicca \emph{prev page} e \emph{poll} finché torna identica. Il secondo test legge il numero di righe correnti, prova a impostare \emph{page size} a $20$ (con \texttt{test.skip} se l'opzione non è offerta dal \emph{select}), \emph{poll} finché il numero di righe è inferiore al precedente, e verifica che il conteggio totale (incluse intestazione e \emph{filter row}) non superi $21$. Il \emph{poll} è cruciale: la richiesta \emph{backend} di paginazione è asincrona e arriva quando arriva.
+
+\paragraph{\texttt{resize.spec.ts} — \emph{drag} della \emph{handle} di resize.} Il test recupera la collezione delle \texttt{.resize-holder} esposte dalla \texttt{ResizeColumnsDirective}; se non ne trova alcuna fa \texttt{test.skip} con motivo (situazione possibile su griglie con \emph{resize} disabilitato). Altrimenti invoca \texttt{resizeFirstColumn(80)} che misura la \texttt{width} dell'\emph{header} prima del \emph{drag}, esegue un \texttt{mouse.down} sulla \emph{handle}, una sequenza di \texttt{mouse.move} a passi intermedi (per simulare un \emph{drag} fluido che la \emph{directive} possa intercettare), un \texttt{mouse.up}, rilegge la \texttt{width} dopo il \emph{drag} e ritorna i due valori. Il test asserisce che il \emph{delta} assoluto sia $> 5$\,px, una tolleranza ampia che assorbe \emph{layout shift}, \texttt{min-width} e arrotondamenti del \emph{browser}.
+
+\paragraph{\texttt{export.spec.ts} — \emph{download} del \emph{file} Excel.} L'\emph{export} è una delle interazioni più delicate da testare: avviene tramite un \emph{download} del \emph{browser}, non un \emph{response} HTTP che possiamo intercettare con un semplice \texttt{await}. Il pattern Playwright canonico è registrare una \texttt{Promise} su \texttt{page.waitForEvent('download')} \emph{prima} dell'azione che genera il \emph{download}, poi fare l'azione, e infine \texttt{await} la \texttt{Promise}: l'\texttt{ordine} è importante perché l'evento di \emph{download} è sincrono rispetto al click e perderlo significa attendere all'infinito. Il test apre il menu ``Azioni rapide'' (icona \emph{bolt} sul \emph{toolbar}), clicca la voce ``Esporta in excel'' (matching \emph{case-insensitive} via \emph{regex}) e attende il \emph{download}. Verifica che il \texttt{suggestedFilename} termini per \texttt{.xlsx} o \texttt{.xls}.
+
+\paragraph{\texttt{refresh.spec.ts} — il pulsante \emph{refresh} ricarica.} Il \emph{toolbar} di \texttt{sia-mat-grid} dovrebbe esporre un pulsante con icona \texttt{refresh}; se non viene trovato, il test fa \texttt{test.skip} con motivo (\emph{discovery} incompleta). Altrimenti registra una \texttt{Promise} su \texttt{page.waitForRequest} che si risolve quando parte una richiesta \texttt{POST} il cui \emph{URL} contiene ``\texttt{SiaGrid}'' o ``\texttt{grid}'' o ``\texttt{components}'', clicca il pulsante \emph{refresh}, e verifica che la richiesta sia partita entro $15$ secondi. Il pattern \texttt{waitForRequest} è la versione \emph{network-side} di \texttt{waitForEvent}: invece di osservare il DOM, osserva il traffico HTTP del \emph{browser}, dimostrando che il \emph{refresh} non è solo un \emph{ri-render} cosmetico ma una vera nuova \emph{call} al \emph{backend}. In caso di assenza della \emph{call} (sintomo che la \emph{directive} potrebbe usare un altro pattern), un \emph{fallback} verifica almeno che la tabella sia ancora visibile, evitando \emph{false negative} dovuti a \emph{discovery} incompleta.
+
+\paragraph{\texttt{multi-grid.spec.ts} — \emph{rendering} di una multi-grid.} La \emph{route} \texttt{multi-grid/<id>/<guid>} ospita più \emph{grid} figlie nello stesso \emph{outlet}. Poiché il menu della multi-grid non è in sidebar nell'installazione di test, la navigazione avviene per URL diretto (\texttt{gotoDirect}). Il test verifica che il \emph{host} \texttt{<sia-multi-grid>} sia visibile e che il numero di \emph{grid} figlie effettivamente renderizzate (\texttt{innerGridCount}) sia $\geq 2$. Il caso copre il \emph{wiring} del componente \texttt{sia-multi-grid} con i suoi figli, area che gli \emph{unit test} non possono esercitare senza \emph{render} pesante.
+
+\paragraph{\texttt{error-500.spec.ts} — la UI sopravvive a un errore HTTP.} Questo è probabilmente il test più interessante in termini di pattern Playwright: invece di sperare che il \emph{backend} sia in errore, il test \emph{forza} l'errore intercettando il traffico di rete del \emph{browser}. Tramite \texttt{page.route(/Grid|grid|components/i, \dots)} viene installato un \emph{handler} che, per ogni richiesta \texttt{POST} o per gli URL che contengono \texttt{/get}/\texttt{/page}/\texttt{/filter}/\texttt{/data}, risponde con un \texttt{fulfill} sintetico: \texttt{status: 500}, \emph{body} \texttt{\{ "message": "simulated error" \}}. Le altre richieste passano via \texttt{route.continue()}. Il test poi naviga al menu della \emph{grid} e verifica che il \emph{container} \texttt{sia-mat-grid} sia ancora visibile (UI non in \emph{crash}), oppure che sia apparsa una notifica DevExtreme (\texttt{.dx-toast}) o un \emph{snack-bar} Material (\texttt{.mat-mdc-snack-bar-container}). Il test garantisce un \emph{contract} di robustezza: \emph{nessun} errore HTTP del \emph{backend} deve poter portare la UI in uno stato non recuperabile dall'utente.
+
+\paragraph{Fonti di \emph{flakiness} e mitigazione.} Tre categorie di problemi sono emerse durante la stesura:
+
+\begin{itemize}
+    \item \textbf{Tempi di caricamento variabili} dei dati \emph{backend}: mitigati con \texttt{expect.poll} (re-evaluation periodica della condizione fino al \emph{timeout}) e con il \texttt{networkidle} sulla prima navigazione.
+    \item \textbf{Animazioni di Material} (\emph{paginator}, \emph{select}, \emph{menu}): l'\emph{auto-wait} di Playwright le copre nella maggior parte dei casi (attende la stabilità del \emph{box model}); dove non basta, i \emph{page object} attendono esplicitamente il \emph{repaint} prima di leggere valori.
+    \item \textbf{\emph{Discovery} incompleta dei selettori} su flussi marginali (\emph{global filter}, \emph{refresh}): preferito \texttt{test.skip} con motivo esplicito a un'asserzione fragile, in modo che l'\emph{intento} resti documentato e ripreso in un \emph{follow-up} dedicato.
+\end{itemize}
+
+\subsection{Convenzione e debito tecnico}
+
+In analogia con la convenzione di \emph{scaffolding} formalizzata sul \emph{backend}, anche sul \emph{frontend} è stata stabilita la regola che \emph{ogni nuova libreria Angular creata in \texttt{Sia.Angular.Framework/projects/} deve nascere con almeno uno scheletro di \emph{spec} Vitest sui suoi \emph{API client} e servizi}, in modo da evitare che il debito di test si accumuli a posteriori. La copertura E2E, per il suo costo computazionale, resta concentrata sui flussi utente strategici e viene estesa solo alle funzionalità che hanno superficie comportamentale rilevante (interazione DOM, integrazione HTTP, navigazione).
+
+\section{Risultato finale}
+
+L'intervento ha lasciato il framework con:
+\begin{itemize}
+    \item \textbf{Backend}: due progetti di \emph{unit test} (\texttt{Sia.Grid.Tests} e \texttt{Sia.Devextreme.Crud.Tests}) per un totale di $51$ test \emph{green} (22 Grid + 29 Crud) al primo \texttt{dotnet test};
+    \item \textbf{Backend}: due progetti di \emph{integration test} per un totale di circa $220$ test parametrizzati sui dati di produzione: \texttt{Sia.Grid.IntegrationTests} con \emph{smoke} sull'intero parco delle $138$ \emph{grid} (\emph{skip} tracciati via \texttt{SkippedComponents.json}), $6/6$ \emph{lifecycle test green} sul ciclo CRUD delle \emph{lookup table}, $9/10$ \emph{summary test green} \emph{data-driven} sulle prospettive; \texttt{Sia.Devextreme.Crud.IntegrationTests} con $56/65$ \emph{smoke test green} sui \emph{Get} più $12/12$ \emph{lifecycle test green} su altrettanti pattern strutturali distinti (incluse \emph{primary key} composite e \emph{soft-delete});
+    \item \textbf{Backend}: un \emph{framework} di test \emph{data-driven} via JSON con supporto a entrambe le modalità di \emph{delete} (\emph{hard} e \emph{soft}) e a \emph{key fields} singoli o compositi, riutilizzabile per ogni futuro \emph{scenario} di lifecycle CRUD;
+    \item \textbf{Frontend}: una baseline di \emph{unit test} \texttt{Vitest} sulla libreria pilota \texttt{sia-grid} (\emph{API client}, servizi, \emph{directive}, configuratori), con debito di copertura tracciato esplicitamente sul componente principale via \emph{spec} \emph{placeholder};
+    \item \textbf{Frontend}: una \emph{suite} \emph{end-to-end} \texttt{Playwright} di nove \emph{spec} sul flusso utente reale di \texttt{sia-grid} (\emph{smoke}, \emph{sort}, \emph{filtering}, \emph{pagination}, \emph{resize}, \emph{export}, \emph{refresh}, \emph{multi-grid}, \emph{error-500}), con \emph{login} unico via \texttt{globalSetup} + \texttt{storageState} (incluso il \emph{patching} manuale del \texttt{sessionStorage} non gestito di default da Playwright) e \emph{Page Object Model} per disaccoppiare i selettori dagli \emph{spec};
+    \item una convenzione di scaffolding formalizzata sia sull'\emph{agent} di sviluppo \emph{server} sia sul lato Angular, che vincola la creazione di nuovi moduli/librerie all'aggiunta automatica del progetto di test gemello;
+    \item due \emph{fix} difensivi nei moduli \texttt{Sia.Base} e \texttt{Sia.Grid} emersi grazie ai test e applicati senza modifiche di comportamento per il codice esistente;
+    \item la rimozione di $316$ \emph{synonym} \texttt{*\_Log} obsoleti sul database di sviluppo, che mascheravano il fatto che l'audit non era operativo da tempo.
+\end{itemize}
+
+Il valore principale dell'intervento, al di là del numero di test, sta nell'aver trasformato il modello di verifica da implicito (``funziona se non lo segnala nessuno'') a esplicito (``ogni regressione che attraversa la \emph{suite} viene catturata, ogni nuovo modulo nasce con un \emph{baseline} di copertura''), e nell'aver esteso questa rete di sicurezza dal solo \emph{backend} all'intero stack: dalla \emph{stored procedure} SQL fino al click dell'utente sul \emph{browser}. I \emph{bug} emersi su \texttt{BaseRepository} e \texttt{GridDataService} sono il primo esempio concreto del ritorno di questo investimento: difetti latenti sotto forma di \texttt{NullReferenceException} con \emph{stack trace} criptici, che si sarebbero manifestati solo in produzione di un cliente specifico, sono stati identificati e corretti in un ciclo di sviluppo locale.

@@ -6,27 +6,21 @@
 \section{Introduzione al progetto}
 
 Nel contesto dello sviluppo software moderno, le applicazioni tendono ad assumere
-un'architettura sempre pi\`u distribuita e complessa. La capacit\`a di monitorare il
+un'architettura sempre più distribuita e complessa. La capacità di monitorare il
 comportamento di tali sistemi in tempo reale, diagnosticare anomalie e analizzare le
-prestazioni costituisce un requisito fondamentale per garantire la qualit\`a del servizio.
-
-Il concetto di \emph{osservabilità} (\emph{observability}) si riferisce alla
-possibilità di inferire lo stato interno di un sistema a partire dai dati che esso emette
-verso l'esterno. In ambito applicativo, i principali vettori di osservabilit\`a sono tre:
-le \emph{trace distribuite}, che tracciano il percorso di una richiesta attraverso il
-sistema; le \emph{metriche}, che forniscono misure aggregate nel tempo; i \emph{log}, che
-registrano gli eventi discreti generati dall'applicazione. La convergenza di questi tre
-segnali in un'unica piattaforma \`e oggi indicata come \emph{observability stack} o, pi\`u
-informalmente, con l'acronimo \emph{MELT} (Metrics, Events, Logs, Traces).
-
+prestazioni costituisce un requisito fondamentale per garantire la qualità del servizio.
 Il progetto \emph{Sia.Web} ha richiesto la progettazione e l'implementazione di un sistema
-di telemetria completo, in grado di raccogliere e correlare questi tre tipi di segnale per
-offrire una visione unificata del comportamento delle applicazioni in produzione.
+di telemetria completo, in grado di raccogliere e correlare \emph{trace}, metriche e
+\emph{log} per offrire una visione unificata del comportamento delle applicazioni in
+produzione. I fondamenti teorici dell'osservabilità sono trattati in
+dettaglio nel capitolo~\ref{cap:progettazione}.
 
 \section{Requisiti e obiettivi}
 
 \subsection{Obiettivi}
 \begin{enumerate}[label=\arabic*.]
+  \item Identificare le tecnologie più adatte allo sviluppo del progetto e i moduli più
+        importanti da tracciare tramite telemetria.
   \item Analizzare i requisiti di osservabilit\`a dell'ecosistema \emph{Sia.Web} e
         identificare le soluzioni tecnologiche adeguate.
   \item Progettare un'architettura di telemetria basata sullo standard \gls{otel},
@@ -56,21 +50,24 @@ offrire una visione unificata del comportamento delle applicazioni in produzione
         sorgente di trace.
     \item Deve essere possibile visualizzare i valori di trace e metriche raggruppate in dashboard
         Grafana.
-    \item Le dashboard di Grafana devono raccogliere i dati da più servizi e installazioni diverse 
+    \item Le dashboard di Grafana devono raccogliere i dati da più servizi e installazioni diverse
         di ciascun cliente, e permettere di filtrare per gli stessi.
-    \item Sviluppo di Claude skill per permettere la propagazione della telemetria in tutto il sistema.
+    \item Sviluppo di \emph{Claude skill} per permettere la propagazione della telemetria in tutto il sistema.
+    \item Il sistema deve arricchire automaticamente ogni span con l'identità dell'utente autenticato
+        (\texttt{enduser.id}, \texttt{enduser.name}) senza richiedere modifiche ai singoli moduli applicativi.
+    \item Le metriche di tipo \emph{Histogram} devono esporre \emph{exemplars}, ovvero puntatori al
+        \texttt{TraceId} del campione, per abilitare la navigazione dalla metrica aggregata alla trace
+        corrispondente.
 \end{enumerate}
 
 \subsection{Requisiti non funzionali}
 
 \begin{enumerate}[label=RNF\arabic*.]
-    \item Identificazione delle tecnologie più adatte allo sviluppo del progetto.
-    \item Identificazione dei moduli più importanti da tracciare tramite telemetria.
-  \item La telemetria non deve degradare sensibilmente le prestazioni in produzione.
-  \item Le metriche devono essere progettate per non generare un numero eccessivo di serie temporali in Prometheus.
-  \item I segnali prodotti devono essere compatibili con qualsiasi backend \gls{otel}-compatibile.
-  \item Le impostazioni devono essere modificabili per ambiente (sviluppo, staging, produzione) tramite appsettings.
-    \end{enumerate}
+    \item La telemetria non deve degradare sensibilmente le prestazioni in produzione.
+    \item Le metriche devono essere progettate per non generare un numero eccessivo di serie temporali in Prometheus; in particolare, i tag ad alta variabilità (es.\ identificativi utente o di record) non devono essere usati come attributi di metriche.
+    \item I segnali prodotti devono essere compatibili con qualsiasi backend \gls{otel}-compatibile.
+    \item Le impostazioni devono essere modificabili per ambiente (sviluppo, \emph{staging}, produzione) tramite \emph{appsettings}.
+\end{enumerate}
 
 
 \section{Analisi preventiva dei rischi}
@@ -102,9 +99,9 @@ Per ciascun rischio identificato, è stata definita una possibile strategia di m
 \end{risk}
 \vspace{0.2cm}
 \begin{risk}{Qualità dei test generati automaticamente}
-    \riskdescription{i test generati tramite modelli di intelligenza artifutilizzo di un approccio incrementale all’integrazione, partendo da coiciale potrebbero risultare incompleti, non corretti o con copertura insufficiente, compromettendo l’efficacia del processo di \emph{testing}}
+    \riskdescription{i test generati tramite modelli di intelligenza artificiale potrebbero risultare incompleti, non corretti o con copertura insufficiente, compromettendo l'efficacia del processo di \emph{testing}}
     \risksolution{introduzione di attività di validazione e revisione dei test generati, utilizzo di metriche di copertura del codice e iterazione sui \emph{prompt} per migliorare progressivamente la qualità dei risultati}
-    \label{risk:test-quality} 
+    \label{risk:test-quality}
 \end{risk}
 \vspace{0.2cm}
 \begin{risk}{Differenze di comportamento tra ambiente di sviluppo e produzione}
@@ -171,8 +168,8 @@ La quinta settimana è stata dedicata allo studio delle tecniche di \emph{prompt
     \item Raccolta, analisi e valutazione del codice generato
 \end{itemize}
 
-\subsubsection{Settimana 6: Iterazione e integrazione della telemetria}
-Nella sesta settimana il lavoro si è concentrato sul miglioramento iterativo dei test generati e sull’integrazione della telemetria nel sistema.
+\subsubsection{Settimana 6: Iterazione sui test e prima integrazione della telemetria}
+Nella sesta settimana il lavoro si è concentrato sul miglioramento iterativo dei test generati e sull'integrazione della telemetria nel sistema.
 \begin{itemize}
     \item Analisi dei risultati: identificazione di test mancanti, errati o incompleti
     \item Raffinamento dei\emph{ prompt }e nuove iterazioni di generazione
@@ -183,8 +180,8 @@ principali
     \item Documentazione delle iterazioni e delle decisioni prese
 \end{itemize}
 
-\subsubsection{Settimana 7: Iterazione e integrazione della telemetria}
-La settima settimana ha previsto l’esecuzione di una campagna completa di test e la validazione dell’intero sistema integrato.
+\subsubsection{Settimana 7: Validazione del sistema integrato e tuning delle dashboard}
+La settima settimana ha previsto l'esecuzione di una campagna completa di test e la validazione dell'intero sistema integrato.
 \begin{itemize}
     \item Esecuzione della suite completa di test su ambiente di \emph{staging}
     \item Analisi della copertura del codice e identificazione delle aree scoperte
@@ -195,8 +192,8 @@ La settima settimana ha previsto l’esecuzione di una campagna completa di test
 
 \end{itemize}
 
-\subsubsection{Settimana 8: Iterazione e integrazione della telemetria}
-L’ultima settimana è stata dedicata alla messa in produzione della soluzione e alla redazione della documentazione finale.
+\subsubsection{Settimana 8: Messa in produzione e documentazione finale}
+L'ultima settimana è stata dedicata alla messa in produzione della soluzione e alla redazione della documentazione finale.
 \begin{itemize}
     \item Preparazione e revisione finale dell'ambiente di produzione
     \item Deploy della configurazione \emph{OpenTelemetry} e \emph{Grafana} in produzione

@@ -1,59 +1,100 @@
 \chapter{Conclusioni}
 \label{cap:conclusioni}
 
+\intro{Il presente capitolo tira le somme del lavoro svolto durante lo stage, confrontando la pianificazione con l'esecuzione reale, valutando il raggiungimento degli obiettivi, sintetizzando le conoscenze acquisite e proponendo possibili evoluzioni future.}\\
+
 \section{Consuntivo finale}
+
+Il progetto si è sviluppato sulle 8 settimane pianificate, per un totale di 300 ore. Il
+monte ore è stato complessivamente rispettato, con una redistribuzione interna: le fasi di
+studio (settimane 1--3) e di prototipazione (settimana 4) hanno richiesto un numero di ore
+inferiore al preventivato grazie all'uso dell'agente AI come \emph{pair engineer}, mentre le
+fasi di propagazione dell'instrumentazione ad altri moduli e di costruzione delle dashboard
+Grafana sono state estese rispetto alla pianificazione originaria, assorbendo le ore
+risparmiate nella prima parte.
 
 \section{Raggiungimento degli obiettivi}
 
+Gli obiettivi dichiarati nella sezione ``Obiettivi'' del capitolo~\ref{cap:descrizione-stage}
+sono stati raggiunti:
+
+\begin{itemize}
+    \item l'analisi dei requisiti di osservabilità e la selezione delle tecnologie hanno
+        portato all'adozione dello stack \gls{otel} + \emph{Grafana LGTM}, motivata dai
+        criteri descritti nel capitolo~\ref{cap:tecnologie-adottate};
+    \item l'architettura di telemetria è stata progettata e integrata con il framework
+        \emph{.NET}, centralizzando la configurazione in \texttt{BaseApplicationBuilder}
+        (capitolo~\ref{cap:progettazione});
+    \item le strategie di campionamento sono state definite a due livelli (\emph{sampler}
+        globale e \emph{processor} per-\emph{source}), con ratio configurabili per ambiente;
+    \item gli strumenti di istrumentazione sono stati implementati per i moduli
+        \emph{Sia.Auth}, \emph{Sia.Base} e \emph{Sia.Grid}, e propagati successivamente ad
+        altri moduli del framework tramite le \emph{Claude skill} dedicate;
+    \item la piattaforma di visualizzazione Grafana è stata configurata con i relativi
+        \emph{backend} di \emph{storage} (Tempo, Loki, Prometheus) e con le dashboard
+        versionate nel repository.
+\end{itemize}
+
+I requisiti funzionali RFN-1..RFN-11 e non funzionali sono stati soddisfatti nella loro
+versione \emph{obbligatoria}. In particolare, i requisiti aggiuntivi RFN-10 (arricchimento
+automatico con \texttt{enduser.*}) e RFN-11 (\emph{exemplars} metrica $\rightarrow$ trace) sono
+stati implementati come descritto nelle sezioni~\ref{sec:modello-enduser}
+e~\ref{sec:modello-exemplars}.
+
 \section{Conoscenze acquisite}
 
-\section{Valutazione personale}
-
-
-\chapter{Roba da organizzare}
-\section{Model Context Protocol (MCP)}
-
-\intro{Il presente capitolo descrive il protocollo \gls{mcp}, utilizzato durante lo stage per integrare un agente di codifica basato su modelli linguistici con i sistemi di osservabilità, in particolare Grafana.}
-
-\subsection{Introduzione}
-
-Nel contesto dello sviluppo software assistito da modelli di intelligenza artificiale, emerge la necessità di fornire agli agenti informazioni aggiornate, contestualizzate e provenienti da sistemi esterni. I modelli linguistici di grandi dimensioni (\gls{llm}), infatti, non hanno accesso diretto allo stato runtime delle applicazioni o ai dati di monitoraggio, limitando la loro capacità di analisi e decisione.
-
-Per superare tale limite, è stato adottato il \gls{mcp}, un protocollo progettato per consentire a un agente AI di interagire in modo strutturato con servizi esterni, ottenendo dati dinamici e contestuali.
-
-Nel progetto di stage, \gls{mcp} è stato utilizzato per collegare l'agente di sviluppo \emph{Claude Code} con il sistema di osservabilità basato su \emph{Grafana}, permettendo all'agente di accedere alla gestione delle dashboard in Grafana.
-
-\subsection{Obiettivi del protocollo}
-
-L'introduzione di MCP risponde ai seguenti obiettivi:
+Lo stage ha portato all'acquisizione di competenze in più ambiti:
 
 \begin{itemize}
-    \item \textbf{Accesso a dati runtime}: consentire all'agente AI di interrogare dati di telemetria in tempo reale
-    \item \textbf{Contesto dinamico}: fornire informazioni aggiornate sul comportamento dell'applicazione
-    \item \textbf{Integrazione modulare}: permettere l'aggiunta di nuovi servizi senza modificare l'agente
-    \item \textbf{Standardizzazione}: definire un'interfaccia comune per la comunicazione tra agenti e strumenti esterni
+    \item standard \gls{otel} e modello dei segnali (\emph{trace}, metriche, \emph{log},
+        \emph{exemplars});
+    \item stack \emph{Grafana} (Tempo, Prometheus, Loki), con i rispettivi linguaggi di
+        query PromQL, TraceQL, LogQL;
+    \item libreria Serilog e \emph{sink} OTLP, con correlazione \emph{log}-\emph{trace};
+    \item applicazione dei \emph{design pattern} Adapter e Factory a un contesto reale di
+        framework condiviso;
+    \item metodologie di lavoro assistito da agenti AI, \emph{prompt} e \emph{skill
+        engineering}, uso del \gls{mcp} per integrare l'agente con servizi runtime.
 \end{itemize}
 
-\subsection{Uso del protocollo nel progetto}
-Collegando l'agente sviluppato per l'integrazione della telemetria nel progetto \emph{Sia.Core}, all'applicativo Grafana
-tramite \gls{mcp}, è stato possibile migliorare l'accuratezza dell'agente nello sviluppo delle dashboard e dei relativi widget
-per la visualizzazione dei dati di telemetria.
-Dopo l'introduzione del protocollo, si è notato immediatamente un miglioramento nella qualità delle dashboard create,
-nonostante ciò è stato comunque necessario correggere l'elaborato dell'agente, introducendo nuove direttive per prevenire
-eventuali allucinazioni come l'uso di metriche e/o trace non esistenti e filtraggio di metriche tramite attributi che non fossero 
-presenti nelle metriche interessate. Inoltre si è presentata la necessità di istruire l'agente sulla creazione di widget: elencando
-quali tipi di grafico usare per determinate metriche, quali variabili assegnare alle dashboard per ottimizzare il filtraggio e 
-come organizzare la distribuzione dei widget nella dashboard.
+\section{Retention e gestione dei dati di telemetria}
 
-\subsection{Vantaggi}
-
-L'utilizzo del Model Context Protocol ha introdotto diversi benefici:
-
+Un aspetto operativo affrontato durante lo stage è la \emph{retention} dei dati di
+telemetria. Ogni segnale ha caratteristiche di storage differenti:
 \begin{itemize}
-    \item \textbf{Maggiore accuratezza}: l'agente può basarsi su dati reali anziché su ipotesi
-    \item \textbf{Riduzione delle allucinazioni}: l'accesso a fonti affidabili limita la generazione di informazioni errate
-    \item \textbf{Automazione e propagazione avanzata}: possibilità di automatizzare la gestione della visualizzazione dei dati di telemetria, facilitando così la propagazione di tale integrazione in tutto il progetto \emph{Sia.Core} ed eventuali servizi ulteriori.
+    \item le \emph{trace} su Tempo sono voluminose per singolo campione ma a bassa densità
+        (sono campionate); la \emph{retention} suggerita è \emph{medio-breve} (7--14 giorni),
+        sufficiente per la diagnosi di incidenti recenti;
+    \item le metriche su Prometheus (o Mimir) sono aggregate e compatte: la \emph{retention}
+        può estendersi a 90 giorni o più, permettendo il confronto di tendenze nel tempo;
+    \item i \emph{log} su Loki sono voluminosi ma indicizzati per \emph{label}: la
+        \emph{retention} tipica è di 30 giorni, con possibilità di archiviazione a lungo
+        termine in storage a basso costo.
 \end{itemize}
+I tempi concreti di \emph{retention} sono configurati in funzione delle esigenze di indagine
+e del costo di \emph{storage} accettabile per il singolo cliente.
 
-----------------------------------------------
-Retention dati telemetria
+\section{Valutazione personale e sviluppi futuri}
+
+Dal punto di vista personale, lo stage ha permesso di lavorare a stretto contatto con un
+\emph{framework} enterprise reale, cimentandosi sia con la progettazione (scelte di
+cardinalità, \emph{sampling}, correlazione \emph{cross-signal}) sia con la
+meta-programmazione del processo di sviluppo tramite \emph{Claude skill}. La collaborazione
+con il \emph{team} aziendale e il confronto continuo sulle scelte architetturali sono stati
+parte integrante del percorso formativo.
+
+Tra gli sviluppi futuri più promettenti si collocano:
+\begin{itemize}
+    \item introduzione del \emph{tail-based sampling} tramite \emph{Collector}, che
+        permetterebbe di conservare integralmente le trace di richieste lente o in errore
+        anche con un \emph{ratio} globale basso;
+    \item definizione di metriche \emph{RED} (Rate, Errors, Duration) e \emph{USE}
+        (Utilization, Saturation, Errors) in forma automatizzata per ogni nuovo modulo;
+    \item definizione di \emph{Service Level Objective} (SLO) e \emph{alerting} basato sul
+        \emph{burn-rate} dell'\emph{error budget};
+    \item integrazione di \emph{continuous profiling} tramite \emph{Pyroscope}, già presente
+        nello stack Grafana, per correlare trace e profili di CPU/memoria;
+    \item estensione del pattern di \emph{skill engineering} ad altri ambiti del framework,
+        oltre alla telemetria (es.\ generazione di \emph{CRUD}, di \emph{controller}, di
+        \emph{dashboard} di \emph{business}).
+\end{itemize}

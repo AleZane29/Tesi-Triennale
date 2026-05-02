@@ -126,6 +126,55 @@
     name=\glslink{mcp}{MCP},
     text={Model Context Protocol},
     sort=mcp,
-    description={\emph{MCP, Model Context Protocol} è un protocollo che consente a un agente basato su modelli di intelligenza artificiale di interagire con sistemi e servizi esterni in modo strutturato, permettendo l'accesso a dati dinamici e contestuali. MCP abilita l’integrazione tra modelli linguistici e strumenti operativi, migliorando la capacità decisionale dell’agente e riducendo la dipendenza da informazioni statiche}
+    description={\emph{MCP, Model Context Protocol} è un protocollo che consente a un agente basato su modelli di intelligenza artificiale di interagire con sistemi e servizi esterni in modo strutturato, permettendo l'accesso a dati dinamici e contestuali. MCP abilita l'integrazione tra modelli linguistici e strumenti operativi, migliorando la capacità decisionale dell'agente e riducendo la dipendenza da informazioni statiche}
 }
-        
+
+\newacronym[description={\glslink{meltg}{Metrics, Events, Logs, Traces}}]
+    {melt}{MELT}{Metrics, Events, Logs, Traces}
+
+\newglossaryentry{meltg} {
+    name=\glslink{melt}{MELT},
+    text={Metrics, Events, Logs, Traces},
+    sort=melt,
+    description={acronimo usato in letteratura per indicare l'insieme dei segnali di osservabilità di un sistema: \emph{Metrics} (metriche aggregate), \emph{Events} (eventi discreti), \emph{Logs} (registrazioni testuali strutturate) e \emph{Traces} (tracciamento distribuito delle richieste). Si riferisce alla convergenza di questi segnali in un'unica piattaforma di osservabilità}
+}
+
+\newacronym[description={Cloud Native Computing Foundation}]
+    {cncf}{CNCF}{Cloud Native Computing Foundation}
+
+\newacronym[description={\glslink{otlpg}{OpenTelemetry Protocol}}]
+    {otlp}{OTLP}{OpenTelemetry Protocol}
+
+\newglossaryentry{otlpg} {
+    name=\glslink{otlp}{OTLP},
+    text={OpenTelemetry Protocol},
+    sort=otlp,
+    description={protocollo binario e testuale, definito dallo standard OpenTelemetry, utilizzato per il trasporto di \emph{trace}, metriche e \emph{log} tra applicazioni, \emph{Collector} e \emph{backend} di \emph{storage}}
+}
+
+\newacronym[description={Loki, Grafana, Tempo, Mimir}]
+    {lgtm}{LGTM}{Loki, Grafana, Tempo, Mimir}
+
+\newglossaryentry{exemplarg} {
+    name=Exemplar,
+    text=Exemplar,
+    sort=exemplar,
+    description={in OpenTelemetry, campione concreto allegato a un dato aggregato di metrica, che porta con sé il \texttt{TraceId} (e opzionalmente il \texttt{SpanId}) della richiesta che lo ha prodotto. Consente la navigazione diretta dalla metrica aggregata alla \emph{trace} corrispondente}
+}
+
+\newglossaryentry{baggageg} {
+    name=Baggage,
+    text=Baggage,
+    sort=baggage,
+    description={in OpenTelemetry, meccanismo di propagazione di coppie chiave-valore lungo il contesto di esecuzione di una richiesta. A differenza degli attributi di \emph{span}, le voci di \emph{baggage} possono essere lette e scritte da qualsiasi punto del codice e sono ereditate automaticamente dalle operazioni figlie}
+}
+
+\newglossaryentry{samplerg} {
+    name=Sampler,
+    text=Sampler,
+    sort=sampler,
+    description={in OpenTelemetry, componente del pipeline di \emph{trace} che decide, per ogni nuova operazione, se registrarla ed esportarla (\emph{sampled}) oppure scartarla. La scelta può basarsi su criteri fissi (ratio probabilistico) o dinamici (es.\ presenza di errori, durata)}
+}
+
+\newacronym[description={Software as a Service}]
+    {saas}{SaaS}{Software as a Service}

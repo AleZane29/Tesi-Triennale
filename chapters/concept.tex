@@ -4,8 +4,14 @@
 \intro{Il presente capitolo descrive le funzionalità del prodotto, formalizzate sotto forma di requisiti di progetto, e relativi casi d’uso associati.}\\
 
 \section{Analisi del sistema}
-Il prodotto sviluppato durante il periodo di stage, mette a disposizione dello sviluppatore un sistema che permetta la creazione automatizzata di test
-e il monitoraggio dello stato del sistema Sia.Core tramite dashboard. Continua con descrizione tecnica...
+Il prodotto sviluppato durante il periodo di stage mette a disposizione dello sviluppatore un sistema che permette la creazione automatizzata di test e il monitoraggio dello stato del sistema \emph{Sia.Core} tramite dashboard.
+\\
+Dal punto di vista funzionale, la soluzione si compone di due macro-sottosistemi:
+\begin{itemize}
+    \item un sottosistema di \emph{testing} \emph{AI-driven}, basato sull'integrazione tra \emph{Spec-Kit} e un modello \gls{llm}, che guida la generazione strutturata di test unitari e di integrazione a partire da specifiche formali;
+    \item un sottosistema di \emph{osservabilità}, basato sullo standard \gls{otel} e sullo stack \emph{Grafana} (Tempo, Prometheus, Loki), che raccoglie trace, metriche e log prodotti dall'applicazione e ne permette la visualizzazione e la correlazione tramite dashboard.
+\end{itemize}
+I due sottosistemi sono indipendenti sul piano tecnologico ma complementari sul piano metodologico: la telemetria fornisce il feedback che guida il miglioramento iterativo dei test, mentre i test supportano la validazione continua dell'instrumentazione.
 
 \section{Casi d'uso}
 La presente sezione illustra i casi d’uso analizzati, corredati dai relativi diagrammi. 
@@ -15,16 +21,18 @@ I diagrammi dei casi d’uso (in inglese \emph{Use Case Diagram}) costituiscono 
 Gli attori nei casi d’uso rappresentano entità esterne al sistema, quali utenti o altri servizi, che interagiscono con esso.
 In merito al sistema sviluppato si possono individuare come attori:
 \begin{itemize}
-    \item \textbf{Sviluppatore}: è l'attore principale che utilizza il sistema 
-    \item \textbf{LLM}: descrizione 
-    \item \textbf{Sia.Core}: descrizione 
+    \item \textbf{Sviluppatore}: è l'attore principale che utilizza il sistema, sia per generare e revisionare i test sia per consultare le dashboard di telemetria durante le attività di diagnosi e tuning.
+    \item \textbf{LLM}: modello linguistico di grandi dimensioni (\gls{llm}) invocato dall'ambiente di sviluppo, utilizzato per la generazione automatica di test a partire dalle specifiche prodotte tramite \emph{Spec-Kit} e per il supporto alla propagazione della telemetria ai moduli del framework.
+    \item \textbf{Sia.Core}: applicazione \emph{full-stack} oggetto dell'osservazione e del testing.
 \end{itemize}
 
 \subsection{Elenco casi d'uso}
 
 \begin{itemize}
-    \item Generazione test (sarà necessario specificare un determinato componente/classe per i quali generare test)
-    \item Singole visualizzazioni nella dashboard Grafana
+    \item UC1 --- Generazione automatica di test a partire da una specifica \emph{Spec-Kit}.
+    \item UC2 --- Visualizzazione delle metriche, trace e log di un modulo tramite dashboard Grafana.
+    \item UC3 --- Propagazione della telemetria a un nuovo modulo del framework tramite le \emph{Claude skill} dedicate.
+    \item UC4 --- Diagnosi di una richiesta lenta a partire da un pannello percentili, tramite \emph{exemplar} verso la trace e navigazione ai log correlati.
 \end{itemize}
 
 \begin{figure}[!h] 
@@ -53,49 +61,71 @@ Il codice dei requisiti è così strutturato R(F/Q/V)(N/D/O) dove:
     \item[V =] di vincolo
     \item[N =] obbligatorio (necessario)
     \item[D =] desiderabile
-    \item[Z =] opzionale
+    \item[O =] opzionale
 \end{enumerate}
 Nelle tabelle \ref{tab:requisiti-funzionali}, \ref{tab:requisiti-qualitativi} e \ref{tab:requisiti-vincolo} sono riassunti i requisiti e il loro tracciamento con gli use case delineati in fase di analisi.
 
 \newpage
 
-\begin{itemize}
-    \item Il sistema deve permettere la generazione automatizzata di test
-    \item 
-\end{itemize}
 
-\begin{table}%
-\caption{Tabella del tracciamento dei requisti funzionali}
+\begin{table}[h]%
+\caption{Tabella del tracciamento dei requisiti funzionali}
 \label{tab:requisiti-funzionali}
 \begin{tabularx}{\textwidth}{lXl}
 \hline\hline
 \textbf{Requisito} & \textbf{Descrizione} & \textbf{Use Case}\\
 \hline
-RFN-1     & L'interfaccia permette di configurare il tipo di sonde del test & UC1 \\
+RFN-1 & Tracciamento del percorso completo di ogni richiesta HTTP, incluse le operazioni sul database & UC2, UC4 \\
+\hline
+RFN-2 & Identificazione delle operazioni CRUD tramite attributi di metodo e repository & UC2, UC4 \\
+\hline
+RFN-3 & Esposizione di metriche operative per i moduli di autenticazione, accesso ai dati e griglia & UC2 \\
+\hline
+RFN-4 & Correlazione tra log e trace tramite \texttt{TraceId} e \texttt{SpanId} & UC4 \\
+\hline
+RFN-5 & Attivazione/disattivazione della telemetria tramite configurazione \emph{appsettings} & UC3 \\
+\hline
+RFN-6 & Configurazione indipendente del campionamento per ciascuna sorgente di trace & UC3 \\
+\hline
+RFN-7 & Visualizzazione di trace e metriche raggruppate in dashboard Grafana & UC2 \\
+\hline
+RFN-8 & Raccolta dei dati da più servizi e installazioni, con filtraggio per cliente e servizio & UC2 \\
+\hline
+RFN-9 & Sviluppo di \emph{Claude skill} per la propagazione della telemetria ai moduli del framework & UC3 \\
+\hline
+RFN-10 & Arricchimento automatico degli span con identità utente (\texttt{enduser.id}, \texttt{enduser.name}) & UC4 \\
+\hline
+RFN-11 & Esposizione di \emph{exemplars} per le metriche Histogram (puntatore al \texttt{TraceId}) & UC4 \\
 \hline
 \end{tabularx}
 \end{table}%
 
-\begin{table}%
+\begin{table}[h]%
 \caption{Tabella del tracciamento dei requisiti qualitativi}
 \label{tab:requisiti-qualitativi}
 \begin{tabularx}{\textwidth}{lXl}
 \hline\hline
 \textbf{Requisito} & \textbf{Descrizione} & \textbf{Use Case}\\
 \hline
-RQD-1    & Le prestazioni del simulatore hardware deve garantire la giusta esecuzione dei test e non la generazione di falsi negativi & - \\
+RQN-1 & La telemetria non deve degradare sensibilmente le prestazioni in produzione & - \\
+\hline
+RQN-2 & Le metriche non devono generare un numero eccessivo di serie temporali in Prometheus (cardinalità controllata) & - \\
+\hline
+RQD-1 & Le dashboard devono privilegiare la visualizzazione della latenza (percentili) rispetto al solo \emph{throughput} & UC2 \\
 \hline
 \end{tabularx}
 \end{table}%
 
-\begin{table}%
+\begin{table}[h]%
 \caption{Tabella del tracciamento dei requisiti di vincolo}
 \label{tab:requisiti-vincolo}
 \begin{tabularx}{\textwidth}{lXl}
 \hline\hline
 \textbf{Requisito} & \textbf{Descrizione} & \textbf{Use Case}\\
 \hline
-RVO-1    & La libreria per l'esecuzione dei test automatici deve essere riutilizzabile & - \\
+RVN-1 & I segnali prodotti devono essere compatibili con qualsiasi backend \gls{otel}-compatibile & - \\
+\hline
+RVN-2 & Le impostazioni devono essere modificabili per ambiente (sviluppo, \emph{staging}, produzione) tramite \emph{appsettings} & - \\
 \hline
 \end{tabularx}
 \end{table}%
