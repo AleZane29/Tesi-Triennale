@@ -78,9 +78,26 @@ Consente di creare dashboard interattive a partire da diverse fonti di dati (com
 \subsection*{Serilog}
 Libreria di \emph{logging} strutturato per .NET, scelta per la produzione e la gestione dei \emph{log} applicativi. Supporta nativamente il \emph{sink} OTLP, permettendo l'esportazione dei \emph{log} verso il \emph{Collector} OpenTelemetry e la correlazione automatica con le \emph{trace} tramite \texttt{TraceId} e \texttt{SpanId} iniettati da \texttt{Activity.Current}.
 
-\subsection*{OpenTelemetry Collector}
-Componente intermedio dell'architettura di osservabilità. Riceve i segnali dall'applicazione tramite protocollo OTLP, applica trasformazioni e filtri, e li inoltra ai backend di destinazione (Tempo, Loki, Prometheus). L'introduzione del \emph{Collector} disaccoppia l'applicazione dai backend, permettendo di sostituire o affiancare \emph{exporter} senza modificare il codice.
+\subsection*{Playwright}
+Framework \emph{open-source} per l'automazione dei browser e il testing end-to-end di applicazioni web.
+Permette di simulare il comportamento reale degli utenti attraverso interazioni come navigazione, compilazione di form e verifica dei contenuti, supportando diversi browser (Chromium, Firefox, WebKit).
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.15\linewidth]{../images/technologies/Playwright.png}
+    \caption{Logo Playwright}
+    \label{fig:logo-playwright}
+\end{figure}
 
-\subsection*{Claude Code e Model Context Protocol}
+\subsection*{Vitest}
+Framework di testing unitario moderno per applicazioni JavaScript e TypeScript, progettato per integrarsi con strumenti di sviluppo basati su Vite.
+Offre esecuzione rapida dei test, e funzionalità avanzate come mocking, snapshot testing e coverage del codice.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.15\linewidth]{../images/technologies/Vitest.png}
+    \caption{Logo Vitest}
+    \label{fig:logo-vitest}
+\end{figure}
+
+\subsection*{Claude Code}
 \emph{Claude Code} è l'agente di codifica basato su modelli linguistici di grandi dimensioni (\gls{llm}) utilizzato durante lo stage come \emph{pair engineer} strutturato per lo studio delle tecnologie, la realizzazione di prototipi e la propagazione della telemetria ai moduli del framework.
 Il \gls{mcp} è il protocollo che consente all'agente di interagire con servizi esterni (in particolare \emph{Grafana}) in modo strutturato, ottenendo dati runtime e invocando operazioni come la creazione e la validazione di dashboard. L'utilizzo combinato di \emph{Claude Code} e \gls{mcp} è descritto in dettaglio nel capitolo~\ref{cap:metodologia-ai}.
