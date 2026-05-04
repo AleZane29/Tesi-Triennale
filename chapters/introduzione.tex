@@ -32,7 +32,7 @@ In particolare, l'applicazione Sia.Core rappresenta un sistema complesso, basato
 In questo contesto, le attività di \emph{testing} e di monitoraggio risultano cruciali ma, allo stesso tempo, onerose se svolte manualmente o con strumenti tradizionali.
 La crescente complessità del sistema e il numero sempre maggiore di componenti rendono infatti difficile mantenere una copertura di test adeguata e individuare tempestivamente eventuali anomalie o malfunzionamenti.
 \\
-Il progetto si è sviluppato lungo due linee di lavoro parallele. La prima riguarda la generazione automatica di test tramite modelli di intelligenza artificiale, utilizzando lo strumento \emph{Spec-Kit} per definire in modo strutturato le specifiche e guidare la produzione del codice di test. La seconda, su cui è concentrato il focus del presente documento, riguarda la progettazione e l'implementazione di un sistema di \emph{telemetria} e \emph{osservabilità} basato su \emph{OpenTelemetry} per la raccolta di metriche, \emph{log} e \emph{trace}, e su \emph{Grafana} per la loro visualizzazione, analisi e correlazione.
+Il progetto si è sviluppato lungo due linee di lavoro parallele. La prima riguarda la generazione di test di unità e integrazione per il backend, e test di unità e \emph{end2end} per il frontend. La seconda, su cui è concentrato il focus del presente documento, riguarda la progettazione e l'implementazione di un sistema di \emph{telemetria} e \emph{osservabilità} basato su \emph{OpenTelemetry} per la raccolta di metriche, \emph{log} e \emph{trace}, e su \emph{Grafana} per la loro visualizzazione, analisi e correlazione.
 \\
 In entrambe le linee di lavoro, lo sviluppo è stato affiancato dall'agente di codifica \emph{Claude Code}, utilizzato come \emph{pair engineer} strutturato per accelerare lo studio delle tecnologie, la realizzazione di prototipi e la propagazione della telemetria a più moduli del framework. Tale metodologia è descritta in dettaglio nel capitolo~\ref{cap:metodologia-ai}.
 
@@ -51,7 +51,7 @@ In entrambe le linee di lavoro, lo sviluppo è stato affiancato dall'agente di c
 
     \item[{\hyperref[cap:codifica]{Il settimo capitolo}}] espone i dettagli implementativi della soluzione, illustrando l'organizzazione del codice, i design pattern adottati e le convenzioni seguite per l'instrumentazione dei moduli.
 
-    \item[{\hyperref[cap:conclusioni]{Nel nono capitolo}}] descrive il consuntivo del lavoro svolto, il raggiungimento degli obiettivi, le conoscenze acquisite e le possibili evoluzioni future del progetto.
+    \item[{\hyperref[cap:conclusioni]{L'ottavo capitolo}}] descrive il consuntivo del lavoro svolto, il raggiungimento degli obiettivi, le conoscenze acquisite e le possibili evoluzioni future del progetto.
 \end{description}
 
 Riguardo la stesura del testo, relativamente al documento sono state adottate le seguenti convenzioni tipografiche:

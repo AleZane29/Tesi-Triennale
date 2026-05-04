@@ -157,15 +157,42 @@ modifiche di istrumentazione e i pannelli di visualizzazione. Ogni dashboard def
     \item le \emph{template variable} \texttt{service\_name}, \texttt{enduser\_id},
         \texttt{enduser\_name} e \texttt{bucket};
     \item pannelli di latenza con percentili \emph{p50}, \emph{p95}, \emph{p99} calcolati via
-        \texttt{histogram\_quantile};
+        \texttt{histogram\_quantile} (\autoref{fig:dash-base});
     \item un pannello \emph{stat} ``Operazioni ultimo \texttt{\$\{bucket\}}'' basato
-        sull'\texttt{increase} del \emph{counter} principale;
-    \item pannelli di errori con \emph{break-down} per \texttt{exception.type};
-    \item un pannello \emph{logs} su Loki filtrato per \texttt{service.name}.
+        sull'\texttt{increase} del \emph{counter} principale (\autoref{fig:dash-bucket});
+    \item pannelli di errori con \emph{break-down} per \texttt{exception.type} (\autoref{fig:dash-logs-trace});
+    \item un pannello \emph{logs} su Loki filtrato per \texttt{service.name} (\autoref{fig:dash-logs-trace}).
 \end{itemize}
 
 La riferenza canonica è la dashboard \texttt{sia-base.dashboard.json} del modulo
 \texttt{Sia.Base}, replicata con le dovute personalizzazioni in ogni modulo successivo.
+
+\begin{figure}[h]
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.25\textwidth]{../images/screenshots/DashboardBase.png}
+    }
+    \caption{Overview e durata richieste della dashboard di \emph{Sia.Base}}
+    \label{fig:dash-base}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.25\textwidth]{../images/screenshots/DashboardBucket.png}
+    }
+        \caption{Sezione richieste per \texttt{\$\{bucket\}} della dashboard \emph{Sia.Base}}
+    \label{fig:dash-bucket}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.25\textwidth]{../images/screenshots/DashboardLogsTrace.png}
+    }
+    \caption{Sezione trace e log della dashboard di \emph{Sia.Grid}}
+    \label{fig:dash-logs-trace}
+\end{figure}
 
 \section{Telemetria delle performance hardware}
 
@@ -276,4 +303,11 @@ picco anomalo su qualsiasi metrica hardware, di navigare alla trace del ciclo di
 corrispondente e ai log emessi in quell'iterazione, chiudendo il percorso diagnostico
 metrica $\rightarrow$ trace $\rightarrow$ log.
 
- ------ AGGIUNGERE IMMAGINE DASHBOARD ------
+\begin{figure}[h]
+    \centering
+    \makebox[\textwidth][c]{%
+        \includegraphics[width=1.25\textwidth]{../images/screenshots/DashboardHardware.png}
+    }
+    \caption{Sezione risorse della dashboard di telemetria hardware}
+    \label{fig:dash-hardware-telemetry}
+\end{figure}
