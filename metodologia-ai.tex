@@ -1,0 +1,334 @@
+\chapter{Metodologia assistita da agenti AI}
+\label{cap:metodologia-ai}
+
+\intro{Il presente capitolo descrive la metodologia di lavoro adottata durante lo stage, incentrata sull'uso di un agente di codifica basato su un modello linguistico di grandi dimensioni (\gls{llm}) come \emph{pair engineer} strutturato. Vengono illustrati gli ambiti di utilizzo, il workflow \emph{Plan $\rightarrow$ Confirm $\rightarrow$ Implement}, i benefici in termini di tempo e le mitigazioni adottate per i limiti noti.}\\
+
+\section{Contesto e motivazione}
+
+La pianificazione dello stage prevedeva una durata di 300 ore distribuite su 8 settimane,
+a fronte di un ambito ampio: apprendimento di tecnologie nuove (OpenTelemetry SDK .NET,
+stack \emph{Grafana} LGTM, PromQL/TraceQL/LogQL, Serilog OTLP, \emph{Playwright}), realizzazione
+di prototipi, instrumentazione di più moduli del framework \emph{Sia.Web} e produzione della
+relativa documentazione. Per colmare il gap di conoscenza in merito alle tecnologie e lo studio
+della soluzione \emph{Sia.Web}, si è fatto ricorso all’utilizzo di agenti di intelligenza artificiale. 
+Questo approccio ha permesso di velocizzare le attività ripetitive e di replicare pattern già validati su nuovi moduli.
+L'introduzione di agenti di codifica, come \emph{Claude Code}, ha reso più efficiente l'introduzione 
+di test automatici e sistemi di telemetria all’interno di un’applicazione di grandi dimensioni, 
+permettendo di creare, e soprattutto propagare, codesti processi di supporto, senza sottrarre eccessive risorse agli sviluppi principali. 
+
+\section{Ambiti di utilizzo}
+
+L'agente è stato utilizzato in tre ambiti distinti, corrispondenti a tre momenti differenti
+dello stage.
+
+\subsection{Studio delle tecnologie}
+
+Nelle prime fasi, dedicate allo studio delle tecnologie, l'agente è stato impiegato
+per sintetizzare la documentazione ufficiale delle varie tecnologie, e per confrontare le possibili
+soluzioni da adottare. Tale attività ha permesso di ridurre in modo sensibile il tempo stimato di 
+\emph{onboarding}, concentrando lo studio sui soli punti
+critici per il progetto invece che sulla documentazione integrale di ciascuna tecnologia.
+
+\subsection{Prove di implementazione}
+
+Durante la fase di progettazione, l'agente è stato usato per produrre rapidamente varianti di
+\emph{proof of concept} (\gls{poc}) su scelte ancora da validare: che moduli testare, quale fosse 
+il carico computazionale introdotto, l'ambiente di hosting più conveniente (\emph{Docker} o servizi Windows).
+Avere a disposizione codice compilabile in pochi minuti ha consentito di provare e
+scartare alternative, invece di decidere a priori sulla base della sola documentazione.
+
+\subsection{Propagazione della telemetria agli altri moduli}
+
+L'ambito in cui l'uso dell'agente si è rivelato più produttivo è stato la propagazione
+dell'instrumentazione ai moduli del framework (\emph{Sia.Base}, \emph{Sia.Auth},
+\emph{Sia.Grid}, \emph{Sia.Crud}, \ldots). Per evitare che la replicazione del pattern di
+instrumentazione su moduli diversi introducesse incoerenze (naming, cardinalità, attributi
+di \emph{resource}), sono state definite \emph{Claude skill} dedicate:
+
+\begin{itemize}
+    \item \texttt{sia-telemetry-setup}: configurazione del pipeline OTel, \emph{sampler},
+        \emph{exporter}, \emph{appsettings};
+    \item \texttt{sia-telemetry-traces}: \emph{span}, \emph{tag}, \emph{helper} \texttt{TrackQuery};
+    \item \texttt{sia-telemetry-metrics}: metriche, \emph{naming}, cardinalità, pattern
+        \texttt{RecordMetricError};
+    \item \texttt{sia-telemetry-logs}: Serilog OTLP, correlazione \emph{log}-\emph{trace};
+    \item \texttt{sia-telemetry-grafana}: \emph{dashboard} Grafana, query PromQL/TraceQL/LogQL,
+        strumenti \gls{mcp}.
+\end{itemize}
+
+Ogni \emph{skill} è un contratto procedurale, non un semplice \emph{prompt}, che descrive
+convenzioni, \emph{anti-pattern} e \emph{template} di codice per uno specifico aspetto. L'agente
+carica la \emph{skill} appropriata quando riceve un task pertinente, garantendo che
+moduli instrumentati in momenti diversi rispettino le stesse convenzioni.
+
+\subsection{Propagazione dei test automatici sul \emph{backend}}
+
+Lo stesso schema \emph{agente specializzato + skill procedurali} è stato replicato per
+l'introduzione e la propagazione dei test automatici sul \emph{backend} del framework. È
+stato definito un agente \texttt{sia-server-test-developer} (\texttt{.claude/agents/}) che
+codifica la struttura della \emph{suite} (\emph{Unit}, \emph{Smoke}, \emph{Lifecycle},
+\emph{Summary}), lo stack tecnologico (xUnit + NSubstitute + FluentAssertions per gli
+\emph{unit}, \texttt{Microsoft.AspNetCore.Mvc.Testing} + \texttt{SkippableFact} per gli
+\emph{integration}), il \emph{naming} obbligatorio dei test
+(\texttt{Method\_Scenario\_Result}), il pattern \emph{Arrange/Act/Assert} esplicito, il
+\emph{trait} \texttt{Category="Integration"} per la separazione in pipeline CI e le
+convenzioni di \texttt{EmbeddedResource} per scenari e \emph{skip list}.
+
+A complemento dell'agente sono state definite due \emph{skill} dedicate al pattern più
+ripetitivo della \emph{suite}, l'aggiunta di un nuovo \emph{lifecycle test}
+\emph{data-driven}, una per ciascun controller mutativo coperto:
+\begin{itemize}
+    \item \texttt{sia-crud-lifecycle-scenario}: schema JSON dello \texttt{CrudLifecycleScenario},
+        \emph{flow} \texttt{INSERT $\rightarrow$ GET $\rightarrow$ UPDATE $\rightarrow$ GET $\rightarrow$ DELETE $\rightarrow$ GET}
+        sul \texttt{CrudDataController}, supporto a \emph{soft delete}
+        (\texttt{deleteMode}, \texttt{softDeleteExpectedFields}) e a \emph{primary key
+        composite} (\texttt{keyFields} come \emph{list});
+    \item \texttt{sia-grid-lifecycle-scenario}: schema gemello sul \texttt{GridDataController},
+        con le specificità del \emph{payload} (\texttt{PageRequestDTO} non vuoto, prefisso
+        \texttt{\_} sulle PK nel \emph{body} di \texttt{DELETE}) e il riuso della stessa
+        \emph{collection} serializzata della \emph{suite} CRUD.
+\end{itemize}
+
+Il beneficio osservato sul \emph{backend} è analogo a quello registrato sulla telemetria:
+una volta validato il pattern sul primo \emph{lifecycle} (\texttt{crud-companyprofile} per
+il CRUD, \texttt{grid-languages} per la Grid), l'estensione a un nuovo componente diventa
+una richiesta semantica all'agente (``\emph{aggiungi il \emph{lifecycle test} su
+\texttt{crud-orders}}'') che produce in pochi minuti il file \texttt{Scenarios/<id>.json},
+la dichiarazione \texttt{EmbeddedResource} nel \texttt{.csproj} e l'\texttt{InlineData}
+nella \emph{theory} corrispondente, senza che lo sviluppatore debba memorizzare
+convenzioni distribuite tra più file di configurazione.
+
+\section{Workflow Agenti AI}
+\label{sec:workflow-plan}
+
+Per evitare i rischi tipici della generazione automatica di codice (allucinazioni, \emph{overfitting} 
+al primo caso visto), è stato adottato un \emph{workflow} strutturato in tre fasi.
+
+\begin{enumerate}
+    \item \textbf{Plan.} Per ogni task non banale, l'agente produce un file
+        \texttt{plan.md} che descrive
+        obiettivo, componenti coinvolti, modifiche pianificate file per file, assunzioni e
+        domande aperte. Nessun codice viene prodotto in questa fase.
+    \item \textbf{Confirm.} Lo sviluppatore revisiona il \texttt{plan.md}, può editarlo
+        direttamente, integrarlo o rifiutarlo. L'agente si ferma \emph{esplicitamente} in
+        attesa di approvazione.
+    \item \textbf{Implement.} Solo dopo approvazione l'agente scrive un \texttt{task.md}, una
+        \emph{checklist} operativa, nella quale vengono tracciati in ordine, i singoli interventi 
+        eseguiti dall'agente.
+\end{enumerate}
+
+Il \emph{workflow} produce un artefatto tracciabile per ogni intervento: \texttt{plan.md} e
+\texttt{task.md} restano nel repository e fungono da registro decisionale.
+
+\section{Confronto pianificazione vs esecuzione}
+
+L'uso dell'agente ha prodotto un beneficio misurabile soprattutto nelle fasi a forte
+componente ripetitiva (studio, \gls{poc}, propagazione del pattern di instrumentazione), e un
+beneficio meno marcato in quelle a forte componente decisionale (scelte architetturali,
+analisi di cardinalità). Nel complesso, il tempo risparmiato nelle fasi assistite è stato
+riinvestito nelle attività non automatizzabili: revisione semantica del codice prodotto,
+validazione delle \emph{dashboard} contro Prometheus, affinamento iterativo delle
+\emph{skill}.
+
+\section{Limiti e mitigazioni}
+
+L'uso di un agente \gls{llm} comporta rischi noti che sono stati mitigati in modo sistematico.
+
+\begin{description}
+    \item[Allucinazioni su metriche/label.] L'agente tende a inventare nomi di metriche o
+        \emph{label} plausibili ma inesistenti. \textbf{Mitigazione}: regola obbligatoria di
+        validazione tramite \gls{mcp} Grafana (\texttt{list\_prometheus\_metric\_names},
+        \texttt{list\_prometheus\_label\_values}) prima di chiudere ogni task dashboard.
+    \item[Overfitting del prompt.] Le \emph{skill} iniziali, scritte a partire dal primo
+        modulo instrumentato (\texttt{Sia.Base}), contenevano riferimenti troppo specifici
+        (nomi di metriche, \emph{tag}, stored procedure). \textbf{Mitigazione}: riscrittura
+        delle \emph{skill} in termini generali, con placeholder \texttt{\{modulo\}} e
+        riferimenti ai moduli canonici solo come esempi.
+    \item[Perdita di contesto su sessioni lunghe.] La \emph{context window} dell'\gls{llm} è
+        finita; su task lunghi, l'agente perde traccia di decisioni prese in precedenza.
+        \textbf{Mitigazione}: memorizzazione persistente tramite \texttt{MEMORY.md} per
+        progetto e per agente, \texttt{plan.md} e \texttt{task.md} come registro decisionale
+        per ogni task.
+    \item[Divergenza dei pattern tra moduli.] Sviluppatori diversi, o sessioni diverse, possono
+        produrre variazioni del pattern di instrumentazione. \textbf{Mitigazione}:
+        centralizzazione dei pattern obbligatori nell'agente \texttt{sia-telemetry-developer}
+        (es.\ counter errori controller via \texttt{IControllerDiagnostics} con Adapter, uso
+        obbligatorio della \emph{template variable} \texttt{bucket} nelle dashboard).
+\end{description}
+Per superare gran parte di queste limitazioni e arricchire i processi di ragionamento degli agenti AI
+con contenuti e contesto aggiuntivi, è stato adottato il protocollo \gls{mcp}.
+Considerato inoltre il crescente impatto di questo strumento nell’ecosistema \gls{llm}, 
+si è ritenuto opportuno dedicargli una sezione specifica di approfondimento.
+
+
+% =============================================================================
+\section{Model Context Protocol}
+\label{sec:mcp-methodology}
+% =============================================================================
+Il \gls{mcp} è il protocollo, introdotto nel 2024, che consente a un agente basato su modelli
+linguistici di interagire in modo strutturato con servizi esterni, ottenendo dati dinamici e
+contestuali.
+
+\subsection{Il problema che MCP risolve}
+
+Un modello linguistico di grandi dimensioni (\emph{Large Language Model}, LLM) è, nella
+sua forma base, un sistema chiuso: conosce ciò che è stato scritto fino alla sua data di
+addestramento e risponde in linguaggio naturale, ma non può aprire un file, interrogare un
+database, chiamare un'API o agire nel mondo esterno. Questa limitazione non dipende
+dall'intelligenza del modello, dipende dall'assenza di un canale strutturato attraverso
+cui il modello possa ricevere dati aggiornati e restituire azioni concrete.\\
+Prima dell'avvento di \gls{mcp}, ogni integrazione tra un LLM e un sistema esterno richiedeva
+un connettore ad hoc: codice scritto una volta per quella specifica combinazione di
+modello e strumento, da riscrivere ogni volta che cambiava uno dei due. Con la
+proliferazione dei modelli e degli strumenti, il costo di manutenzione di questa matrice
+di integrazioni punto-a-punto è diventato rapidamente insostenibile.\\
+Il \gls{mcp}, introdotto da Anthropic nel novembre 2024 e
+oggi standard open-source governato dalla Linux Foundation sotto l'egida dell'Agentic AI
+Foundation, risolve questo problema esattamente come USB-C ha risolto la frammentazione
+dei connettori fisici: definendo un'interfaccia universale che qualsiasi modello e
+qualsiasi strumento possono implementare una volta sola per comunicare con l'intero
+ecosistema.
+
+% =============================================================================
+\subsection{Architettura}
+\label{sec:mcp-architettura}
+% =============================================================================
+
+\gls{mcp} è un protocollo client-server basato su \emph{JSON-RPC 2.0} con connessioni stateful. I
+ruoli coinvolti sono tre.
+
+\begin{description}
+  \item[Host:] L'applicazione che ospita l'LLM e avvia le connessioni \gls{mcp}. Può essere
+    un'interfaccia conversazionale come Claude Desktop, un IDE con assistente integrato,
+    o un servizio backend autonomo. L'host è responsabile del consenso dell'utente e
+    del controllo di accesso: decide quali server \gls{mcp} connettere e con quali permessi.
+  \item[Client:] Il componente interno all'host che gestisce il ciclo di vita della
+    connessione verso uno specifico server \gls{mcp}: negozia le capacità, invia richieste,
+    riceve risposte.
+  \item[Server \gls{mcp}:] Il servizio che espone dati e funzionalità all'LLM. Può girare
+    in locale (processo figlio, comunicazione via \emph{stdio}) o in remoto (connessione
+    via HTTP con Server-Sent Events). Un server \gls{mcp} può rappresentare un'API esterna,
+    un database, un file system, uno strumento di automazione, o qualsiasi sistema
+    che si voglia rendere accessibile all'agente.
+\end{description}
+La connessione tra client e server è stateful: prima di qualsiasi scambio applicativo
+avviene una fase di \emph{handshake} in cui le due parti negoziano le rispettive
+capacità. Questo meccanismo garantisce la retrocompatibilità: un client più nuovo può
+parlare con un server più vecchio senza rompere nulla, e viceversa.
+
+% =============================================================================
+\subsection{Le primitive del protocollo}
+\label{sec:mcp-primitive}
+% =============================================================================
+
+\gls{mcp} definisce tre categorie di primitive che un server può esporre, e tre che un client
+può offrire al server.
+
+\subsubsection{Primitive lato server}
+
+\begin{description}
+  \item[Resources] Dati e contesto che il modello o l'utente possono consultare:
+    file, pagine web, righe di database, output di API. Le risorse sono identificate da
+    URI e possono essere statiche o dinamiche (aggiornate a ogni lettura).
+  \item[Tools] Funzioni che il modello può invocare per compiere azioni nel mondo:
+    creare un file, inviare un'email, eseguire una query SQL, chiamare un endpoint REST.
+    I tool rappresentano esecuzione arbitraria di codice e richiedono consenso esplicito
+    dell'utente prima di essere invocati.
+  \item[Prompts] Template di messaggi e workflow predefiniti che il server mette a
+    disposizione dell'utente o dell'applicazione host, per guidare interazioni ricorrenti
+    senza doverle riscrivere ogni volta.
+\end{description}
+
+\subsubsection{Primitive lato client}
+
+\begin{description}
+  \item[Sampling] Consente al server di avviare interazioni ricorsive con l'LLM,
+    delegando al client (e quindi all'utente) il controllo su quali prompt vengono
+    effettivamente inviati al modello e cosa il server può vedere delle risposte.
+  \item[Roots] Permette al server di interrogare il client sulle radici del filesystem
+    o degli URI entro cui è autorizzato a operare, definendo i confini del suo spazio
+    di lavoro.
+  \item[Elicitation] Consente al server di richiedere informazioni aggiuntive
+    all'utente in modo strutturato, durante l'esecuzione di un workflow.
+\end{description}
+
+% =============================================================================
+\subsection{Dall'integrazione al microservizio agentico}
+\label{sec:mcp-agentico}
+% =============================================================================
+
+La portata dell'innovazione si può cogliere quando si analizza il protocollo come, non soltanto un modo
+più comodo per collegare gli LLM a qualche strumento locale, bensì a \gls{mcp} come 
+l'\textbf{infrastruttura per i microservizi agentici}.\\
+Nel modello tradizionale, un microservizio espone una REST API che altri servizi chiamano
+in modo deterministico: il chiamante sa esattamente quale endpoint invocare, con quali
+parametri, e interpreta la risposta secondo uno schema fisso. In un'architettura agentica,
+il chiamante è un LLM che ragiona sul problema, decide autonomamente quali tool invocare e
+in quale ordine, e compone i risultati in modo flessibile. \gls{mcp} è il contratto che rende
+possibile questa composizione senza che ogni strumento debba essere scritto appositamente
+per ogni modello.\\
+Un server \gls{mcp} che espone dati in tempo reale, da una piattaforma di visualizzazione dati come \emph{Grafana},
+da un database operativo, da un framework per lo sviluppo di test (es. \emph{Playwright}), diventa un blocco riutilizzabile
+dell'ecosistema agentico: qualsiasi agente compatibile con \gls{mcp} può scoprirlo, negoziare
+le sue capacità e usarlo, esattamente come un'applicazione scopre e usa un dispositivo
+USB. La standardizzazione sposta il valore dall'integrazione alla
+logica applicativa.
+
+% =============================================================================
+\subsection{Sicurezza}
+\label{sec:mcp-sicurezza}
+% =============================================================================
+
+L'ampiezza dei permessi che un server \gls{mcp} può richiedere, accesso al filesystem,
+esecuzione di query, chiamate a API esterne, rende la sicurezza un tema centrale che
+la specifica affronta esplicitamente attraverso quattro principi.\\
+Il primo è il \textbf{consenso esplicito dell'utente}: nessun tool può essere invocato
+senza che l'utente abbia approvato l'azione, e le descrizioni dei tool non devono essere
+considerate attendibili se provengono da server non verificati (vettore noto di
+\emph{prompt injection} tramite descrizioni malevole). Il secondo è la \textbf{privacy dei
+dati}: l'host non deve trasmettere dati utente verso server \gls{mcp} senza consenso esplicito.
+Il terzo è il \textbf{controllo sul sampling}: l'utente deve poter vedere e approvare i
+prompt che il server vuole inviare al modello. Il quarto è la \textbf{separazione dei
+contesti}: il protocollo limita intenzionalmente la visibilità del server sui prompt
+dell'utente, riducendo la superficie di attacco per l'estrazione di informazioni
+confidenziali.\\
+Ricerche indipendenti hanno evidenziato che implementazioni permissive possono essere
+vulnerabili a \emph{tool poisoning} e \emph{prompt injection} attraverso descrizioni
+malevole nei server \gls{mcp}. Per mitigare tali rischi, è consigliabile adottare meccanismi di autorizzazione granulari, 
+in grado di limitare l’accesso ai dati sensibili e di ridurre la superficie di esposizione verso questi server.
+
+\subsection{Applicazione nel progetto}
+
+Nel contesto del progetto \emph{Sia.Core}, MCP è stato impiegato per collegare l'agente
+di sviluppo direttamente a Grafana, a \emph{Playwright} e a \emph{mssql}, eliminando il
+passaggio manuale di schemi, nomi di metriche e strutture dati tra l'utente e l'agente.\\
+L'impatto più evidente si è registrato nella generazione delle dashboard: prima
+dell'integrazione, l'agente produceva widget plausibili ma spesso errati, metriche
+inesistenti, attributi di filtraggio non presenti nelle serie temporali, tipi di grafico
+inadatti alla natura del dato. Connettere l'agente a Grafana tramite MCP ha ridotto
+sensibilmente questi errori, perché il modello poteva interrogare direttamente l'istanza
+e ricevere come contesto i nomi reali delle metriche, le label disponibili e la struttura
+delle trace esistenti in Tempo.\\
+Nonostante il miglioramento, si è resa necessaria una fase di \emph{prompt engineering}
+mirata a consolidare le linee guida operative dell'agente. In particolare, sono state
+introdotte direttive esplicite su tre fronti: quali tipi di grafico associare a ciascuna
+categoria di metrica (es.\ \emph{time series} per latenze e rate, \emph{stat} per
+contatori cumulativi, \emph{histogram} per distribuzioni di percentili); quali variabili
+di template definire a livello di dashboard per abilitare il filtraggio per
+\texttt{service\_name}, \texttt{sia\_repository} e \texttt{sia\_operation}; come
+organizzare la griglia dei widget per mantenere leggibilità e coerenza visiva tra moduli
+diversi.\\
+Un beneficio analogo si è ottenuto con l'integrazione di \emph{Playwright} e
+\emph{mssql}: in entrambi i casi, l'accesso diretto agli strumenti tramite MCP ha
+permesso all'agente di operare su dati reali anziché su assunzioni, riducendo il numero
+di iterazioni necessarie per ottenere un risultato corretto.
+
+\section{Considerazioni conclusive}
+
+L’utilizzo di un agente AI come supporto allo sviluppo, insieme all’adozione del protocollo \gls{mcp}, 
+ha contribuito in modo significativo al miglioramento della qualità del prodotto, 
+alla riduzione dei tempi di sviluppo e al superamento delle iniziali lacune tecniche.\\
+Tuttavia, il ruolo dell’agente AI non deve essere interpretato come sostitutivo di quello dello sviluppatore.
+Il lavoro eseguito dall'agente, che fosse codice prodotto, scelte architetturali
+o propagazione degli sviluppi, ha spesso richiesto interventi di indirizzamento, correzione e validazione
+da parte dello sviluppatore risultando quindi un processo collaborativo piuttosto che autonomo.
