@@ -1,22 +1,33 @@
 \chapter{Introduzione}
 \label{cap:introduzione}
 
-\intro{Il capitolo seguente descrive l'azienda ospitante e l'idea alla base del progetto di stage}\\
+\intro{Il presente capitolo introduce il contesto aziendale in cui si è svolto
+lo stage, l'idea da cui il progetto ha preso forma, i contributi originali del
+lavoro presentato e l'organizzazione del documento.}\\
 
 \section{L'azienda}
-Sia Informatica S.r.l. è una società con sede a Vigonza (PD) che, dal 1996, opera nel settore dello sviluppo software e della consulenza 
-informatica per aziende di diversi comparti produttivi. Il \emph{core business} dell'azienda è la progettazione e l'implementazione di
-soluzioni tecnologiche personalizzate, pensate per rispondere alle specifiche esigenze operative di ciascun cliente.
-L'offerta comprende sistemi \gls{erp} verticali, declinati per i settori del packaging, dell'arredamento e della moda sotto il nome 
-commerciale \emph{Job3 ERP}, servizi web tra cui un \gls{crm} (\emph{Sales Connect}) e strumenti per la gestione logistica, soluzioni 
-di gestione documentale (fatturazione elettronica, firma digitale e conservazione sostitutiva), nonché sistemi di integrazione 
-avanzata come la tecnologia \gls{rfid}, per la gestione intelligente della logistica e la tracciabilità aziendale, e un assistente basato 
-sull'intelligenza artificiale denominato \emph{Kitsune}. 
-La filosofia aziendale si ispira al principio giapponese del Kintsugi, ovvero l'arte di valorizzare le imperfezioni trasformandole in punti di forza: 
-in modo analogo, Sia Informatica non si limita a fornire strumenti software isolati, ma costruisce connessioni profonde tra i 
-processi aziendali, puntando all'armonizzazione e all'ottimizzazione dei flussi operativi. Con oltre vent'anni di esperienza nel 
-mercato, l'azienda rappresenta un partner tecnologico consolidato per le imprese del Nord-Est Italia che cercano soluzioni 
-scalabili, integrate e su misura.
+
+Sia Informatica S.r.l.\ è una società con sede a Vigonza (PD) che, dal 1996,
+opera nel settore dello sviluppo software e della consulenza informatica per
+aziende di diversi comparti produttivi. Il \emph{core business} consiste nella
+progettazione e realizzazione di soluzioni tecnologiche personalizzate,
+costruite su misura delle esigenze operative dei clienti. L'offerta comprende
+sistemi \gls{erp} verticali, declinati per i settori del \emph{packaging},
+dell'arredamento e della moda con il marchio \emph{Job3 ERP}, servizi web tra
+cui un \gls{crm} (\emph{Sales Connect}) e strumenti di gestione logistica,
+soluzioni di gestione documentale (fatturazione elettronica, firma digitale,
+conservazione sostitutiva), nonché tecnologie di integrazione avanzata come
+\gls{rfid} e un assistente basato sull'intelligenza artificiale denominato
+\emph{Kitsune}.\\
+La filosofia aziendale si ispira al principio giapponese del \emph{Kintsugi},
+l'arte di valorizzare le imperfezioni trasformandole in punti di forza: in
+modo analogo, Sia Informatica non si limita a fornire strumenti software
+isolati, ma costruisce connessioni profonde tra i processi aziendali, con
+l'obiettivo di armonizzare e ottimizzare i flussi operativi. Con oltre
+vent'anni di esperienza, l'azienda è oggi un partner tecnologico consolidato
+per le imprese del Nord-Est italiano che cercano soluzioni integrate,
+scalabili e sostenibili nel tempo.
+
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.2\linewidth]{../images/technologies/Sia.png}
@@ -26,37 +37,147 @@ scalabili, integrate e su misura.
 
 \section{L'idea}
 
-Il progetto di stage nasce dall'esigenza, da parte di Sia Informatica, di migliorare la qualità e il monitoraggio delle applicazioni \emph{web enterprise} sviluppate internamente.
-In particolare, l'applicazione Sia.Core rappresenta un sistema complesso, basato su architettura \emph{full-stack} (\emph{Angular} per il \emph{client} e \emph{.NET 9} per il \emph{server}), per il quale risulta fondamentale garantire elevati standard di affidabilità, manutenibilità e prestazioni.
-\\
-In questo contesto, le attività di \emph{testing} e di monitoraggio risultano cruciali ma, allo stesso tempo, onerose se svolte manualmente o con strumenti tradizionali.
-La crescente complessità del sistema e il numero sempre maggiore di componenti rendono infatti difficile mantenere una copertura di test adeguata e individuare tempestivamente eventuali anomalie o malfunzionamenti.
-\\
-Il progetto si è sviluppato lungo due linee di lavoro parallele. La prima riguarda la generazione di test di unità e integrazione per il backend, e test di unità e \emph{end2end} per il frontend. La seconda, su cui è concentrato il focus del presente documento, riguarda la progettazione e l'implementazione di un sistema di \emph{telemetria} e \emph{osservabilità} basato su \emph{OpenTelemetry} per la raccolta di metriche, \emph{log} e \emph{trace}, e su \emph{Grafana} per la loro visualizzazione, analisi e correlazione.
-\\
-In entrambe le linee di lavoro, lo sviluppo è stato affiancato dall'agente di codifica \emph{Claude Code}, utilizzato come \emph{pair engineer} strutturato per accelerare lo studio delle tecnologie, la realizzazione di prototipi e la propagazione della telemetria a più moduli del framework. Tale metodologia è descritta in dettaglio nel capitolo~\ref{cap:metodologia-ai}.
+Tutti i prodotti aziendali condividono una stessa base tecnologica,
+\emph{Sia.Core}: un'applicazione \emph{web enterprise} che cresce di
+funzionalità mese dopo mese, distribuita su decine di installazioni di
+clienti diversi. Una piattaforma di queste dimensioni vive di un compromesso
+delicato: ogni nuova funzionalità deve poter essere introdotta rapidamente,
+ma senza intaccare la stabilità di ciò che già funziona.\\
+A questo compromesso si aggiunge una difficoltà tipica delle applicazioni
+distribuite: quando in produzione qualcosa non va come previsto, capire
+cosa sta accadendo e perché non è affatto immediato. Un
+malfunzionamento può avere origine in un punto del sistema e manifestarsi in
+un punto completamente diverso, con un ritardo difficile da imputare. Senza
+strumenti adatti, lo sviluppatore si trova a indagare a posteriori, con
+informazioni frammentarie e dipendendo dalla memoria di chi ha installato il
+software.
+
+L'idea alla base dello stage nasce da queste due esigenze parallele:
+
+\begin{itemize}
+    \item dare al team di sviluppo una rete di sicurezza che permetta
+        di intervenire sul codice del framework con la confidenza che
+        nulla di già funzionante venga rotto, ovvero un sistema di
+        \emph{testing} automatico integrato e ripetibile;
+    \item dare a chi si occupa di assistenza e diagnosi uno strumento che
+        renda visibile il comportamento dell'applicazione in tempo reale,
+        ovvero un sistema di telemetria che osservi in modo
+        sistematico ciò che il software sta facendo e ne registri le
+        prestazioni e le anomalie.
+\end{itemize}
+Il presente documento è dedicato in modo prevalente al secondo filone, mentre
+del primo viene data una panoramica orientata alla metodologia adottata e ai
+risultati ottenuti.
+
+\section{Una metodologia di lavoro centrata sull'AI}
+\label{sec:introduction-ai}
+
+Un elemento che ha attraversato trasversalmente entrambe le linee di lavoro
+è stato l'utilizzo di un agente di intelligenza artificiale come \emph{pair
+engineer} strutturato. La creazione e lo sviluppo di più agenti di codifica 
+all'interno di un \emph{framework} di queste dimensioni non è stata banale: per 
+evitare che generasse codice incoerente o che inventasse pezzi di realtà non esistenti
+(``allucinazioni''), si è dovuta progettare diversi \emph{tools}, tra i quali:
+
+\begin{itemize}
+    \item nuovi agenti AI specializzati, configurati per operare su specifici moduli 
+        del sistema e guidati tramite prompt strutturati e contesto controllato, con
+        convenzioni del \emph{framework} in modo che la propagazione della telemetria e dei
+        test ai vari moduli avvenga in modo uniforme;
+    \item un insieme di \emph{skill} procedurali: piccoli regolamenti
+        scritti per l'agente, per la specializzazione degli agenti in determinati 
+        compiti, come: lo sviluppo dei vari segnali di telemetria, la creazione 
+        di dashboard per la visualizzazione di dati, la scrittura di test di vario tipo, ecc.;
+    \item l'uso del \gls{mcp}, uno standard recente
+        che consente all'agente di interrogare direttamente i sistemi
+        coinvolti (\emph{Grafana}, il database, gli strumenti di test)
+        anziché lavorare su assunzioni potenzialmente errate.
+\end{itemize}
+
+\section{Implementazioni realizzate}
+\label{sec:contributi}
+
+Il lavoro svolto durante il periodo di stage ha prodotto diversi contributi
+originali, sintetizzabili come segue:
+
+\begin{itemize}
+    \item la \textbf{progettazione completa di un'architettura di
+        osservabilità} per \emph{Sia.Core}, dalla scelta dello stack
+        (\emph{OpenTelemetry} + \emph{Grafana LGTM}) all'integrazione con
+        l'infrastruttura esistente, passando alla standardizzazione del
+        \emph{pipeline}, in modo che ogni nuovo modulo possa aderirvi
+        senza conoscerne i dettagli, terminando con la presentazione dei dati
+        raccolti in dashboard apposite.
+    \item la definizione di una \textbf{tassonomia coerente} di metriche,
+        \emph{trace} e attributi per i moduli centrali del \emph{framework}
+        (autenticazione, singoli componenti \emph{Angular} come griglie e form,
+        prestazioni dell'hardware, interrogazione del database, ecc.), pensata per evitare l'esplosione
+        della cardinalità lato Prometheus e per consentire il confronto
+        omogeneo tra moduli e clienti diversi;
+    \item l'introduzione di due meccanismi per il \textbf{miglioramento dell'analisi
+        della telemetria}: l'arricchimento automatico di ogni \emph{trace} con
+        l'identità dell'utente autenticato e l'uso degli \emph{exemplar}
+        per collegare metriche aggregate alla \emph{trace} che le ha
+        prodotte, che rendono possibile una catena diagnostica
+        completa: dal grafico Grafana alla richiesta specifica, passando
+        per l'utente coinvolto e i \emph{log} emessi nel suo contesto;
+    \item l'introduzione, da zero, di un'\textbf{infrastruttura di testing
+        automatico} nel \emph{framework} backend, articolata su \emph{unit test}
+        per la logica di business e \emph{integration test} per la verifica
+        dell'attendibilità dei dati presenti nei database, delle procedure SQL utilizzate
+        e delle prospettive presenti per descrive la struttura dei vari componenti;
+    \item lo sviluppo di \textbf{test anche lato frontend}, comprendenti sia \emph{unit test} 
+        tradizionali per la verifica della logica applicativa, sia test di validazione \emph{end-to-end}, 
+        finalizzati a verificare il corretto comportamento e la corretta visualizzazione dell’applicazione 
+        dal punto di vista dell’utente finale;
+    \item come già approfondito nella sezione precedente (\ref{sec:introduction-ai}),
+        la \textbf{creazione di agenti AI e \emph{skill}} per la replicabilità e la propagazione
+        di telemetria e test a contesti di sviluppo analoghi nel \emph{framework}.
+\end{itemize}
 
 \section{Organizzazione del testo}
 
 \begin{description}
-    \item[{\hyperref[cap:descrizione-stage]{Il secondo capitolo}}] descrive gli obiettivi del periodo di stage, la pianificazione del lavoro ed eventuali rischi preventivati.
-    
-    \item[{\hyperref[cap:analisi-requisiti]{Il terzo capitolo}}] approfondisce le funzionalità del prodotto, tramite requisiti e casi d'uso implementati.
-    
-    \item[{\hyperref[cap:tecnologie-adottate]{Il quarto capitolo}}] presenta le tecnologie e gli strumenti utilizzati durante il periodo di stage e adottati per lo sviluppo del prodotto.
-    
-    \item[{\hyperref[cap:progettazione]{Il quinto capitolo}}] affronta le caratteristiche tecniche del prodotto, con particolare riferimento alle scelte progettuali e architetturali.
-    
-    \item[{\hyperref[cap:metodologia-ai]{Il sesto capitolo}}] descrive la metodologia di lavoro assistita da agenti di intelligenza artificiale, con particolare riferimento allo studio delle tecnologie, alla realizzazione di prove di implementazione e alla propagazione della telemetria ai diversi moduli del framework.
+    \item[{\hyperref[cap:descrizione-stage]{Il secondo capitolo}}] descrive
+        gli obiettivi del periodo di stage, la pianificazione del lavoro e
+        l'analisi preventiva dei rischi.
 
-    \item[{\hyperref[cap:codifica]{Il settimo capitolo}}] espone i dettagli implementativi della soluzione, illustrando l'organizzazione del codice, i design pattern adottati e le convenzioni seguite per l'instrumentazione dei moduli.
+    \item[{\hyperref[cap:analisi-requisiti]{Il terzo capitolo}}]
+        approfondisce le funzionalità del prodotto, presentando i requisiti
+        e i casi d'uso individuati.
 
-    \item[{\hyperref[cap:conclusioni]{L'ottavo capitolo}}] descrive il consuntivo del lavoro svolto, il raggiungimento degli obiettivi, le conoscenze acquisite e le possibili evoluzioni future del progetto.
+    \item[{\hyperref[cap:tecnologie-adottate]{Il quarto capitolo}}] presenta
+        le tecnologie e gli strumenti adottati durante lo stage,
+        soffermandosi sui criteri di scelta.
+
+    \item[{\hyperref[cap:progettazione]{Il quinto capitolo}}] illustra le
+        scelte progettuali e architetturali del sistema di telemetria, con
+        rinvio in appendice ai dettagli tecnici di ampia dimensione.
+
+    \item[{\hyperref[cap:metodologia-ai]{Il sesto capitolo}}] descrive in
+        dettaglio la metodologia di lavoro AI-assistita, le \emph{skill}
+        sviluppate, il \gls{mcp} e le sue applicazioni
+        pratiche al progetto.
+
+    \item[{\hyperref[cap:codifica]{Il settimo capitolo}}] espone gli aspetti
+        implementativi salienti, mantenendo nel corpo principale solo le
+        descrizioni di alto livello e relegando in appendice i frammenti di
+        codice e i dettagli più estesi.
+
+    \item[{\hyperref[cap:conclusioni]{L'ottavo capitolo}}] riassume i
+        risultati raggiunti, le conoscenze acquisite e gli sviluppi futuri
+        più promettenti.
 \end{description}
 
-Riguardo la stesura del testo, relativamente al documento sono state adottate le seguenti convenzioni tipografiche:
+Riguardo alla stesura del testo, sono state adottate le seguenti convenzioni
+tipografiche:
 \begin{itemize}
-	\item gli acronimi, le abbreviazioni e i termini ambigui o di uso non comune menzionati vengono definiti nel glossario, situato alla fine del presente documento;
-	\item per la prima occorrenza dei termini riportati nel glossario viene utilizzata la nomenclatura "parola(abbreviazione)", mentre per ogni successiva occorrenza verrà utilizzata solamente l’abbreviazione di tale termine;
-	\item i termini in lingua straniera e facenti parti del gergo tecnico sono evidenziati con il carattere \emph{corsivo}.
+    \item gli acronimi, le abbreviazioni e i termini ambigui o di uso non
+        comune sono definiti nel glossario, situato alla fine del presente
+        documento;
+    \item alla prima occorrenza di un termine riportato nel glossario è
+        utilizzata la nomenclatura ``parola (abbreviazione)'', mentre
+        nelle occorrenze successive si utilizza solamente l'abbreviazione;
+    \item i termini in lingua straniera o appartenenti al gergo tecnico
+        sono evidenziati con il carattere \emph{corsivo}.
 \end{itemize}
