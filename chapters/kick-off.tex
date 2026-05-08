@@ -22,9 +22,8 @@ creazione di agenti specializzati, di \emph{skill} procedurali e l'integrazione 
 e della metodologia AI-assistita sono trattati in dettaglio rispettivamente nei
 capitoli~\ref{cap:progettazione} e~\ref{cap:metodologia-ai}.
 
-\section{Requisiti e obiettivi}
+\section{Obiettivi}
 
-\subsection{Obiettivi}
 \begin{enumerate}[label=\arabic*.]
   \item Analizzare i requisiti di osservabilità dell'ecosistema \emph{Sia.Core} e
         identificare le soluzioni tecnologiche adeguate, scegliendo lo stack di
@@ -56,60 +55,6 @@ capitoli~\ref{cap:progettazione} e~\ref{cap:metodologia-ai}.
         \gls{mcp} per garantire la replicabilità della propagazione di telemetria e
         test ai diversi moduli del \emph{framework}.
 \end{enumerate}
-
-\subsection{Requisiti funzionali}
-
-\begin{enumerate}[label=RF\arabic*.]
-    \item Il sistema deve tracciare il percorso completo di ogni richiesta HTTP in
-        ingresso, incluse le operazioni di accesso al database.
-    \item Le operazioni CRUD verso il database devono essere riconoscibili tramite
-        attributi che espongono il metodo e la \emph{repository} da cui è stata
-        scatenata la richiesta.
-    \item Il sistema deve esporre metriche operative per i moduli centrali del
-        \emph{framework} (autenticazione, componenti \emph{Angular} come griglie e
-        \emph{form}, prestazioni hardware, accesso al database).
-    \item I \emph{log} devono essere correlabili alle \emph{trace} tramite
-        \texttt{TraceId} e \texttt{SpanId}.
-    \item Il sistema deve essere attivabile e disattivabile tramite configurazione,
-        senza richiedere modifiche al codice.
-    \item Deve essere possibile configurare indipendentemente il campionamento per
-        ciascuna sorgente di \emph{trace}.
-    \item Deve essere possibile visualizzare \emph{trace} e metriche raggruppate in
-        dashboard \emph{Grafana} costruite sullo stack \emph{LGTM}.
-    \item Le dashboard di \emph{Grafana} devono raccogliere i dati da più servizi e
-        installazioni di clienti diversi, e permettere di filtrare per gli stessi.
-    \item Il sistema deve arricchire automaticamente ogni \emph{span} con l'identità
-        dell'utente autenticato (\texttt{enduser.id}, \texttt{enduser.name}) senza
-        richiedere modifiche ai singoli moduli applicativi.
-    \item Le metriche di tipo \emph{Histogram} devono esporre \emph{exemplar}, ovvero
-        puntatori al \texttt{TraceId} del campione, per abilitare la navigazione dalla
-        metrica aggregata alla \emph{trace} corrispondente.
-    \item Devono essere prodotti \emph{unit test} per la logica di business dei moduli
-        core del \emph{framework backend}, eseguibili in modo automatizzato.
-    \item Devono essere prodotti \emph{integration test} per la verifica
-        dell'attendibilità dei dati presenti nel database, delle procedure SQL e delle
-        prospettive di configurazione dei componenti.
-    \item Devono essere prodotti \emph{unit test} lato \emph{frontend} per la verifica
-        della logica applicativa dei componenti \emph{Angular}.
-    \item Devono essere prodotti test \emph{end-to-end} lato \emph{frontend} per
-        verificare il corretto comportamento e la corretta visualizzazione
-        dell'applicazione dal punto di vista dell'utente finale.
-    \item La suite di test deve essere integrabile nel processo di \emph{build} e
-        fornire un report di copertura del codice.
-    \item Devono essere realizzati agenti AI specializzati e \emph{skill} procedurali
-        per propagare in modo uniforme telemetria e test ai diversi moduli del
-        \emph{framework}.
-\end{enumerate}
-
-\subsection{Requisiti non funzionali}
-
-\begin{enumerate}[label=RNF\arabic*.]
-    \item La telemetria non deve degradare sensibilmente le prestazioni in produzione.
-    \item Le metriche devono essere progettate per non generare un numero eccessivo di serie temporali in Prometheus; in particolare, i tag ad alta variabilità (es.\ identificativi utente o di record) non devono essere usati come attributi di metriche.
-    \item I segnali prodotti devono essere compatibili con qualsiasi backend \gls{otel}-compatibile.
-    \item Le impostazioni devono essere modificabili per ambiente (sviluppo, \emph{staging}, produzione) tramite \emph{appsettings}.
-\end{enumerate}
-
 
 \section{Analisi preventiva dei rischi}
 Durante la fase iniziale di analisi, sono stati individuati i principali rischi che sarebbero potuti emergere nel corso dello stage. 
