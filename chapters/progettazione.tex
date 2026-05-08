@@ -142,7 +142,7 @@ corrisponde, si applica il ratio globale \texttt{SamplingRatio}.
 
 Per soddisfare il requisito RFN-10, il sistema arricchisce automaticamente ogni span con
 l'identità dell'utente autenticato senza richiedere modifiche ai singoli moduli applicativi. Il
-meccanismo è descritto nel dettaglio nella sezione~\ref{sec:modello-enduser}.
+meccanismo è descritto nel dettaglio nella sezione%~\ref{sec:modello-enduser}.
 
 \subsubsection{Correlazione metrica-trace tramite \emph{exemplars}}
 \label{sec:exemplars-design}
@@ -152,7 +152,7 @@ Per soddisfare il requisito RFN-11, le metriche di tipo \emph{Histogram} espongo
 generati. Questo abilita la navigazione dal pannello di una metrica aggregata alla trace
 specifica che ha prodotto il campione anomalo, risolvendo la domanda ``quale richiesta ha
 causato questo picco?''. Il meccanismo è descritto nel dettaglio nella
-sezione~\ref{sec:modello-exemplars}.
+sezione%~\ref{sec:modello-exemplars}.
 
 \subsubsection{Pattern architetturali applicati}
 \label{sec:design-patterns-intro}
@@ -698,8 +698,8 @@ condiviso \texttt{BaseApiController.RecordMetricError} passando il singleton
 
 La figura~\ref{fig:diag-enduser} mostra le collaborazioni che realizzano l'arricchimento
 automatico di ogni \texttt{Activity} con i \emph{tag} \texttt{enduser.id} e
-\texttt{enduser.name}, descritte nella sezione~\ref{sec:modello-enduser}. Il
-\texttt{EnrichActivityWithUserMiddleware} legge le \emph{claim} da
+\texttt{enduser.name}, descritte nella sezione.%~\ref{sec:modello-enduser}.
+Il \texttt{EnrichActivityWithUserMiddleware} legge le \emph{claim} da
 \texttt{HttpContext.User} e pubblica le voci nel \texttt{Baggage}; il
 \texttt{BaggageActivityProcessor}, registrato come \texttt{ActivityProcessor} nel
 \texttt{TracerProvider}, copia ogni \emph{entry} di \emph{baggage} con prefisso

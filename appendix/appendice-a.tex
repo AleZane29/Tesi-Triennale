@@ -1,3 +1,402 @@
-\chapter{Appendice A}
+\chapter{Tracciamento completo dei requisiti}
+\label{app:requisiti}
 
-\epigraph{Citazione}{Autore della citazione}
+In questa appendice sono raccolte le tabelle complete dei requisiti
+(funzionali, qualitativi e di vincolo) con il relativo tracciamento sui casi
+d'uso. La struttura del codice identificativo dei requisiti è descritta nella
+sezione~\ref{sec:codice-requisiti}.
+
+\begin{table}[h]
+\caption{Tabella del tracciamento dei requisiti funzionali}
+\label{tab:requisiti-funzionali}
+\begin{tabularx}{\textwidth}{lXl}
+\hline\hline
+\textbf{Requisito} & \textbf{Descrizione} & \textbf{Use Case}\\
+\hline
+RFN-1 & Tracciamento del percorso completo di ogni richiesta HTTP, incluse le operazioni sul database & UC2, UC4 \\
+\hline
+RFN-2 & Identificazione delle operazioni CRUD tramite attributi di metodo e repository & UC2, UC4 \\
+\hline
+RFN-3 & Esposizione di metriche operative per i moduli di autenticazione, accesso ai dati e griglia & UC2 \\
+\hline
+RFN-4 & Correlazione tra log e trace tramite \texttt{TraceId} e \texttt{SpanId} & UC4 \\
+\hline
+RFN-5 & Attivazione/disattivazione della telemetria tramite configurazione \emph{appsettings} & UC3 \\
+\hline
+RFN-6 & Configurazione indipendente del campionamento per ciascuna sorgente di trace & UC3 \\
+\hline
+RFN-7 & Visualizzazione di trace e metriche raggruppate in dashboard Grafana & UC2 \\
+\hline
+RFN-8 & Raccolta dei dati da più servizi e installazioni, con filtraggio per cliente e servizio & UC2 \\
+\hline
+RFN-9 & Sviluppo di \emph{Claude skill} per la propagazione della telemetria ai moduli del framework & UC3 \\
+\hline
+RFN-10 & Arricchimento automatico degli span con identità utente (\texttt{enduser.id}, \texttt{enduser.name}) & UC4 \\
+\hline
+RFN-11 & Esposizione di \emph{exemplars} per le metriche Histogram (puntatore al \texttt{TraceId}) & UC4 \\
+\hline
+\end{tabularx}
+\end{table}
+
+\begin{table}[h]
+\caption{Tabella del tracciamento dei requisiti qualitativi}
+\label{tab:requisiti-qualitativi}
+\begin{tabularx}{\textwidth}{lXl}
+\hline\hline
+\textbf{Requisito} & \textbf{Descrizione} & \textbf{Use Case}\\
+\hline
+RQN-1 & La telemetria non deve degradare sensibilmente le prestazioni in produzione & - \\
+\hline
+RQN-2 & Le metriche non devono generare un numero eccessivo di serie temporali in Prometheus (cardinalità controllata) & - \\
+\hline
+RQD-1 & Le dashboard devono privilegiare la visualizzazione della latenza (percentili) rispetto al solo \emph{throughput} & UC2 \\
+\hline
+\end{tabularx}
+\end{table}
+
+\begin{table}[h]
+\caption{Tabella del tracciamento dei requisiti di vincolo}
+\label{tab:requisiti-vincolo}
+\begin{tabularx}{\textwidth}{lXl}
+\hline\hline
+\textbf{Requisito} & \textbf{Descrizione} & \textbf{Use Case}\\
+\hline
+RVN-1 & I segnali prodotti devono essere compatibili con qualsiasi backend \gls{otel}-compatibile & - \\
+\hline
+RVN-2 & Le impostazioni devono essere modificabili per ambiente (sviluppo, \emph{staging}, produzione) tramite \emph{appsettings} & - \\
+\hline
+\end{tabularx}
+\end{table}
+
+\chapter{Diagrammi delle classi del sistema di telemetria}
+\label{app:diagrammi-classi}
+
+In questa appendice sono raccolti i diagrammi delle classi del sistema di
+telemetria descritti, in forma narrativa, nel capitolo~\ref{cap:progettazione}.
+I diagrammi adottano uno stile \gls{uml} semplificato: rettangoli con nome e
+membri salienti, frecce tratteggiate per le dipendenze d'uso, freccia con
+triangolo vuoto per la relazione di implementazione di interfaccia.
+
+\section{Pipeline condiviso in \texttt{BaseApplicationBuilder}}
+\label{app:diag-pipeline}
+
+La figura~\ref{fig:diag-pipeline} mostra il pipeline \gls{otel} centralizzato:
+i tre provider \texttt{TracerProvider}, \texttt{MeterProvider} e
+\texttt{LoggerProvider} sono costruiti una sola volta da
+\texttt{BaseApplicationBuilder}, che vi registra rispettivamente il
+\texttt{SiaParentBasedSampler}, il \texttt{PerSourceFilterProcessor} e il
+\texttt{BaggageActivityProcessor} per le \emph{trace}, il filtro
+\emph{exemplar} \texttt{TraceBased} per le metriche, e il \emph{sink} OTLP di
+Serilog per i \emph{log}. Tutti i segnali condividono lo stesso
+\texttt{ResourceBuilder}, garantendo la coerenza degli attributi
+\texttt{service.name}, \texttt{sia.product\_type}, \texttt{sia.customer\_name}
+e l'esportazione verso il \emph{Collector} tramite \texttt{OtlpExporter}.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    node distance=6mm and 10mm,
+    every node/.style={font=\footnotesize},
+    builder/.style={
+        rectangle split, rectangle split parts=2,
+        draw, thick, rounded corners=1pt,
+        rectangle split draw splits=true,
+        align=left, inner sep=3pt, text width=58mm,
+        fill=yellow!10
+    },
+    provider/.style={
+        rectangle split, rectangle split parts=2,
+        draw, thick, rounded corners=1pt,
+        rectangle split draw splits=true,
+        align=left, inner sep=3pt, text width=42mm,
+        fill=blue!5
+    },
+    comp/.style={
+        rectangle, draw, thick, rounded corners=1pt,
+        align=center, inner sep=3pt, text width=34mm,
+        fill=orange!10
+    },
+    dep/.style={-{Stealth[length=2.5mm]}, thick, dashed},
+    use/.style={-{Stealth[length=2.5mm]}, thick}
+]
+
+\node[builder] (builder) {
+    \textbf{BaseApplicationBuilder}
+    \nodepart{second}
+    \texttt{+ ConfigureBuilder()}\\
+    \quad registra i 3 provider OTel\\
+    \quad costruisce ResourceBuilder\\
+    \quad registra middleware enduser
+};
+
+\node[provider, below left=12mm and 18mm of builder] (tp) {
+    \textbf{TracerProvider}
+    \nodepart{second}
+    \texttt{+ Sampler}\\
+    \texttt{+ Processors[]}\\
+    \texttt{+ OtlpExporter}
+};
+\node[provider, below=12mm of builder] (mp) {
+    \textbf{MeterProvider}
+    \nodepart{second}
+    \texttt{+ ExemplarFilter = TraceBased}\\
+    \texttt{+ OtlpExporter}
+};
+\node[provider, below right=12mm and 18mm of builder] (lp) {
+    \textbf{LoggerProvider (Serilog)}
+    \nodepart{second}
+    \texttt{+ OTLP sink}\\
+    \texttt{+ TraceId / SpanId enricher}
+};
+
+\node[comp, below=6mm of tp] (sampler)   {\textbf{SiaParentBasedSampler}};
+\node[comp, below=6mm of sampler] (proc) {\textbf{PerSourceFilterProcessor}\\ \textbf{BaggageActivityProcessor}};
+
+\node[comp, left=10mm of tp]  (resource) {\textbf{ResourceBuilder}\\ service.name, product\_type,\\ customer\_name};
+
+\draw[dep] (builder.south) -- (tp.north);
+\draw[dep] (builder.south) -- (mp.north);
+\draw[dep] (builder.south) -- (lp.north);
+\draw[use] (tp.south) -- (sampler.north);
+\draw[use] (sampler.south) -- (proc.north);
+\draw[dep] (resource.east) -- node[above, font=\scriptsize]{condiviso} (tp.west);
+\draw[dep] (resource.east) -- (mp.west);
+\draw[dep] (resource.east) -- (lp.west);
+
+\end{tikzpicture}
+\caption{Pipeline OpenTelemetry centralizzato in \texttt{BaseApplicationBuilder}: i tre provider (trace, metriche, log) condividono lo stesso \texttt{ResourceBuilder} e utilizzano \emph{sampler} e \emph{processor} custom per le \emph{trace}.}
+\label{fig:diag-pipeline}
+\end{figure}
+
+\section{Pattern \texttt{Sia\{Modulo\}Diagnostics} e Adapter}
+\label{app:diag-diagnostics}
+
+La figura~\ref{fig:diag-diagnostics-pattern} illustra in forma generica la
+classe \texttt{Sia\{Modulo\}Diagnostics} che ogni modulo del framework espone.
+La classe è l'unico punto di istanziazione degli strumenti \gls{otel} del
+modulo (pattern \emph{Static Factory}); inoltre, per i moduli che espongono
+un controller, ospita un \texttt{ControllerDiagnosticsAdapter} annidato che
+implementa il contratto condiviso \texttt{IControllerDiagnostics} (pattern
+\emph{Adapter}). Il controller chiama il metodo condiviso
+\texttt{BaseApiController.RecordMetricError} passando il singleton
+\texttt{AsControllerDiagnostics}, senza conoscere l'implementazione
+concreta.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    node distance=6mm and 14mm,
+    every node/.style={font=\footnotesize},
+    iface/.style={
+        rectangle split, rectangle split parts=2,
+        draw, thick, rounded corners=1pt,
+        rectangle split draw splits=true,
+        align=left, inner sep=3pt, text width=50mm,
+        fill=green!5
+    },
+    cls/.style={
+        rectangle split, rectangle split parts=2,
+        draw, thick, rounded corners=1pt,
+        rectangle split draw splits=true,
+        align=left, inner sep=3pt, text width=60mm,
+        fill=blue!3
+    },
+    diag/.style={
+        rectangle split, rectangle split parts=2,
+        draw, thick, rounded corners=1pt,
+        rectangle split draw splits=true,
+        align=left, inner sep=3pt, text width=66mm,
+        fill=orange!10
+    },
+    nested/.style={
+        rectangle split, rectangle split parts=2,
+        draw, thick, rounded corners=1pt,
+        rectangle split draw splits=true,
+        align=left, inner sep=3pt, text width=56mm,
+        fill=orange!4
+    },
+    impl/.style={-{Triangle[length=3mm, width=3mm, open]}, thick},
+    dep/.style={-{Stealth[length=2.5mm]}, thick, dashed}
+]
+
+\node[iface] (i) {
+    \textbf{\textlangle\textlangle{}interface\textrangle\textrangle{} IControllerDiagnostics}
+    \nodepart{second}
+    \texttt{+ ControllerErrors : Counter<long>}
+};
+
+\node[cls, right=18mm of i] (base) {
+    \textbf{BaseApiController}
+    \nodepart{second}
+    \texttt{\# RecordMetricError(}\\
+    \quad \texttt{IControllerDiagnostics,}\\
+    \quad \texttt{Exception, operation)}
+};
+
+\node[diag, below=14mm of i] (diag) {
+    \textbf{Sia\{Modulo\}Diagnostics}
+    \nodepart{second}
+    \texttt{+ Source : ActivitySource}\\
+    \texttt{+ Meter : Meter}\\
+    \texttt{+ OperationCount : Counter<long>}\\
+    \texttt{+ OperationDuration : Histogram<double>}\\
+    \texttt{+ ControllerErrors : Counter<long>}\\
+    \texttt{+ AsControllerDiagnostics : IControllerDiagnostics}
+};
+
+\node[nested, below=6mm of diag] (adapter) {
+    \textbf{ControllerDiagnosticsAdapter} \emph{(private sealed, nested)}
+    \nodepart{second}
+    \texttt{ControllerErrors =}\\ \quad \texttt{Sia\{Modulo\}Diagnostics.ControllerErrors}
+};
+
+\node[cls, right=18mm of diag] (ctrl) {
+    \textbf{Sia\{Modulo\}Controller}
+    \nodepart{second}
+    \texttt{catch (Exception ex) \{}\\
+    \quad \texttt{RecordMetricError(}\\
+    \quad\quad \texttt{Diagnostics.AsControllerDiagnostics,}\\
+    \quad\quad \texttt{ex, nameof(Op));}\\
+    \texttt{\}}
+};
+
+\draw[impl] (adapter.north) -- node[right, font=\scriptsize]{\emph{implements}} (diag.south);
+\draw[impl] (adapter.west) .. controls +(-2,0) and +(-0.5,-2) .. node[left, font=\scriptsize]{\emph{implements}} (i.south);
+\draw[dep] (ctrl.north) -- node[right, font=\scriptsize]{extends} (base.south);
+\draw[dep] (ctrl.west)  -- node[above, font=\scriptsize]{\emph{usa AsControllerDiagnostics}} (diag.east);
+\draw[dep] (base.south) -- node[right, font=\scriptsize]{dipende da}  (i.east);
+
+\end{tikzpicture}
+\caption{Struttura generica del pattern \texttt{Sia\{Modulo\}Diagnostics} con \texttt{ControllerDiagnosticsAdapter} annidato. Il controller invoca \texttt{RecordMetricError} del metodo condiviso \texttt{BaseApiController}, passando il singleton \texttt{AsControllerDiagnostics}; l'Adapter riconcilia il \texttt{Counter} per-modulo con il contratto comune \texttt{IControllerDiagnostics}.}
+\label{fig:diag-diagnostics-pattern}
+\end{figure}
+
+\section{Arricchimento del contesto utente}
+\label{app:diag-enduser}
+
+La figura~\ref{fig:diag-enduser} mostra le collaborazioni che realizzano
+l'arricchimento automatico di ogni \texttt{Activity} con i \emph{tag}
+\texttt{enduser.id} e \texttt{enduser.name}. Il
+\texttt{EnrichActivityWithUserMiddleware} legge le \emph{claim} da
+\texttt{HttpContext.User} e pubblica le voci nel \texttt{Baggage}; il
+\texttt{BaggageActivityProcessor}, registrato come \texttt{ActivityProcessor}
+nel \texttt{TracerProvider}, copia ogni \emph{entry} di \emph{baggage} con
+prefisso \texttt{enduser.} come \emph{tag} sull'\texttt{Activity} nel proprio
+\emph{hook} \texttt{OnStart}. L'effetto è che qualsiasi \texttt{Activity}
+creata durante la richiesta --- sia dalle classi
+\texttt{Sia\{Modulo\}Diagnostics}, sia dalle instrumentazioni automatiche di
+ASP.NET Core e \texttt{SqlClient} --- riceve i \emph{tag} utente senza
+modifiche al codice del modulo.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    node distance=5mm and 12mm,
+    every node/.style={font=\footnotesize},
+    cls/.style={
+        rectangle split, rectangle split parts=2,
+        draw, thick, rounded corners=1pt,
+        rectangle split draw splits=true,
+        align=left, inner sep=3pt, text width=52mm,
+        fill=blue!3
+    },
+    comp/.style={
+        rectangle, draw, thick, rounded corners=1pt,
+        align=center, inner sep=3pt, text width=34mm,
+        fill=orange!10
+    },
+    use/.style={-{Stealth[length=2.5mm]}, thick},
+    dep/.style={-{Stealth[length=2.5mm]}, thick, dashed}
+]
+
+\node[cls] (mw) {
+    \textbf{EnrichActivityWithUserMiddleware}
+    \nodepart{second}
+    \texttt{+ InvokeAsync(HttpContext)}\\
+    \quad legge claim \texttt{userId}, \texttt{userName}\\
+    \quad \texttt{Baggage.SetBaggage("enduser.id", \ldots)}
+};
+
+\node[comp, right=of mw] (bag) {\textbf{Baggage}\\ (\emph{OpenTelemetry context})};
+
+\node[cls, below=of bag] (proc) {
+    \textbf{BaggageActivityProcessor} : \textbf{ActivityProcessor}
+    \nodepart{second}
+    \texttt{+ OnStart(Activity)}\\
+    \quad legge \texttt{Baggage.Current}\\
+    \quad copia voci \texttt{enduser.*} su \texttt{Activity.SetTag}
+};
+
+\node[comp, right=of proc] (act) {\textbf{Activity}\\ (\emph{span in corso})};
+
+\node[cls, below=of mw] (diag) {
+    \textbf{Sia\{Modulo\}Diagnostics}
+    \nodepart{second}
+    \texttt{Source.StartActivity("sia.xxx.op")}
+};
+
+\draw[use] (mw.east) -- node[above, font=\scriptsize]{scrive} (bag.west);
+\draw[use] (bag.south) -- node[right, font=\scriptsize]{legge} (proc.north);
+\draw[use] (proc.east) -- node[above, font=\scriptsize]{\texttt{SetTag}} (act.west);
+\draw[dep] (diag.east) -- node[above, font=\scriptsize]{crea} (proc.west);
+
+\end{tikzpicture}
+\caption{Flusso di arricchimento automatico delle \texttt{Activity} con l'identità utente. Il \emph{middleware} pubblica \texttt{enduser.id} e \texttt{enduser.name} nel \texttt{Baggage} di OpenTelemetry; il \texttt{BaggageActivityProcessor} li copia come \emph{tag} su ogni \texttt{Activity} creata, comprese quelle prodotte dalle classi \texttt{Sia\{Modulo\}Diagnostics}.}
+\label{fig:diag-enduser}
+\end{figure}
+
+\chapter{Listati di codice rappresentativi}
+\label{app:listati}
+
+In questa appendice sono raccolti i frammenti di codice più estesi citati in
+forma di rinvio nei capitoli del corpo principale. I frammenti sono pensati
+come riferimento canonico: ogni nuovo modulo del \emph{framework} li adotta
+con minime variazioni di \emph{naming}.
+
+\section{Pattern Adapter applicato alla diagnostica del modulo CRUD}
+\label{app:listing-adapter}
+
+Il listato~\ref{lst:adapter-diagnostics-app} mostra la classe statica
+\texttt{Sia\{Modulo\}Diagnostics} per il modulo CRUD, con il
+\texttt{ControllerDiagnosticsAdapter} annidato che riconcilia il
+\texttt{Counter} statico del modulo con il contratto comune
+\texttt{IControllerDiagnostics}. Il listato~\ref{lst:recordmetricerror-call-app}
+mostra il punto di chiamata, ridotto a una riga nel \emph{controller}
+derivato.
+
+\begin{lstlisting}[language={[Sharp]C},
+  caption={Pattern Adapter applicato alla diagnostica del modulo CRUD},
+  label=lst:adapter-diagnostics-app]
+public static class SiaDevextremeCrudDiagnostics
+{
+    public static readonly Meter Meter =
+        new("Sia.Devextreme.Crud", "1.0.0");
+
+    public static readonly Counter<long> ControllerErrors =
+        Meter.CreateCounter<long>(
+            "sia.devextreme.crud.controller.errors");
+
+    public static readonly IControllerDiagnostics
+        AsControllerDiagnostics = new ControllerDiagnosticsAdapter();
+
+    private sealed class ControllerDiagnosticsAdapter
+        : IControllerDiagnostics
+    {
+        public Counter<long> ControllerErrors =>
+            SiaDevextremeCrudDiagnostics.ControllerErrors;
+    }
+}
+\end{lstlisting}
+
+\begin{lstlisting}[language={[Sharp]C},
+  caption={Invocazione di \texttt{RecordMetricError} dal controller derivato},
+  label=lst:recordmetricerror-call-app]
+catch (Exception ex)
+{
+    RecordMetricError(
+        SiaDevextremeCrudDiagnostics.AsControllerDiagnostics,
+        ex,
+        nameof(GetData));
+    throw;
+}
+\end{lstlisting}
