@@ -113,7 +113,7 @@ L’attività di stage è stata pianificata su una durata complessiva di 8 setti
 \\
 La pianificazione è stata strutturata in modo progressivo, suddividendo il lavoro in fasi settimanali, ciascuna con obiettivi specifici e attività mirate, al fine di garantire un apprendimento graduale e un’integrazione efficace delle tecnologie coinvolte.
 \subsection{Pianificazione settimanale}
-\subsubsection{Settimane 1 e 2: Studio dell’architettura del sistema}
+\subsubsection*{Settimane 1 e 2: Studio dell’architettura del sistema}
 Le prime due settimane sono state dedicate all’analisi dell’architettura dell’applicazione Sia.Core, con particolare attenzione alla separazione tra componente \emph{client-side} e \emph{server-side}.
 \begin{itemize}
     \item Analisi della struttura del progetto \emph{Angular}: moduli, componenti, servizi, \emph{routing}
@@ -125,7 +125,7 @@ Le prime due settimane sono state dedicate all’analisi dell’architettura del
     \item Mappatura dei componenti critici candidati all'integrazione di test e telemetria
 \end{itemize}
 
-\subsubsection{Settimana 3: Studio degli strumenti e della metodologia AI-assistita}
+\subsubsection*{Settimana 3: Studio degli strumenti e della metodologia AI-assistita}
 La terza settimana è stata dedicata all'apprendimento degli strumenti chiave del progetto: lo stack \emph{OpenTelemetry} + \emph{Grafana LGTM}, gli strumenti di \emph{testing} per \emph{.NET} e \emph{Angular}, e la metodologia di lavoro basata su agenti di intelligenza artificiale.
 \begin{itemize}
     \item \emph{OpenTelemetry}: studio dei concetti fondamentali (\emph{trace}, metriche, \emph{log}), del modello a \emph{span}, delle convenzioni semantiche e dell'integrazione con \emph{.NET 9}
@@ -135,7 +135,7 @@ La terza settimana è stata dedicata all'apprendimento degli strumenti chiave de
     \item Realizzazione di un ambiente di sviluppo locale integrato con il \emph{pipeline} \gls{otel} completo
 \end{itemize}
 
-\subsubsection{Settimana 4: Progettazione dell'architettura di telemetria e strategia di testing}
+\subsubsection*{Settimana 4: Progettazione dell'architettura di telemetria e strategia di testing}
 Durante la quarta settimana è stata progettata l'architettura del sistema di telemetria ed è stata definita in parallelo la strategia di \emph{testing} per le due linee di lavoro.
 \begin{itemize}
     \item Analisi dei moduli centrali del \emph{framework} candidati all'instrumentazione (autenticazione, componenti \emph{Angular} come griglie e \emph{form}, prestazioni hardware, accesso al database)
@@ -147,7 +147,7 @@ Durante la quarta settimana è stata progettata l'architettura del sistema di te
     \item Stesura del documento di progettazione e della strategia di testing condivisi con il team
 \end{itemize}
 
-\subsubsection{Settimana 5: Implementazione del pipeline OTel e prima suite di test}
+\subsubsection*{Settimana 5: Implementazione del pipeline OTel e prima suite di test}
 La quinta settimana è stata dedicata all'implementazione del \emph{pipeline} \emph{OpenTelemetry} nel \emph{framework} \emph{.NET 9}, alla prima instrumentazione dei moduli core e alla realizzazione di una prima suite di test con il supporto degli agenti AI.
 \begin{itemize}
     \item Configurazione del \emph{pipeline} \gls{otel} nel \texttt{BaseApplicationBuilder} con \emph{sampler}, \emph{exporter} OTLP e instrumentazioni automatiche
@@ -158,7 +158,7 @@ La quinta settimana è stata dedicata all'implementazione del \emph{pipeline} \e
     \item Validazione \emph{end-to-end} del flusso telemetrico e revisione manuale del codice di test generato
 \end{itemize}
 
-\subsubsection{Settimana 6: Propagazione della telemetria, dashboard e integration test}
+\subsubsection*{Settimana 6: Propagazione della telemetria, dashboard e integration test}
 Nella sesta settimana il lavoro si è concentrato sulla propagazione della telemetria a ulteriori moduli del \emph{framework}, sulla configurazione delle dashboard e sull'introduzione degli \emph{integration test} e dei test \emph{end-to-end} frontend.
 \begin{itemize}
     \item Sviluppo di \emph{skill} procedurali per standardizzare la propagazione della telemetria ai diversi moduli del \emph{framework}
@@ -169,7 +169,7 @@ Nella sesta settimana il lavoro si è concentrato sulla propagazione della telem
     \item Sviluppo dei test \emph{end-to-end} frontend per la verifica del comportamento dell'applicazione dal punto di vista dell'utente finale
 \end{itemize}
 
-\subsubsection{Settimana 7: Validazione del sistema integrato, tuning delle dashboard e suite di test}
+\subsubsection*{Settimana 7: Validazione del sistema integrato, tuning delle dashboard e suite di test}
 La settima settimana ha previsto la validazione complessiva del sistema di telemetria su ambiente di \emph{staging}, l'ottimizzazione delle dashboard e l'esecuzione della suite completa di test.
 \begin{itemize}
     \item Verifica della telemetria \emph{end-to-end}: dall'evento applicativo al \emph{collector} \gls{otel}, fino alla dashboard \emph{Grafana}
@@ -180,7 +180,7 @@ La settima settimana ha previsto la validazione complessiva del sistema di telem
     \item Stesura del report intermedio sullo stato del sistema di osservabilità e sulla qualità della suite di test
 \end{itemize}
 
-\subsubsection{Settimana 8: Messa in produzione e documentazione finale}
+\subsubsection*{Settimana 8: Messa in produzione e documentazione finale}
 L'ultima settimana è stata dedicata alla messa in produzione della soluzione di telemetria, al consolidamento della suite di test e alla redazione della documentazione finale.
 \begin{itemize}
     \item Preparazione e revisione finale dell'ambiente di produzione

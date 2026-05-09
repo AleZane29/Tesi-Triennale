@@ -149,7 +149,7 @@ In merito al sistema sviluppato si possono individuare come attori:
 \begin{usecase}{1.2}{Invocazione dell'agente AI tramite prompt}
 \usecaseactors{Sviluppatore, Agente AI}
 \usecasepre{Il componente target è stato identificato (UC1.1) e la \emph{skill} per la generazione di \emph{unit test} \emph{backend} è disponibile nell'ambiente}
-\usecasedesc{Lo sviluppatore richiama l'agente AI passando il riferimento al componente, L'agente riconosce il contesto del \emph{prompt} e recupera la \emph{skill} di generazione \emph{unit test}}
+\usecasedesc{Lo sviluppatore richiama l'agente AI passando il riferimento al componente, l'agente riconosce il contesto del \emph{prompt} e recupera la \emph{skill} di generazione \emph{unit test}}
 \usecasepost{L'agente AI ha ricevuto il contesto necessario per produrre i test}
 \usecasescenario{
 \begin{enumerate}
@@ -316,7 +316,7 @@ In merito al sistema sviluppato si possono individuare come attori:
 \usecasescenario{
 \begin{enumerate}
     \item L'agente legge il codice del componente e dei servizi correlati;
-    \item L'agente produce i \emph{unit test} con \emph{TestBed} e \emph{mock} delle dipendenze.
+    \item L'agente produce i \emph{unit test} con \emph{mock} delle dipendenze.
 \end{enumerate}
 }
 \label{uc:test-frontend-unit}
@@ -352,7 +352,7 @@ In merito al sistema sviluppato si possono individuare come attori:
 \end{usecase}
 
 \begin{usecase}{4}{Esecuzione della suite di test e produzione del report di copertura}
-\usecaseactors{Sviluppatore}
+\usecaseactors{Sviluppatore, Sia.Core}
 \usecasepre{La suite di test (\emph{unit}, \emph{integration} ed \emph{end-to-end}) è integrata nel processo di \emph{build}}
 \usecasedesc{Lo sviluppatore lancia l'esecuzione completa della suite per ottenere un esito complessivo e un report di copertura aggiornato del codice}
 \usecasepost{Lo sviluppatore dispone di un esito complessivo della suite e di un report di copertura}
@@ -381,7 +381,7 @@ In merito al sistema sviluppato si possono individuare come attori:
 
 \begin{usecase}{4.1}{Avvio della suite di test}
 \usecaseactors{Sviluppatore}
-\usecasepre{La suite è installata e configurata sul sistema dello sviluppatore o sulla pipeline di \emph{build}}
+\usecasepre{La suite è installata e configurata sul sistema dello sviluppatore}
 \usecasedesc{Lo sviluppatore lancia il comando o l'azione di avvio della suite}
 \usecasepost{La suite è in esecuzione}
 \usecasescenario{
@@ -393,7 +393,7 @@ In merito al sistema sviluppato si possono individuare come attori:
 \end{usecase}
 
 \begin{usecase}{4.2}{Esecuzione dei test integrata nella build}
-\usecaseactors{Sviluppatore}
+\usecaseactors{Sia.Core}
 \usecasepre{La suite è stata avviata (UC4.1)}
 \usecasedesc{Il sistema esegue in sequenza \emph{unit test}, \emph{integration test} ed \emph{end-to-end test} riportando l'esito di ciascuno}
 \usecasepost{Tutti i test sono stati eseguiti e ciascuno ha un esito noto}
@@ -408,7 +408,7 @@ In merito al sistema sviluppato si possono individuare come attori:
 \end{usecase}
 
 \begin{usecase}{4.3}{Generazione del report di copertura del codice}
-\usecaseactors{Sviluppatore}
+\usecaseactors{Sia.Core}
 \usecasepre{L'esecuzione della suite è terminata (UC4.2)}
 \usecasedesc{Il sistema raccoglie i dati di copertura dei test e produce un report consultabile dallo sviluppatore}
 \usecasepost{È disponibile un report di copertura del codice aggiornato}
@@ -446,7 +446,7 @@ In merito al sistema sviluppato si possono individuare come attori:
     \item Lo sviluppatore identifica il modulo da instrumentare (UC5.1);
     \item Lo sviluppatore invoca la \emph{skill} di propagazione della telemetria (UC5.2);
     \item L'agente introduce il pattern \texttt{SiaXxxDiagnostics} e registra la sorgente nel \emph{pipeline} \gls{otel} (UC5.3);
-    \item L'agente definisce metriche con cardinalità controllata (UC5.4);
+    \item L'agente definisce metriche studiate per il modulo da coprire (UC5.4);
     \item Lo sviluppatore valida i segnali sullo stack \emph{Grafana LGTM} (UC5.5).
 \end{enumerate}
 }
@@ -479,12 +479,12 @@ In merito al sistema sviluppato si possono individuare come attori:
 \begin{usecase}{5.2}{Invocazione della skill di propagazione della telemetria}
 \usecaseactors{Sviluppatore, Agente AI}
 \usecasepre{Il modulo target è stato identificato (UC5.1) e la \emph{skill} dedicata è disponibile}
-\usecasedesc{Lo sviluppatore richiama l'agente AI passando il riferimento al modulo e attivando la \emph{skill} di propagazione della telemetria}
+\usecasedesc{Lo sviluppatore richiama l'agente AI passando il riferimento al componente, l'agente riconosce il contesto del \emph{prompt} e recupera la \emph{skill} di propagazione della telemetria}
 \usecasepost{L'agente ha ricevuto il contesto necessario per procedere all'instrumentazione}
 \usecasescenario{
 \begin{enumerate}
-    \item Lo sviluppatore apre l'interfaccia dell'agente AI;
-    \item Lo sviluppatore invoca la \emph{skill} indicando il modulo target.
+    \item Lo sviluppatore scrive il \emph{prompt} nel quale descrive la volontà di coprire un nuovo modulo con la telemetria;
+    \item L'agente invoca la \emph{skill} dedicata.
 \end{enumerate}
 }
 \label{uc:propagazione-invoke}
@@ -492,7 +492,7 @@ In merito al sistema sviluppato si possono individuare come attori:
 
 \begin{usecase}{5.3}{Introduzione di SiaXxxDiagnostics e registrazione della sorgente OTel}
 \usecaseactors{Agente AI}
-\usecasepre{La \emph{skill} di propagazione è stata attivata sul modulo target (UC5.2)}
+\usecasepre{L'agente dispone del conteso per la propagazione sul modulo target (UC5.2)}
 \usecasedesc{L'agente introduce nel modulo il pattern \texttt{SiaXxxDiagnostics}, definisce \texttt{ActivitySource} e \texttt{Meter} e registra la nuova sorgente nel \emph{pipeline} \gls{otel} del \emph{framework}}
 \usecasepost{Il modulo dispone della propria infrastruttura di telemetria registrata nel \emph{pipeline}}
 \usecasescenario{
@@ -505,7 +505,7 @@ In merito al sistema sviluppato si possono individuare come attori:
 \label{uc:propagazione-diagnostics}
 \end{usecase}
 
-\begin{usecase}{5.4}{Definizione di metriche con cardinalità controllata}
+\begin{usecase}{5.4}{Definizione di metriche studiate per il modulo da coprire}
 \usecaseactors{Agente AI}
 \usecasepre{Il modulo dispone della propria \texttt{SiaXxxDiagnostics} (UC5.3)}
 \usecasedesc{L'agente definisce le metriche del modulo applicando le convenzioni del \emph{framework} sui tag, in modo da evitare l'esplosione della cardinalità lato Prometheus}
@@ -523,8 +523,8 @@ In merito al sistema sviluppato si possono individuare come attori:
 \begin{usecase}{5.5}{Validazione dei segnali sullo stack Grafana LGTM}
 \usecaseactors{Sviluppatore}
 \usecasepre{Il modulo è stato instrumentato (UC5.3, UC5.4) e lo stack \emph{Grafana LGTM} è raggiungibile}
-\usecasedesc{Lo sviluppatore esercita il modulo in sviluppo e verifica che \emph{trace}, metriche e \emph{log} compaiano correttamente in \emph{Tempo}, \emph{Mimir/Prometheus} e \emph{Loki}}
-\usecasepost{La nuova telemetria è validata end-to-end}
+\usecasedesc{Lo sviluppatore esegue il modulo in sviluppo e verifica che \emph{trace}, metriche e \emph{log} compaiano correttamente in \emph{Tempo}, \emph{Prometheus} e \emph{Loki}}
+\usecasepost{La nuova telemetria è validata}
 \usecasescenario{
 \begin{enumerate}
     \item Lo sviluppatore esercita il modulo;
@@ -660,7 +660,7 @@ In merito al sistema sviluppato si possono individuare come attori:
 \usecasescenario{
 \begin{enumerate}
     \item Lo sviluppatore apre la \emph{trace} in \emph{Tempo};
-    \item Lo sviluppatore analizza la \emph{waterfall} degli \emph{span};
+    \item Lo sviluppatore analizza gli \emph{span} presenti nella \emph{trace};
     \item Lo sviluppatore identifica lo \emph{span} dominante.
 \end{enumerate}
 }
@@ -670,11 +670,11 @@ In merito al sistema sviluppato si possono individuare come attori:
 \begin{usecase}{7.4}{Navigazione ai log correlati tramite TraceId}
 \usecaseactors{Sviluppatore}
 \usecasepre{Lo \emph{span} responsabile è stato identificato (UC7.3)}
-\usecasedesc{Lo sviluppatore segue il \emph{link} verso \emph{Loki}, filtrato per \texttt{TraceId}, e consulta i \emph{log} emessi nel contesto della richiesta}
+\usecasedesc{Lo sviluppatore segue il link verso \emph{Loki}, filtrato per \texttt{TraceId}, e consulta i \emph{log} emessi nel contesto della richiesta}
 \usecasepost{Lo sviluppatore ha consultato i \emph{log} di dettaglio della richiesta lenta}
 \usecasescenario{
 \begin{enumerate}
-    \item Lo sviluppatore segue il \emph{link} \emph{Trace}-to-\emph{Logs};
+    \item Lo sviluppatore segue il link \emph{Trace}-to-\emph{Logs};
     \item Lo sviluppatore consulta i \emph{log} filtrati per \texttt{TraceId}.
 \end{enumerate}
 }

@@ -181,14 +181,29 @@
 
 \newcommand{\usecasename}{UC}
 
-\newcommand{\usecaseactors}[1]{\textbf{\\Attori Principali:} #1. \vspace{4pt}}
-\newcommand{\usecasepre}[1]{\textbf{\\Precondizioni:} #1. \vspace{4pt}}
-\newcommand{\usecasedesc}[1]{\textbf{\\Descrizione:} #1. \vspace{4pt}}
-\newcommand{\usecasepost}[1]{\textbf{\\Postcondizioni:} #1. \vspace{4pt}}
-\newcommand{\usecasescenario}[1]{\textbf{\\Scenario Principale:} #1 \vspace{-4pt}}
-\newcommand{\usecasegeneralizations}[1]{\textbf{\\Generalizzazioni:} #1 \vspace{-4pt}}
-\newcommand{\usecaseextensions}[1]{\textbf{\\Estensioni:} #1 \vspace{-4pt}}
-\newcommand{\usecasealt}[1]{\textbf{\\Scenario Alternativo:} #1 \vspace{-4pt}}
+\newcommand{\usecaseactors}[1]{%
+\par\noindent\textbf{Attori Principali:} #1.\par\vspace{2pt}}
+
+\newcommand{\usecasepre}[1]{%
+\par\noindent\textbf{Precondizioni:} #1.\par\vspace{2pt}}
+
+\newcommand{\usecasedesc}[1]{%
+\par\noindent\textbf{Descrizione:} #1.\par\vspace{2pt}}
+
+\newcommand{\usecasepost}[1]{%
+\par\noindent\textbf{Postcondizioni:} #1.\par\vspace{2pt}}
+
+\newcommand{\usecasescenario}[1]{%
+\par\noindent\textbf{Scenario Principale:}\vspace{-4pt}#1\par\vspace{2pt}}
+
+\newcommand{\usecasegeneralizations}[1]{%
+\par\vspace{-4pt}\noindent\textbf{Generalizzazioni:}\vspace{-4pt}#1\par\vspace{2pt}}
+
+\newcommand{\usecaseextensions}[1]{%
+\par\vspace{-4pt}\noindent\textbf{Estensioni:}\vspace{-4pt}#1\par\vspace{2pt}}
+
+\newcommand{\usecasealt}[1]{%
+\par\vspace{-4pt}\noindent\textbf{Scenario Alternativo:}\vspace{-4pt}#1\par\vspace{2pt}}
 
 % Namespace description environment
 \newenvironment{namespacedesc}{

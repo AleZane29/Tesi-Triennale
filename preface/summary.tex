@@ -10,20 +10,27 @@
 
 Il presente documento descrive il lavoro svolto durante il periodo di stage, della durata di circa trecento ore, presso l'azienda Sia Informatica s.r.l.
 \\
-Il progetto prevede l'integrazione di un sistema strutturato di testing automatizzato e telemetria all'interno
-dell'applicazione web \emph{enterprise} Sia.Core, il cui core è composto da un client-side sviluppato in Angular e un
-server-side in .NET 9.
-L'approccio adottato si basa sull'utilizzo dell'intelligenza artificiale come elemento centrale del processo, con
-particolare riferimento a Spec-Kit, strumento che consente di definire in modo formale e strutturato le specifiche
-del lavoro svolto dall'AI, garantendo tracciabilità, riproducibilità e qualità nella generazione automatica del codice
-di test.
-Per la telemetria e l'osservabilità, il progetto adotta OpenTelemetry per la raccolta distribuita di metriche, trace e
-log, e Grafana come piattaforma di visualizzazione e analisi, al fine di valutare le prestazioni del sistema e
-identificare eventuali criticità in modo proattivo.
-\\Gli obbiettivi da raggiungere erano molteplici. \\
-In primo luogo, è stato necessario approfondire le tecnologie richieste per lo sviluppo del progetto e comprendere l’applicativo Sia.Core, all’interno del quale la soluzione sarebbe stata integrata. 
-In secondo luogo, si è resa necessaria l’analisi della strategia di testing più adatta al framework aziendale, insieme all’individuazione del modello di intelligenza artificiale più idoneo a supportare tale attività. 
-Infine, il progetto è stato portato a termine attraverso l’integrazione della telemetria e l’implementazione dei test necessari al rilascio della soluzione in produzione.
+Il progetto nasce da due esigenze concrete legate a \emph{Sia.Core}, la piattaforma
+condivisa da tutti i prodotti aziendali, distribuita su decine di installazioni
+cliente: da un lato, la necessità di una rete di sicurezza che permetta di evolvere
+il \emph{framework} senza rompere ciò che già funziona; dall'altro, la necessità di
+rendere visibile il comportamento dell'applicazione in produzione, dove un
+malfunzionamento può manifestarsi lontano dalla sua causa reale e con un ritardo
+difficile da imputare.\\
+La risposta a queste esigenze si articola in due filoni paralleli. Il primo riguarda
+la \textbf{telemetria e l'osservabilità}: è stata progettata un'architettura completa
+basata su \emph{OpenTelemetry} per la raccolta distribuita di metriche, \emph{trace}
+e \emph{log}, con \emph{Grafana} come piattaforma unificata di visualizzazione e
+analisi. Il secondo riguarda il \textbf{testing automatico}: è stata introdotta
+un'infrastruttura di test articolata su \emph{unit test}, \emph{integration test}
+e test \emph{end-to-end}, volta a garantire la correttezza del
+\emph{framework} al variare del codice.\\
+Un elemento trasversale a entrambi i filoni è l'utilizzo strutturato dell'intelligenza
+artificiale come \emph{pair engineer}: agenti AI specializzati per modulo, guidati da
+\emph{skill} procedurali e connessi direttamente agli strumenti di sviluppo tramite
+\gls{mcp}, hanno reso la propagazione di telemetria
+e test ai nuovi moduli un processo replicabile e omogeneo, riducendo le allucinazioni
+e aumentando la qualità del codice generato.
 %\vfill
 
 %\selectlanguage{english}
