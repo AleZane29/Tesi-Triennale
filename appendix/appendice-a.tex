@@ -6,67 +6,79 @@ In questa appendice sono raccolte le tabelle complete dei requisiti
 d'uso. La struttura del codice identificativo dei requisiti è descritta nella
 sezione~\ref{sec:codice-requisiti}.
 
-\begin{table}[h]
-\caption{Tabella del tracciamento dei requisiti funzionali}
-\label{tab:requisiti-funzionali}
-\begin{tabularx}{\textwidth}{lXl}
-\hline\hline
-\textbf{Requisito} & \textbf{Descrizione} & \textbf{Use Case}\\
-\hline
-RFN-1 & Tracciamento del percorso completo di ogni richiesta HTTP, incluse le operazioni sul database & UC2, UC4 \\
-\hline
-RFN-2 & Identificazione delle operazioni CRUD tramite attributi di metodo e repository & UC2, UC4 \\
-\hline
-RFN-3 & Esposizione di metriche operative per i moduli di autenticazione, accesso ai dati e griglia & UC2 \\
-\hline
-RFN-4 & Correlazione tra log e trace tramite \texttt{TraceId} e \texttt{SpanId} & UC4 \\
-\hline
-RFN-5 & Attivazione/disattivazione della telemetria tramite configurazione \emph{appsettings} & UC3 \\
-\hline
-RFN-6 & Configurazione indipendente del campionamento per ciascuna sorgente di trace & UC3 \\
-\hline
-RFN-7 & Visualizzazione di trace e metriche raggruppate in dashboard Grafana & UC2 \\
-\hline
-RFN-8 & Raccolta dei dati da più servizi e installazioni, con filtraggio per cliente e servizio & UC2 \\
-\hline
-RFN-9 & Sviluppo di \emph{Claude skill} per la propagazione della telemetria ai moduli del framework & UC3 \\
-\hline
-RFN-10 & Arricchimento automatico degli span con identità utente (\texttt{enduser.id}, \texttt{enduser.name}) & UC4 \\
-\hline
-RFN-11 & Esposizione di \emph{exemplars} per le metriche Histogram (puntatore al \texttt{TraceId}) & UC4 \\
-\hline
-\end{tabularx}
-\end{table}
 
-\begin{table}[h]
-\caption{Tabella del tracciamento dei requisiti qualitativi}
-\label{tab:requisiti-qualitativi}
-\begin{tabularx}{\textwidth}{lXl}
-\hline\hline
+\begin{longtable}{|C{2cm}|C{8.5cm}|C{2.5cm}|}
+\caption{Tracciamento dei requisiti funzionali} \label{tab:requisiti-funzionali}\\
+\hline
 \textbf{Requisito} & \textbf{Descrizione} & \textbf{Use Case}\\
 \hline
-RQN-1 & La telemetria non deve degradare sensibilmente le prestazioni in produzione & - \\
+RFO-1  & Tracciamento del percorso completo di ogni richiesta HTTP in ingresso, incluse le operazioni di accesso al database & UC5, UC6 \\
 \hline
-RQN-2 & Le metriche non devono generare un numero eccessivo di serie temporali in Prometheus (cardinalità controllata) & - \\
+RFO-2  & Le operazioni CRUD verso il database devono essere riconoscibili tramite attributi che espongono il metodo e la \emph{repository} da cui è stata scatenata la richiesta & UC5, UC6 \\
 \hline
-RQD-1 & Le dashboard devono privilegiare la visualizzazione della latenza (percentili) rispetto al solo \emph{throughput} & UC2 \\
+RFO-3  & Esposizione di metriche operative per i moduli centrali del \emph{framework} (autenticazione, componenti \emph{Angular} come griglie e \emph{form}, prestazioni hardware, accesso al database) & UC5, UC6 \\
 \hline
-\end{tabularx}
-\end{table}
+RFO-4  & I \emph{log} devono essere correlabili alle \emph{trace} tramite \texttt{TraceId} e \texttt{SpanId} & UC6, UC7 \\
+\hline
+RFO-5  & Il sistema deve essere attivabile e disattivabile tramite configurazione, senza richiedere modifiche al codice & UC5 \\
+\hline
+RFD-6  & Configurazione indipendente del campionamento per ciascuna sorgente di \emph{trace} & UC5 \\
+\hline
+RFO-7  & Visualizzazione di \emph{trace} e metriche raggruppate in dashboard \emph{Grafana} costruite sullo stack \emph{LGTM} & UC6, UC9 \\
+\hline
+RFO-8  & Le dashboard di \emph{Grafana} devono raccogliere i dati da più servizi e installazioni di clienti diversi, e permettere di filtrare per gli stessi & UC6 \\
+\hline
+RFD-9  & Il sistema deve arricchire automaticamente ogni \emph{span} con l'identità dell'utente autenticato (\texttt{enduser.id}, \texttt{enduser.name}) senza richiedere modifiche ai singoli moduli applicativi & UC8 \\
+\hline
+RFO-10 & Le metriche di tipo \emph{Histogram} devono esporre \emph{exemplar} (puntatori al \texttt{TraceId} del campione) per abilitare la navigazione dalla metrica aggregata alla \emph{trace} corrispondente & UC7 \\
+\hline
+RFO-11 & Devono essere prodotti \emph{unit test} per la logica di business dei moduli core del \emph{framework backend}, eseguibili in modo automatizzato & UC1, UC4 \\
+\hline
+RFO-12 & Devono essere prodotti \emph{integration test} per la verifica dell'attendibilità dei dati presenti nel database, delle procedure SQL e delle prospettive di configurazione dei componenti & UC2, UC4 \\
+\hline
+RFO-13 & Devono essere prodotti \emph{unit test} lato \emph{frontend} per la verifica della logica applicativa dei componenti \emph{Angular} & UC3, UC4 \\
+\hline
+RFO-14 & Devono essere prodotti test \emph{end-to-end} lato \emph{frontend} per verificare il corretto comportamento e la corretta visualizzazione dell'applicazione dal punto di vista dell'utente finale & UC3, UC4 \\
+\hline
+RFO-15 & La suite di test deve essere integrabile nel processo di \emph{build} e fornire un report di copertura del codice & UC4 \\
+\hline
+RFO-16 & Devono essere realizzati agenti AI specializzati e \emph{skill} procedurali per propagare in modo uniforme telemetria e test ai diversi moduli del \emph{framework} & UC1, UC2, UC3, UC5, UC9 \\
+\hline
+\end{longtable}
 
-\begin{table}[h]
-\caption{Tabella del tracciamento dei requisiti di vincolo}
-\label{tab:requisiti-vincolo}
-\begin{tabularx}{\textwidth}{lXl}
-\hline\hline
-\textbf{Requisito} & \textbf{Descrizione} & \textbf{Use Case}\\
+\begin{longtable}{|C{2cm}|C{8.5cm}|C{2.5cm}|}
+\caption{Tracciamento dei requisiti qualitativi} \label{tab:requisiti-qualitativi}\\
 \hline
-RVN-1 & I segnali prodotti devono essere compatibili con qualsiasi backend \gls{otel}-compatibile & - \\
+\textbf{Requisito} & \textbf{Descrizione} & \textbf{Fonte}\\
 \hline
-RVN-2 & Le impostazioni devono essere modificabili per ambiente (sviluppo, \emph{staging}, produzione) tramite \emph{appsettings} & - \\
+RQO-1 & La telemetria non deve degradare sensibilmente le prestazioni in produzione & Aziendale \\
 \hline
-\end{tabularx}
-\end{table}
+RQO-2 & Le metriche devono essere progettate per non generare un numero eccessivo di serie temporali in Prometheus; i tag ad alta variabilità (es.\ identificativi utente o di record) non devono essere usati come attributi di metriche & Aziendale \\
+\hline
+RQO-3 & Le dashboard Grafana devono essere versionabili insieme al codice del modulo che instrumentano & Aziendale \\
+\hline
+\end{longtable}
+
+\begin{longtable}{|C{2cm}|C{8.5cm}|C{2.5cm}|}
+\caption{Tracciamento dei requisiti di vincolo} \label{tab:requisiti-vincolo}\\
+\hline
+\textbf{Requisito} & \textbf{Descrizione} & \textbf{Fonte}\\
+\hline
+RVD-1 & I segnali prodotti devono essere compatibili con qualsiasi backend \gls{otel}-compatibile & Aziendale \\
+\hline
+RVO-2 & Per lo sviluppo dei test di unità e integrazione del backend devono essere utilizzati dei pacchetti NuGet standard di .NET & Aziendale \\
+\hline
+RVO-3 & I test di unità del frontend devono utilizzare Vitest come tecnologia di sviluppo & Aziendale \\
+\hline
+RVO-4 & I test end-to-end del frontend devono utilizzare Playwright come tecnologia di sviluppo & Aziendale \\
+\hline
+RVO-5 & Lo stack di osservabilità deve utilizzare OpenTelemetry come protocollo di raccolta dei segnali & Stagista \\
+\hline
+RVO-6 & La piattaforma di visualizzazione deve essere Grafana con stack LGTM & Stagista \\
+\hline
+RVO-7 & Le impostazioni devono essere modificabili per ambiente (sviluppo, \emph{staging}, produzione) tramite \emph{appsettings} & Aziendale \\
+\hline
+\end{longtable}
 
 \chapter{Diagrammi delle classi del sistema di telemetria}
 \label{app:diagrammi-classi}

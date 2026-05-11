@@ -889,29 +889,19 @@ In merito al sistema sviluppato si possono individuare come attori:
 
 \subsection{Tracciamento dei requisiti}
 
-Dall'analisi dei requisiti e degli \emph{use case} è stata derivata una
-matrice di tracciamento che pone in relazione ciascun requisito con i casi
+Dall'analisi dei requisiti e degli \emph{use case} è stata sviluppata una
+tabella di tracciamento che pone in relazione ciascun requisito con i casi
 d'uso che ne dipendono. Per distinguere le diverse classi di requisito si è
-adottato un codice identificativo nella forma R(F/Q/V)(N/D/O), dove:
+adottato un codice identificativo nella forma R(F/Q/V)(O/D), dove:
 
 \begin{itemize}
     \item la prima lettera (sempre R) indica che si tratta di un requisito;
-    \item la seconda lettera ne indica la natura --- F (funzionale), Q
+    \item la seconda lettera ne indica la natura: F (funzionale), Q
         (qualitativo) o V (di vincolo);
-    \item la terza lettera ne indica la priorità --- N (obbligatorio), D
-        (desiderabile) o O (opzionale).
+    \item la terza lettera ne indica la priorità: O (obbligatorio) o D
+        (desiderabile).
 \end{itemize}
 
-Sono stati individuati complessivamente sedici requisiti funzionali, tre
-qualitativi e due di vincolo. Tra i funzionali, i più caratterizzanti del
-contributo originale del lavoro sono RFN-9 (arricchimento automatico degli
-\emph{span} con l'identità utente), RFN-10 (\emph{exemplar} che collegano
-le metriche aggregate alla \emph{trace} responsabile del campione), i
-requisiti relativi alla suite di \emph{testing} automatico --- \emph{unit
-test} e \emph{integration test} \emph{backend} su database, procedure SQL e
-prospettive (RFN-11, RFN-12) e test \emph{frontend} (RFN-13, RFN-14) --- e
-RFN-16 (realizzazione di agenti AI specializzati e \emph{skill} procedurali
-per la propagazione di telemetria e test ai diversi moduli del
-\emph{framework}). Per non appesantire il corpo del capitolo, le tabelle
+Per non appesantire il corpo del capitolo, le tabelle
 complete del tracciamento sono raccolte nell'appendice~\ref{app:requisiti},
 alle quali si rimanda i lettori interessati al dettaglio.

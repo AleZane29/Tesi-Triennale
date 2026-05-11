@@ -142,7 +142,7 @@ corrisponde, si applica il ratio globale \texttt{SamplingRatio}.
 
 Per soddisfare il requisito RFN-10, il sistema arricchisce automaticamente ogni span con
 l'identità dell'utente autenticato senza richiedere modifiche ai singoli moduli applicativi. Il
-meccanismo è descritto nel dettaglio nella sezione%~\ref{sec:modello-enduser}.
+meccanismo è descritto nel dettaglio nella sezione~\ref{sec:modello-enduser}.
 
 \subsubsection{Correlazione metrica-trace tramite \emph{exemplars}}
 \label{sec:exemplars-design}
@@ -152,7 +152,7 @@ Per soddisfare il requisito RFN-11, le metriche di tipo \emph{Histogram} espongo
 generati. Questo abilita la navigazione dal pannello di una metrica aggregata alla trace
 specifica che ha prodotto il campione anomalo, risolvendo la domanda ``quale richiesta ha
 causato questo picco?''. Il meccanismo è descritto nel dettaglio nella
-sezione%~\ref{sec:modello-exemplars}.
+sezione~\ref{sec:modello-exemplars}.
 
 \subsubsection{Pattern architetturali applicati}
 \label{sec:design-patterns-intro}
@@ -341,6 +341,7 @@ si ottiene invece tramite gli exemplar: dalla metrica si naviga alla trace, che 
 già \texttt{enduser.*}.
 
 \subsection{Exemplar: collegamento diretto da metrica a trace}
+\label{sec:modello-exemplars}
 Le metriche aggregate dicono \emph{quanto} e \emph{quando} qualcosa è andato storto, ma
 non \emph{quale} richiesta specifica ne è responsabile. Un picco sul percentile $p_{99}$
 della latenza, ad esempio, non rivela di per sé la chiamata incriminata. Gli
@@ -364,63 +365,56 @@ Oltre ai pattern architetturali generali citati nella sezione~\ref{sec:design-pa
 la soluzione utilizza due \emph{design pattern} della letteratura classica (Gamma et
 al.\footcite{gof:design-patterns}) per risolvere problemi ricorrenti dell'instrumentazione.
 
-\subsection{Standardizzazione del counter errori controller tramite pattern Adapter}
+\subsection{Pattern Adapter per il counter di errore dei controller}
 \label{subsec:pattern-adapter-controller-errors}
 
 \textbf{Contesto}\\ 
-In un'architettura a moduli come quella di \emph{Sia.Web}, ogni modulo possiede una
-propria classe di diagnostica statica con i propri \texttt{Counter} e \texttt{Histogram},
-registrati sul \texttt{Meter} specifico del modulo. Questo garantisce isolamento e
-flessibilità, ma introduce un rischio di divergenza: la logica di registrazione degli
-errori nei controller, che richiede l'unwrap di \texttt{SiaLoggerException.OriginalException}
-e l'applicazione dei tag \texttt{exception.type} e \texttt{sia.operation}, rischia di
-essere replicata in modo leggermente diverso in ciascun controller, rendendo le metriche
-non omogenee e difficili da confrontare in Grafana.\\
+In un'architettura a moduli come quella di \emph{Sia.Web}, ogni modulo
+possiede una propria classe di diagnostica statica con i propri
+\texttt{Counter} e \texttt{Histogram}, registrati sul \texttt{Meter}
+specifico del modulo. Questo garantisce isolamento e flessibilità, ma
+introduce un rischio di divergenza: la logica di registrazione degli errori
+nei controller, che richiede l'\emph{unwrap} di
+\texttt{SiaLoggerException.OriginalException} e l'applicazione dei \emph{tag}
+\texttt{exception.type} e \texttt{sia.operation}, rischierebbe di essere
+replicata in modo leggermente diverso in ciascun controller, rendendo le
+metriche non omogenee e difficili da confrontare in Grafana.\\
 \\\textbf{Problema}\\
-Il nodo architetturale da risolvere è che le classi di diagnostica dei moduli sono
-\texttt{static} e non possono implementare direttamente un'interfaccia di istanza.
-Il problema viene risolto con il pattern \textbf{Adapter}: per ciascun modulo si
-definisce una classe annidata privata che adatta il counter statico al contratto comune,
-e la classe di diagnostica espone un singleton \texttt{AsControllerDiagnostics} di tipo
-\texttt{IControllerDiagnostics}. I field statici esistenti restano invariati, garantendo
-piena retrocompatibilità con i chiamanti diretti.\\
+Le classi di diagnostica dei moduli sono \texttt{static} e non possono
+implementare direttamente un'interfaccia di istanza. È necessario
+riconciliare il contratto astratto fornito dal \emph{framework} con la
+pluralità di implementazioni concrete, senza duplicare la logica di
+\emph{unwrap} nei singoli controller.\\
 \\\textbf{Soluzione}\\
-La soluzione adottata promuove questa logica a comportamento standard del framework:
-\texttt{BaseApiController} espone un metodo protetto \texttt{RecordMetricError} che
-ogni controller derivato può invocare passando la propria classe di diagnostica. Il
-metodo accetta un parametro di tipo \texttt{IControllerDiagnostics}, un'interfaccia
-che impone la presenza di un unico membro: il \texttt{Counter<long> ControllerErrors}.
+Il \emph{framework} espone un'interfaccia
+\texttt{IControllerDiagnostics} con un unico membro
+\texttt{Counter<long> ControllerErrors} e un metodo condiviso
+\texttt{RecordMetricError(\\IControllerDiagnostics, Exception, string)}
+che incapsula la logica di \emph{unwrap} e di applicazione dei \emph{tag}.
+Per ciascun modulo viene definita una classe annidata
+\texttt{private sealed class ControllerDiagnosticsAdapter}: l'\emph{Adapter}
+adatta il \emph{counter} statico del modulo al contratto comune. La classe
+\texttt{Sia\{Modulo\}Diagnostics} espone, accanto ai \emph{field} statici
+esistenti, un singleton
+\texttt{public static readonly IControllerDiagnostics AsControllerDiagnostics};
+il controller invoca sempre
+\texttt{RecordMetricError(Sia\{Modulo\}Diagnostics.AsControllerDiagnostics, ex,\\ nameof(Metodo))}
+senza conoscere l'implementazione concreta.\\
+Il listato canonico, riferito al modulo \texttt{Sia.Devextreme.Crud}, è
+riportato nell'appendice~\ref{app:listing-adapter}
+(listati~\ref{lst:adapter-diagnostics-app} e~\ref{lst:recordmetricerror-call-app}).
 
-\begin{lstlisting}[language={[Sharp]C},
-  caption={Pattern Adapter applicato alla diagnostica del modulo CRUD},
-  label=lst:adapter-diagnostics]
-public static class SiaDevextremeCrudDiagnostics
-{
-    // field statico esistente: invariato e retrocompatibile
-    public static readonly Counter<long> ControllerErrors = ...;
-
-    // singleton che adatta il counter al contratto comune
-    public static readonly IControllerDiagnostics AsControllerDiagnostics
-        = new ControllerDiagnosticsAdapter();
-
-    private sealed class ControllerDiagnosticsAdapter : IControllerDiagnostics
-    {
-        public Counter<long> ControllerErrors
-            => SiaDevextremeCrudDiagnostics.ControllerErrors;
-    }
-}
-\end{lstlisting}
-
-Nel controller, la chiamata diventa:
-
-\begin{lstlisting}[language={[Sharp]C},
-  caption={Invocazione di RecordMetricError dal controller derivato},
-  label=lst:recordmetricerror-call]
-RecordMetricError(SiaDevextremeCrudDiagnostics.AsControllerDiagnostics, ex, operation);
-\end{lstlisting}
-In questo modo abbiamo ottenuto una registrazione uniforme da parte dei vari controller,
-tramite contratto (l'interfaccia) applicata dalla classe
-base (il metodo), eliminando duplicazione e divergenze di naming tra moduli.
+\paragraph{Vantaggi.}
+\begin{itemize}
+    \item contratto unico a livello \emph{framework}, \emph{counter}
+        distinti per modulo (cardinalità controllata);
+    \item logica di \emph{unwrap} e applicazione dei \emph{tag} scritta una
+        sola volta;
+    \item zero ripetizione nel controller: ogni \texttt{catch} diventa una
+        singola riga;
+    \item piena retrocompatibilità con i chiamanti diretti dei \emph{field}
+        statici esistenti, che rimangono invariati.
+\end{itemize}
 
 \subsection{Pattern Adapter}
 
