@@ -7,11 +7,86 @@
 
 Il progetto si è sviluppato sulle 8 settimane pianificate, per un totale di 300 ore. Il
 monte ore è stato complessivamente rispettato, con una redistribuzione interna: le fasi di
-studio (settimane 1--3) e di prototipazione (settimana 4) hanno richiesto un numero di ore
-inferiore al preventivato grazie all'uso dell'agente AI come \emph{pair engineer}, mentre le
-fasi di propagazione dell'instrumentazione ad altri moduli e di costruzione delle dashboard
-Grafana sono state estese rispetto alla pianificazione originaria, assorbendo le ore
-risparmiate nella prima parte.
+studio (settimane 1-3) e di prototipazione (settimana 4) hanno richiesto un numero di ore
+inferiore al preventivato grazie all'uso dell'agente AI come \emph{pair engineer}, permettendo così
+un aumento del tempo a disposizione per lo sviluppo e l'approfondimento di funzionalità non
+precedentemente preventivate:
+\begin{itemize}
+    \item \textbf{arricchimento automatico delle \emph{trace} con l'identità dell'utente
+        autenticato}, ottenuto tramite un \emph{processor} \gls{otel} centralizzato in
+        \texttt{BaseApplicationBuilder} che intercetta ogni \emph{span} radice e ne propaga
+        l'\texttt{enduser.id} senza richiedere modifiche al codice dei singoli moduli;
+    \item \textbf{integrazione del meccanismo degli \emph{exemplars}}, che collega ogni
+        campione di metrica al \texttt{TraceId} della richiesta che lo ha generato,
+        abilitando la navigazione diretta dalla dashboard Grafana al \emph{trace} di Tempo
+        e completando la catena diagnostica
+        metrica~$\rightarrow$~\emph{trace}~$\rightarrow$~utente~$\rightarrow$~\emph{log};
+    \item \textbf{estensione dell'istrumentazione a moduli inizialmente non in scope}
+        (\emph{Sia.Devextreme.Crud}, \emph{Sia.Devextreme.Kanban} e ulteriori moduli
+        ancillari), realizzata tramite la \emph{Claude skill} \texttt{sia-telemetry-developer}
+        che ha permesso la propagazione coerente del pattern \texttt{SiaXxxDiagnostics};
+    \item \textbf{introduzione \emph{ex novo} di un'infrastruttura di testing} per il
+        framework, comprensiva di \emph{unit test} sui \emph{controller}, \emph{integration
+        test} di tipo \emph{smoke}, \emph{lifecycle} (CRUD/Grid) e \emph{summary}, con la
+        relativa \emph{fixture} \texttt{SiaWebApplicationFactory} e i meccanismi di
+        autenticazione/autorizzazione di test (\texttt{TestAuthHandler},
+        \texttt{AllowAllPermissionCheckService}); la sola messa in funzione della prima
+        \emph{suite} ha portato alla luce due difetti applicativi latenti;
+    \item \textbf{popolamento delle dashboard Grafana con pannelli aggiuntivi} per la
+        diagnosi a grana fine (latenza per endpoint, distribuzione degli errori per modulo,
+        \emph{top users} per consumo di risorse), versionate nel repository tramite
+        \emph{provisioning} dichiarativo;
+    \item \textbf{produzione di una suite di \emph{Claude skill} procedurali} che
+        codificano in forma riutilizzabile le convenzioni del framework (telemetria,
+        \emph{controller}, \emph{service}, \emph{repository}, \emph{CRUD}, \emph{grid},
+        ecc.), trasformando un esito incidentale dello stage in un asset metodologico
+        permanente per il team.
+\end{itemize}
+
+% \section{Sintesi dei contributi originali}
+
+% Prima di rendere conto del raggiungimento dei singoli obiettivi, è utile
+% ricapitolare i contributi originali del lavoro, già anticipati nella
+% sezione~\ref{sec:contributi}, evidenziandone l'impatto sul \emph{framework}
+% \emph{Sia.Web}.
+
+% Il primo contributo è la \textbf{progettazione e l'integrazione di un
+% sistema di osservabilità completo} per un \emph{framework} che ne era
+% sprovvisto. Il \emph{pipeline} \gls{otel} è stato centralizzato in
+% \texttt{BaseApplicationBuilder} in modo tale che i moduli applicativi non
+% debbano conoscerne i dettagli; ogni nuovo modulo aderisce alla telemetria
+% semplicemente registrando il proprio \texttt{ActivitySource} e
+% \texttt{Meter}. Questa scelta, unita alla tassonomia di attributi e metriche
+% definita per i moduli core, riduce drasticamente l'attrito di adozione e
+% garantisce confronti omogenei tra moduli e tra installazioni di clienti
+% diversi.
+
+% Il secondo contributo è l'introduzione di due meccanismi trasparenti al
+% codice del modulo --- l'arricchimento automatico delle \emph{trace} con
+% l'identità dell'utente autenticato e l'uso degli \emph{exemplar} ---, i
+% quali abilitano una \textbf{catena diagnostica completa}
+% metrica~$\rightarrow$~\emph{trace}~$\rightarrow$~utente~$\rightarrow$~\emph{log}.
+% Senza questi meccanismi, l'osservabilità si ferma alla domanda ``\emph{quando
+% e quanto} qualcosa è andato storto''; con essi diventa possibile rispondere
+% a ``\emph{quale richiesta} è stata responsabile del picco di latenza, e
+% \emph{a quale utente} stava rispondendo''.
+
+% Il terzo contributo è la \textbf{nascita di un'infrastruttura di testing}
+% nel \emph{framework}, introdotta da zero. La sola messa in funzione della
+% prima \emph{suite} di \emph{integration test} ha portato alla luce due
+% difetti applicativi latenti che si sarebbero manifestati esclusivamente
+% presso un cliente specifico, in produzione: un risultato concreto che
+% quantifica il valore della rete di sicurezza introdotta.
+
+% Il quarto contributo, di natura metodologica, è la definizione di una
+% \textbf{pratica di lavoro AI-assistita} disciplinata e replicabile: il
+% \emph{workflow} \emph{Plan~$\rightarrow$~Confirm~$\rightarrow$~Implement},
+% le \emph{skill} procedurali per la propagazione coerente di telemetria e
+% test, l'adozione del \gls{mcp} per ridurre le ``allucinazioni'' lavorando
+% su dati reali. Questa metodologia è stata utilizzata in modo sistematico
+% durante lo stage e ha permesso di ottenere, in 300 ore, una copertura
+% funzionale ed estensiva che difficilmente sarebbe stata raggiungibile con
+% un approccio tradizionale, a parità di risorse.
 
 \section{Raggiungimento degli obiettivi}
 
@@ -35,11 +110,9 @@ sono stati raggiunti:
         versionate nel repository.
 \end{itemize}
 
-I requisiti funzionali RFN-1..RFN-11 e non funzionali sono stati soddisfatti nella loro
-versione \emph{obbligatoria}. In particolare, i requisiti aggiuntivi RFN-10 (arricchimento
-automatico con \texttt{enduser.*}) e RFN-11 (\emph{exemplars} metrica $\rightarrow$ trace) sono
-stati implementati come descritto nelle sezioni %~\ref{sec:modello-enduser}
-e%~\ref{sec:modello-exemplars}.
+I requisiti funzionali, di qualità e di vincolo sono stati soddisfatti nella loro
+totalità. Compresi quelli desiderabili e quelli aggiuntivi proposti dallo stagista stesso.
+Consultabili nell'appendice~\ref{app:requisiti}.
 
 \section{Conoscenze acquisite}
 
@@ -63,7 +136,7 @@ Un aspetto operativo affrontato durante lo stage è la \emph{retention} dei dati
 telemetria. Ogni segnale ha caratteristiche di storage differenti:
 \begin{itemize}
     \item le \emph{trace} su Tempo sono voluminose per singolo campione ma a bassa densità
-        (sono campionate); la \emph{retention} suggerita è \emph{medio-breve} (7--14 giorni),
+        (sono campionate); la \emph{retention} suggerita è \emph{medio-breve} (7-14 giorni),
         sufficiente per la diagnosi di incidenti recenti;
     \item le metriche su Prometheus (o Mimir) sono aggregate e compatte: la \emph{retention}
         può estendersi a 90 giorni o più, permettendo il confronto di tendenze nel tempo;
