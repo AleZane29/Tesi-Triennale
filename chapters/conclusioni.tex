@@ -1,155 +1,3 @@
-\documentclass[a4paper,11pt]{article}
-
-\usepackage{tikz}                       % diagrammi (class diagram, flowchart)
-\usetikzlibrary{positioning,arrows.meta,shapes.multipart,fit,backgrounds}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage[italian]{babel}
-\usepackage{geometry}
-\geometry{margin=2.5cm}
-\usepackage{hyperref}
-\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
-\usepackage{listings}
-\usepackage{xcolor}
-\usepackage{longtable}
-\usepackage{booktabs}
-\usepackage{array}
-\usepackage{enumitem}
-\usepackage{fancyvrb}
-\usepackage{parskip}
-
-
-% Risks environment
-\newcounter{riskcounter}                % define a counter
-\setcounter{riskcounter}{0}             % set the counter to some initial value
-
-%%%% Parameters
-% #1: Title
-\newenvironment{risk}[1]{
-    \refstepcounter{riskcounter}        % increment counter
-    \par \noindent                      % start new paragraph
-    \textbf{\arabic{riskcounter}. #1}   % display the title before the content of the environment is displayed
-}{
-    \par\medskip
-}
-
-\newcommand{\riskname}{Rischio}
-
-\newcommand{\riskdescription}[1]{\textbf{\\Descrizione:} #1.}
-
-\newcommand{\risksolution}[1]{\textbf{\\Soluzione:} #1.}
-
-% Use case environment
-\newcounter{usecasecounter}             % define a counter
-\setcounter{usecasecounter}{0}          % set the counter to some initial value
-
-%%%% Parameters
-% #1: ID
-% #2: Nome
-\newenvironment{usecase}[2]{
-    \renewcommand{\theusecasecounter}{\usecasename #1}  % this is where the display of
-                                                        % the counter is overwritten/modified
-    \refstepcounter{usecasecounter}             % increment counter
-    \vspace{10pt}
-    \par \noindent                              % start new paragraph
-    {\large \textbf{\usecasename #1: #2}}       % display the title before the
-                                                % content of the environment is displayed
-    \medskip
-}{
-    \medskip
-}
-
-\newcommand{\usecasename}{UC}
-
-\newcommand{\usecaseactors}[1]{\textbf{\\Attori Principali:} #1. \vspace{4pt}}
-\newcommand{\usecasepre}[1]{\textbf{\\Precondizioni:} #1. \vspace{4pt}}
-\newcommand{\usecasedesc}[1]{\textbf{\\Descrizione:} #1. \vspace{4pt}}
-\newcommand{\usecasepost}[1]{\textbf{\\Postcondizioni:} #1. \vspace{4pt}}
-\newcommand{\usecasealt}[1]{\textbf{\\Scenario Alternativo:} #1. \vspace{4pt}}
-\newcommand{\usecasescenario}[1]{\textbf{\\Scenario Principale:} \vspace{2pt} #1 \vspace{4pt}}
-\newcommand{\usecaseextensions}[1]{\textbf{\\Estensioni:} \vspace{2pt} #1 \vspace{4pt}}
-\newcommand{\usecasegeneralizations}[1]{\textbf{\\Generalizzazioni:} \vspace{2pt} #1 \vspace{4pt}}
-
-
-\lstset{
-    basicstyle=\ttfamily\small,
-        breaklines=true,
-            frame=single,
-                backgroundcolor=\color{gray!10},
-                    keywordstyle=\color{blue},
-                        commentstyle=\color{green!50!black},
-                            stringstyle=\color{red!70!black},
-                                showstringspaces=false,
-                                    tabsize=4
-                                    }
-
-                                    \lstdefinelanguage{json}{
-                                        morestring=[b]",
-                                            morecomment=[l]{//},
-                                                literate=
-                                                        *{:}{{{\color{blue!60!black}:}}}{1}
-                                                                {,}{{{\color{blue!60!black},}}}{1}
-                                                                }
-
-                                                                \title{\textbf{Documentazione Telemetria}}
-                                                                \author{Sia.Web}
-                                                                \date{}
-
-                                                                \begin{document}
-
-                                                                \maketitle
-                                                                \tableofcontents
-                                                                \newpage
-                                                                \documentclass[a4paper,11pt]{article}
-
-\usepackage{tikz}                       % diagrammi (class diagram, flowchart)
-\usetikzlibrary{positioning,arrows.meta,shapes.multipart,fit,backgrounds}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage[italian]{babel}
-\usepackage{geometry}
-\geometry{margin=2.5cm}
-\usepackage{hyperref}
-\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
-\usepackage{listings}
-\usepackage{xcolor}
-\usepackage{longtable}
-\usepackage{booktabs}
-\usepackage{array}
-\usepackage{enumitem}
-\usepackage{fancyvrb}
-\usepackage{parskip}
-
-\lstset{
-    basicstyle=\ttfamily\small,
-    breaklines=true,
-    frame=single,
-    backgroundcolor=\color{gray!10},
-    keywordstyle=\color{blue},
-    commentstyle=\color{green!50!black},
-    stringstyle=\color{red!70!black},
-    showstringspaces=false,
-    tabsize=4
-}
-
-\lstdefinelanguage{json}{
-    morestring=[b]",
-    morecomment=[l]{//},
-    literate=
-        *{:}{{{\color{blue!60!black}:}}}{1}
-        {,}{{{\color{blue!60!black},}}}{1}
-}
-
-\title{\textbf{Documentazione Telemetria}}
-\author{Sia.Web}
-\date{}
-
-\begin{document}
-
-\maketitle
-\tableofcontents
-\newpage
-
 \chapter{Conclusioni}
 \label{cap:conclusioni}
 
@@ -257,7 +105,7 @@ precedentemente preventivate:
         metrica~$\rightarrow$~\emph{trace}~$\rightarrow$~utente~$\rightarrow$~\emph{log};
     \item \textbf{estensione dell'istrumentazione a moduli inizialmente non in scope}
         (\emph{Sia.Devextreme.Crud}, \emph{Sia.Devextreme.Kanban} e ulteriori moduli
-        ancillari), realizzata tramite la \emph{Claude skill} \texttt{sia-telemetry-developer}
+        ancillari), realizzata tramite \emph{Claude skill} e agenti AI
         che ha permesso la propagazione coerente del pattern \texttt{SiaXxxDiagnostics};
     \item \textbf{popolamento delle dashboard Grafana con pannelli aggiuntivi} per la
         diagnosi a grana fine (latenza per endpoint, distribuzione degli errori per modulo,
@@ -376,7 +224,7 @@ esigenze di indagine e del costo di \emph{storage} accettabile per il singolo
 cliente.
 
 Tra gli sviluppi futuri di natura più tecnica si collocano:
-
+-------RIMUOVERE L'ITEMIZE E RENDERE DISCORSIVO-----------------
 \begin{itemize}
     \item l'introduzione del \textbf{\emph{tail-based sampling}} tramite il
         \emph{Collector} \gls{otel}, che permetterebbe di conservare
@@ -469,6 +317,3 @@ in produzione. Quanto studiato rappresenta un'importante partenza per il mio
 futuro, accademico e non, aggiornandomi su un ambito decisamente attuale,
 l'osservabilità dei sistemi distribuiti e l'\emph{AI engineering}, di sicuro
 interesse per possibili sviluppi futuri.
-
-
-\end{document}
