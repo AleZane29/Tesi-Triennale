@@ -1,16 +1,250 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage{tikz}                       % diagrammi (class diagram, flowchart)
+\usetikzlibrary{positioning,arrows.meta,shapes.multipart,fit,backgrounds}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{fancyvrb}
+\usepackage{parskip}
+
+
+% Risks environment
+\newcounter{riskcounter}                % define a counter
+\setcounter{riskcounter}{0}             % set the counter to some initial value
+
+%%%% Parameters
+% #1: Title
+\newenvironment{risk}[1]{
+    \refstepcounter{riskcounter}        % increment counter
+    \par \noindent                      % start new paragraph
+    \textbf{\arabic{riskcounter}. #1}   % display the title before the content of the environment is displayed
+}{
+    \par\medskip
+}
+
+\newcommand{\riskname}{Rischio}
+
+\newcommand{\riskdescription}[1]{\textbf{\\Descrizione:} #1.}
+
+\newcommand{\risksolution}[1]{\textbf{\\Soluzione:} #1.}
+
+% Use case environment
+\newcounter{usecasecounter}             % define a counter
+\setcounter{usecasecounter}{0}          % set the counter to some initial value
+
+%%%% Parameters
+% #1: ID
+% #2: Nome
+\newenvironment{usecase}[2]{
+    \renewcommand{\theusecasecounter}{\usecasename #1}  % this is where the display of
+                                                        % the counter is overwritten/modified
+    \refstepcounter{usecasecounter}             % increment counter
+    \vspace{10pt}
+    \par \noindent                              % start new paragraph
+    {\large \textbf{\usecasename #1: #2}}       % display the title before the
+                                                % content of the environment is displayed
+    \medskip
+}{
+    \medskip
+}
+
+\newcommand{\usecasename}{UC}
+
+\newcommand{\usecaseactors}[1]{\textbf{\\Attori Principali:} #1. \vspace{4pt}}
+\newcommand{\usecasepre}[1]{\textbf{\\Precondizioni:} #1. \vspace{4pt}}
+\newcommand{\usecasedesc}[1]{\textbf{\\Descrizione:} #1. \vspace{4pt}}
+\newcommand{\usecasepost}[1]{\textbf{\\Postcondizioni:} #1. \vspace{4pt}}
+\newcommand{\usecasealt}[1]{\textbf{\\Scenario Alternativo:} #1. \vspace{4pt}}
+\newcommand{\usecasescenario}[1]{\textbf{\\Scenario Principale:} \vspace{2pt} #1 \vspace{4pt}}
+\newcommand{\usecaseextensions}[1]{\textbf{\\Estensioni:} \vspace{2pt} #1 \vspace{4pt}}
+\newcommand{\usecasegeneralizations}[1]{\textbf{\\Generalizzazioni:} \vspace{2pt} #1 \vspace{4pt}}
+
+
+\lstset{
+    basicstyle=\ttfamily\small,
+        breaklines=true,
+            frame=single,
+                backgroundcolor=\color{gray!10},
+                    keywordstyle=\color{blue},
+                        commentstyle=\color{green!50!black},
+                            stringstyle=\color{red!70!black},
+                                showstringspaces=false,
+                                    tabsize=4
+                                    }
+
+                                    \lstdefinelanguage{json}{
+                                        morestring=[b]",
+                                            morecomment=[l]{//},
+                                                literate=
+                                                        *{:}{{{\color{blue!60!black}:}}}{1}
+                                                                {,}{{{\color{blue!60!black},}}}{1}
+                                                                }
+
+                                                                \title{\textbf{Documentazione Telemetria}}
+                                                                \author{Sia.Web}
+                                                                \date{}
+
+                                                                \begin{document}
+
+                                                                \maketitle
+                                                                \tableofcontents
+                                                                \newpage
+                                                                \documentclass[a4paper,11pt]{article}
+
+\usepackage{tikz}                       % diagrammi (class diagram, flowchart)
+\usetikzlibrary{positioning,arrows.meta,shapes.multipart,fit,backgrounds}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{fancyvrb}
+\usepackage{parskip}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10},
+    keywordstyle=\color{blue},
+    commentstyle=\color{green!50!black},
+    stringstyle=\color{red!70!black},
+    showstringspaces=false,
+    tabsize=4
+}
+
+\lstdefinelanguage{json}{
+    morestring=[b]",
+    morecomment=[l]{//},
+    literate=
+        *{:}{{{\color{blue!60!black}:}}}{1}
+        {,}{{{\color{blue!60!black},}}}{1}
+}
+
+\title{\textbf{Documentazione Telemetria}}
+\author{Sia.Web}
+\date{}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
 \chapter{Conclusioni}
 \label{cap:conclusioni}
 
-\intro{Il presente capitolo tira le somme del lavoro svolto durante lo stage, confrontando la pianificazione con l'esecuzione reale, valutando il raggiungimento degli obiettivi, sintetizzando le conoscenze acquisite e proponendo possibili evoluzioni future.}\\
+\intro{Il presente capitolo riporta le conclusioni del lavoro svolto durante lo
+stage, analizzando i risultati ottenuti e gli obiettivi raggiunti, le conoscenze
+acquisite, i possibili sviluppi futuri degli ambiti applicativi toccati dal
+progetto e dando una valutazione personale dell'esperienza maturata.}\\
 
-\section{Consuntivo finale}
+\section{Obiettivi raggiunti e consuntivo finale}
 
-Il progetto si è sviluppato sulle 8 settimane pianificate, per un totale di 300 ore. Il
-monte ore è stato complessivamente rispettato, con una redistribuzione interna: le fasi di
-studio (settimane 1-3) e di prototipazione (settimana 4) hanno richiesto un numero di ore
-inferiore al preventivato grazie all'uso dell'agente AI come \emph{pair engineer}, permettendo così
-un aumento del tempo a disposizione per lo sviluppo e l'approfondimento di funzionalità non
-precedentemente preventivate:
+L'oggetto di questo tirocinio è stato lo studio e l'implementazione, all'interno
+del \emph{framework} \emph{Sia.Core}, di un sistema di osservabilità completo
+basato sullo standard \gls{otel} e sullo stack \emph{Grafana LGTM}, affiancato
+dall'introduzione \emph{ex novo} di un'infrastruttura di \emph{testing}
+automatico articolata su \emph{unit test} e \emph{integration test} lato
+\emph{server} e su \emph{unit test} e test \emph{end-to-end} lato \emph{client}.
+Le due linee di lavoro, parallele sul piano tecnologico, si sono dimostrate
+complementari sul piano metodologico: la telemetria ha fornito il \emph{feedback}
+necessario a guidare il miglioramento iterativo dei test, mentre i test hanno
+supportato la validazione continua dell'instrumentazione introdotta.
+
+Trasversalmente alle due linee, il lavoro ha adottato un agente di intelligenza
+artificiale come \emph{pair engineer} strutturato, attraverso la creazione di
+agenti specializzati, di \emph{skill} procedurali e l'integrazione del
+\gls{mcp} per consentire all'agente di interrogare direttamente \emph{Grafana},
+il database e gli strumenti di test. Questo approccio, descritto in dettaglio nel
+capitolo~\ref{cap:metodologia-ai}, ha trasformato un esito incidentale dello
+stage in un asset metodologico permanente per il \emph{team}.
+
+Il progetto si è sviluppato sulle 8 settimane pianificate, per un totale di 300
+ore. Il monte ore è stato complessivamente rispettato, con una redistribuzione
+interna: le fasi di studio (settimane 1--3) e di prototipazione (settimana 4)
+hanno richiesto un numero di ore inferiore al preventivato grazie all'uso
+dell'agente AI come \emph{pair engineer}, permettendo di liberare tempo per
+l'approfondimento di funzionalità non inizialmente preventivate, descritte nel
+seguito.
+
+In merito al raggiungimento degli obiettivi prefissati nel
+capitolo~\ref{cap:descrizione-stage}, si può confermare la soddisfazione di
+ciascuno. Più nello specifico, sono stati raggiunti correttamente i seguenti
+obiettivi:
+
+\begin{itemize}
+    \item \textbf{O1. Analisi dei requisiti di osservabilità e selezione
+        delle tecnologie}: l'analisi ha portato all'adozione dello stack
+        \gls{otel} + \emph{Grafana LGTM}, motivata dai criteri descritti nel
+        capitolo~\ref{cap:tecnologie-adottate};
+    \item \textbf{O2. Progettazione dell'architettura di telemetria}:
+        l'architettura è stata progettata e centralizzata in
+        \texttt{BaseApplicationBuilder}, in modo che ogni nuovo modulo possa
+        aderirvi semplicemente registrando il proprio \texttt{ActivitySource} e
+        \texttt{Meter}, senza conoscere i dettagli interni del
+        \emph{pipeline};
+    \item \textbf{O3. Definizione di una tassonomia coerente di metriche,
+        \emph{trace} e attributi}: la tassonomia è stata stesa per i moduli
+        centrali del \emph{framework} (autenticazione, componenti
+        \emph{Angular} come griglie e \emph{form}, prestazioni hardware,
+        accesso al database, ecc.), con regole esplicite che evitano l'esplosione
+        della cardinalità lato Prometheus;
+    \item \textbf{O4. Definizione delle strategie di campionamento}: sono
+        state realizzate a due livelli (\emph{sampler} globale e
+        \emph{processor} per-\emph{source}), con \emph{ratio} configurabili per
+        ambiente tramite \emph{appsettings};
+    \item \textbf{O5. Arricchimento automatico delle \emph{trace} ed
+        \emph{exemplar}}: è stato implementato un \emph{processor} \gls{otel}
+        centralizzato che intercetta ogni \emph{span} radice e ne propaga
+        \texttt{enduser.id} ed \texttt{enduser.name}, e sono stati abilitati
+        gli \emph{exemplar} sulle metriche di tipo \emph{Histogram};
+    \item \textbf{O6. Configurazione di Grafana LGTM e produzione delle
+        dashboard}: lo stack è stato configurato con i relativi \emph{backend}
+        di \emph{storage} (Tempo, Loki, Prometheus) e le dashboard sono state
+        versionate nel \emph{repository} tramite \emph{provisioning}
+        dichiarativo, rendendo navigabile la catena diagnostica dal grafico
+        alla singola richiesta;
+    \item \textbf{O7. Infrastruttura di \emph{testing} backend}: è stata
+        introdotta da zero una suite comprensiva di \emph{unit test} sui
+        \emph{controller}, \emph{integration test} di tipo \emph{smoke},
+        \emph{lifecycle} (CRUD/Grid) e \emph{summary}; la sola messa in funzione
+        della prima \emph{suite} ha portato alla luce alcuni difetti applicativi
+        latenti che si sarebbero manifestati esclusivamente presso un cliente
+        specifico, in produzione;
+    \item \textbf{O8. Test \emph{frontend}}: sono stati prodotti
+        \emph{unit test} con \emph{Vitest} per la logica dei componenti
+        \emph{Angular} e test \emph{end-to-end} con \emph{Playwright} per i
+        flussi utente principali, integrati nel processo di \emph{build};
+    \item \textbf{O9. Agenti AI e \emph{skill} procedurali}: è stata
+        prodotta una suite di \emph{Claude skill} e agenti AI che codificano in forma
+        riutilizzabile le convenzioni del \emph{framework}, garantendo la
+        replicabilità della propagazione di telemetria e test ai diversi
+        moduli.
+\end{itemize}
+
+Oltre a quanto previsto in fase di pianificazione, il tempo liberato grazie
+all'agente AI ha permesso l'approfondimento di funzionalità non
+precedentemente preventivate: 
 \begin{itemize}
     \item \textbf{arricchimento automatico delle \emph{trace} con l'identità dell'utente
         autenticato}, ottenuto tramite un \emph{processor} \gls{otel} centralizzato in
@@ -25,13 +259,6 @@ precedentemente preventivate:
         (\emph{Sia.Devextreme.Crud}, \emph{Sia.Devextreme.Kanban} e ulteriori moduli
         ancillari), realizzata tramite la \emph{Claude skill} \texttt{sia-telemetry-developer}
         che ha permesso la propagazione coerente del pattern \texttt{SiaXxxDiagnostics};
-    \item \textbf{introduzione \emph{ex novo} di un'infrastruttura di testing} per il
-        framework, comprensiva di \emph{unit test} sui \emph{controller}, \emph{integration
-        test} di tipo \emph{smoke}, \emph{lifecycle} (CRUD/Grid) e \emph{summary}, con la
-        relativa \emph{fixture} \texttt{SiaWebApplicationFactory} e i meccanismi di
-        autenticazione/autorizzazione di test (\texttt{TestAuthHandler},
-        \texttt{AllowAllPermissionCheckService}); la sola messa in funzione della prima
-        \emph{suite} ha portato alla luce due difetti applicativi latenti;
     \item \textbf{popolamento delle dashboard Grafana con pannelli aggiuntivi} per la
         diagnosi a grana fine (latenza per endpoint, distribuzione degli errori per modulo,
         \emph{top users} per consumo di risorse), versionate nel repository tramite
@@ -43,131 +270,205 @@ precedentemente preventivate:
         permanente per il team.
 \end{itemize}
 
-% \section{Sintesi dei contributi originali}
+I requisiti funzionali, qualitativi e di vincolo descritti nel
+capitolo~\ref{cap:analisi-requisiti} sono stati soddisfatti nella loro
+totalità, compresi quelli desiderabili e quelli aggiuntivi proposti in corso
+d'opera. Le tabelle complete di tracciamento sono consultabili
+nell'appendice~\ref{app:requisiti}.
 
-% Prima di rendere conto del raggiungimento dei singoli obiettivi, è utile
-% ricapitolare i contributi originali del lavoro, già anticipati nella
-% sezione~\ref{sec:contributi}, evidenziandone l'impatto sul \emph{framework}
-% \emph{Sia.Web}.
+\section{Conoscenze acquisite e analisi del lavoro svolto}
 
-% Il primo contributo è la \textbf{progettazione e l'integrazione di un
-% sistema di osservabilità completo} per un \emph{framework} che ne era
-% sprovvisto. Il \emph{pipeline} \gls{otel} è stato centralizzato in
-% \texttt{BaseApplicationBuilder} in modo tale che i moduli applicativi non
-% debbano conoscerne i dettagli; ogni nuovo modulo aderisce alla telemetria
-% semplicemente registrando il proprio \texttt{ActivitySource} e
-% \texttt{Meter}. Questa scelta, unita alla tassonomia di attributi e metriche
-% definita per i moduli core, riduce drasticamente l'attrito di adozione e
-% garantisce confronti omogenei tra moduli e tra installazioni di clienti
-% diversi.
+Il tirocinio svolto ha soddisfatto le aspettative principalmente da un punto di
+vista conoscitivo, dato che mi ha permesso di capire le implicazioni
+dell'osservabilità in un \emph{framework enterprise} reale e di comprendere come
+una pratica di lavoro AI-assistita disciplinata possa rappresentare, se ben
+applicata, un passo importante per la produttività e per la qualità del
+software prodotto. Il punto più rilevante di questo tirocinio è stato
+certamente l'integrazione di un sistema di osservabilità in un \emph{framework}
+che ne era sprovvisto, accompagnata dalla nascita di un'infrastruttura di
+\emph{testing} a copertura della logica e dei dati del \emph{framework} stesso.
 
-% Il secondo contributo è l'introduzione di due meccanismi trasparenti al
-% codice del modulo --- l'arricchimento automatico delle \emph{trace} con
-% l'identità dell'utente autenticato e l'uso degli \emph{exemplar} ---, i
-% quali abilitano una \textbf{catena diagnostica completa}
-% metrica~$\rightarrow$~\emph{trace}~$\rightarrow$~utente~$\rightarrow$~\emph{log}.
-% Senza questi meccanismi, l'osservabilità si ferma alla domanda ``\emph{quando
-% e quanto} qualcosa è andato storto''; con essi diventa possibile rispondere
-% a ``\emph{quale richiesta} è stata responsabile del picco di latenza, e
-% \emph{a quale utente} stava rispondendo''.
+L'attività è stata impegnativa e, nonostante il supporto del \emph{team}
+aziendale, la parte progettuale e di effettivo sviluppo ha richiesto uno studio
+mirato di standard e linguaggi di query (\gls{otel}, PromQL, TraceQL, LogQL)
+non affrontati nel percorso accademico, oltre alla comprensione delle
+convenzioni interne del \emph{framework} \emph{Sia.Core}. Le scelte
+implementative e la loro realizzazione sono state attività intense ma sono state
+affrontate con successo, permettendomi di acquisire conoscenze e competenze in
+ambiti di osservabilità, \emph{testing} automatico e \emph{AI engineering}
+decisamente importanti per un percorso di Laurea Triennale come il mio.
 
-% Il terzo contributo è la \textbf{nascita di un'infrastruttura di testing}
-% nel \emph{framework}, introdotta da zero. La sola messa in funzione della
-% prima \emph{suite} di \emph{integration test} ha portato alla luce due
-% difetti applicativi latenti che si sarebbero manifestati esclusivamente
-% presso un cliente specifico, in produzione: un risultato concreto che
-% quantifica il valore della rete di sicurezza introdotta.
-
-% Il quarto contributo, di natura metodologica, è la definizione di una
-% \textbf{pratica di lavoro AI-assistita} disciplinata e replicabile: il
-% \emph{workflow} \emph{Plan~$\rightarrow$~Confirm~$\rightarrow$~Implement},
-% le \emph{skill} procedurali per la propagazione coerente di telemetria e
-% test, l'adozione del \gls{mcp} per ridurre le ``allucinazioni'' lavorando
-% su dati reali. Questa metodologia è stata utilizzata in modo sistematico
-% durante lo stage e ha permesso di ottenere, in 300 ore, una copertura
-% funzionale ed estensiva che difficilmente sarebbe stata raggiungibile con
-% un approccio tradizionale, a parità di risorse.
-
-\section{Raggiungimento degli obiettivi}
-
-Gli obiettivi dichiarati nella sezione ``Obiettivi'' del capitolo~\ref{cap:descrizione-stage}
-sono stati raggiunti:
+Di massima, è possibile descrivere le principali conoscenze maturate
+nell'ambito progettuale:
 
 \begin{itemize}
-    \item l'analisi dei requisiti di osservabilità e la selezione delle tecnologie hanno
-        portato all'adozione dello stack \gls{otel} + \emph{Grafana LGTM}, motivata dai
-        criteri descritti nel capitolo~\ref{cap:tecnologie-adottate};
-    \item l'architettura di telemetria è stata progettata e integrata con il framework
-        \emph{.NET}, centralizzando la configurazione in \texttt{BaseApplicationBuilder}
-        (capitolo~\ref{cap:progettazione});
-    \item le strategie di campionamento sono state definite a due livelli (\emph{sampler}
-        globale e \emph{processor} per-\emph{source}), con ratio configurabili per ambiente;
-    \item gli strumenti di istrumentazione sono stati implementati per i moduli
-        \emph{Sia.Auth}, \emph{Sia.Base} e \emph{Sia.Grid}, e propagati successivamente ad
-        altri moduli del framework tramite le \emph{Claude skill} dedicate;
-    \item la piattaforma di visualizzazione Grafana è stata configurata con i relativi
-        \emph{backend} di \emph{storage} (Tempo, Loki, Prometheus) e con le dashboard
-        versionate nel repository.
+    \item \textbf{standard \gls{otel} e modello dei segnali}: la comprensione
+        del modello a \emph{trace}, metriche, \emph{log} ed \emph{exemplar},
+        delle convenzioni semantiche (\emph{semantic conventions}) e del
+        protocollo di trasporto OTLP, ha permesso di progettare una telemetria
+        coerente con un linguaggio comune adottato dall'intera comunità OTel,
+        evitando soluzioni proprietarie e garantendo la portabilità dei segnali
+        verso qualsiasi backend OTel-compatibile;
+    \item \textbf{stack \emph{Grafana LGTM} e linguaggi di query}: lo studio di
+        \emph{Loki}, \emph{Tempo} e \emph{Mimir/Prometheus}, con i rispettivi
+        linguaggi PromQL, TraceQL e LogQL, ha permesso di comprendere i
+        \emph{trade-off} di ciascun \emph{backend} (cardinalità in Prometheus,
+        \emph{retention} dei segnali, indicizzazione in Loki) e di costruire
+        dashboard navigabili che sfruttano la correlazione \emph{cross}-segnale,
+        elemento centrale di una vera osservabilità;
+    \item \textbf{libreria \emph{Serilog} e \emph{sink} OTLP}: l'integrazione
+        di \emph{Serilog} con esportazione OTLP e la propagazione automatica di
+        \texttt{TraceId} e \texttt{SpanId} hanno consentito di ottenere una
+        correlazione \emph{log}-\emph{trace} senza modifiche nel codice
+        applicativo, un risultato che dimostra come scelte architetturali
+        centralizzate possano avere un impatto trasversale sull'intero
+        \emph{framework};
+    \item \textbf{infrastruttura di \emph{testing}}: lo studio di \emph{xUnit},
+        \emph{NSubstitute}, \emph{FluentAssertions} per il \emph{backend} e di
+        \emph{Vitest} e \emph{Playwright} per il \emph{frontend}, unito alla
+        progettazione di \emph{fixture} riutilizzabili
+        (\texttt{SiaWebApplicationFactory}) e di scenari \emph{lifecycle}
+        \emph{data-driven} per CRUD e Grid, ha permesso di acquisire
+        competenze concrete su un'attività, la scrittura di test su un
+        \emph{framework} esistente, spesso solo accennata nei corsi
+        universitari;
+    \item \textbf{applicazione di \emph{design pattern} a un contesto reale}:
+        l'uso del pattern \texttt{SiaXxxDiagnostics} per ogni modulo, della
+        \emph{factory} per la registrazione delle sorgenti nel \emph{pipeline}
+        e dell'\emph{adapter} per integrare \emph{Serilog} con \gls{otel}, ha
+        permesso di osservare in concreto come pattern studiati in modo
+        astratto durante il corso di Ingegneria del Software trovino una loro
+        naturale applicazione in un \emph{framework} condiviso;
+    \item \textbf{metodologie di lavoro AI-assistite}: la creazione di agenti
+        specializzati, il \emph{prompt} e \emph{skill engineering}, l'adozione
+        del \gls{mcp} per ridurre le ``allucinazioni'' lavorando su dati reali,
+        sono competenze del tutto nuove rispetto al percorso accademico ed
+        estremamente attuali in un mercato del lavoro che integra sempre più
+        intensamente strumenti di intelligenza artificiale nei processi di
+        sviluppo. La definizione del \emph{workflow}
+        Plan~$\rightarrow$~Confirm~$\rightarrow$~Implement, l'uso disciplinato
+        delle \emph{skill} per la propagazione coerente di telemetria e test, e
+        l'integrazione \gls{mcp} con \emph{Grafana} e database hanno permesso di
+        ottenere, in 300 ore, una copertura funzionale ed estensiva
+        difficilmente raggiungibile con un approccio tradizionale a parità di
+        risorse.
 \end{itemize}
 
-I requisiti funzionali, di qualità e di vincolo sono stati soddisfatti nella loro
-totalità. Compresi quelli desiderabili e quelli aggiuntivi proposti dallo stagista stesso.
-Consultabili nell'appendice~\ref{app:requisiti}.
+\section{Scenari di applicabilità e sviluppi futuri}
 
-\section{Conoscenze acquisite}
+Il sistema di osservabilità realizzato e l'infrastruttura di \emph{testing}
+introdotta rappresentano un punto di partenza importante per lo sviluppo
+ulteriore del \emph{framework} \emph{Sia.Core} e si prestano a essere estesi in
+diverse direzioni.
 
-Lo stage ha portato all'acquisizione di competenze in più ambiti:
+Sul piano operativo della telemetria, un primo sviluppo riguarda l'aspetto
+della \textbf{\emph{retention} dei dati}. Ogni segnale ha caratteristiche di
+\emph{storage} differenti: le \emph{trace} su \emph{Tempo} sono voluminose per
+singolo campione ma a bassa densità (sono campionate) e si prestano a una
+\emph{retention} medio-breve (7--14 giorni), sufficiente per la diagnosi di
+incidenti recenti; le metriche su \emph{Prometheus/Mimir} sono aggregate e
+compatte, e la \emph{retention} può estendersi a 90 giorni o più, permettendo
+il confronto di tendenze nel tempo; i \emph{log} su \emph{Loki} sono voluminosi
+ma indicizzati per \emph{label}, con \emph{retention} tipica di 30 giorni e
+possibilità di archiviazione a lungo termine in \emph{storage} a basso costo. I
+tempi concreti di \emph{retention} potranno essere configurati in funzione delle
+esigenze di indagine e del costo di \emph{storage} accettabile per il singolo
+cliente.
+
+Tra gli sviluppi futuri di natura più tecnica si collocano:
 
 \begin{itemize}
-    \item standard \gls{otel} e modello dei segnali (\emph{trace}, metriche, \emph{log},
-        \emph{exemplars});
-    \item stack \emph{Grafana} (Tempo, Prometheus, Loki), con i rispettivi linguaggi di
-        query PromQL, TraceQL, LogQL;
-    \item libreria Serilog e \emph{sink} OTLP, con correlazione \emph{log}-\emph{trace};
-    \item applicazione dei \emph{design pattern} Adapter e Factory a un contesto reale di
-        framework condiviso;
-    \item metodologie di lavoro assistito da agenti AI, \emph{prompt} e \emph{skill
-        engineering}, uso del \gls{mcp} per integrare l'agente con servizi runtime.
+    \item l'introduzione del \textbf{\emph{tail-based sampling}} tramite il
+        \emph{Collector} \gls{otel}, che permetterebbe di conservare
+        integralmente le \emph{trace} di richieste lente o in errore anche con
+        un \emph{ratio} globale basso, ottimizzando il rapporto tra costo di
+        \emph{storage} e valore diagnostico;
+    \item la definizione automatizzata di \textbf{metriche \emph{RED}} (Rate,
+        Errors, Duration) e \textbf{\emph{USE}} (Utilization, Saturation,
+        Errors) per ogni nuovo modulo, in modo da garantire una copertura
+        omogenea e immediata delle nuove istrumentazioni;
+    \item la definizione di \textbf{\emph{Service Level Objective} (SLO)} e di
+        \textbf{\emph{alerting} basato sul \emph{burn-rate} dell'\emph{error
+        budget}}, evolvendo il sistema da una osservabilità reattiva a una
+        gestione proattiva dell'affidabilità;
+    \item l'integrazione di \textbf{\emph{continuous profiling} tramite
+        \emph{Pyroscope}}, già presente nello \emph{stack} \emph{Grafana LGTM},
+        per correlare \emph{trace} e profili di CPU/memoria nei punti di
+        maggiore latenza identificati dagli \emph{exemplar}.
 \end{itemize}
 
-\section{Retention e gestione dei dati di telemetria}
+Sul piano della metodologia AI-assistita, lo sviluppo futuro più promettente è
+l'\textbf{estensione del pattern di \emph{skill engineering}} ad altri ambiti
+del \emph{framework}, oltre alla telemetria e al \emph{testing}: la
+generazione assistita di \emph{controller}, di \emph{service}, di
+\emph{repository}, di nuovi CRUD e \emph{grid}, e di dashboard di
+\emph{business intelligence}. Le \emph{skill} prodotte durante lo stage hanno
+dimostrato che un'investimento iniziale nella codifica delle convenzioni del
+\emph{framework} sotto forma di \emph{skill} procedurali si ripaga rapidamente
+in termini di velocità e qualità degli interventi successivi, e questo schema
+può essere replicato per coprire l'intera superficie del \emph{framework}.
 
-Un aspetto operativo affrontato durante lo stage è la \emph{retention} dei dati di
-telemetria. Ogni segnale ha caratteristiche di storage differenti:
-\begin{itemize}
-    \item le \emph{trace} su Tempo sono voluminose per singolo campione ma a bassa densità
-        (sono campionate); la \emph{retention} suggerita è \emph{medio-breve} (7-14 giorni),
-        sufficiente per la diagnosi di incidenti recenti;
-    \item le metriche su Prometheus (o Mimir) sono aggregate e compatte: la \emph{retention}
-        può estendersi a 90 giorni o più, permettendo il confronto di tendenze nel tempo;
-    \item i \emph{log} su Loki sono voluminosi ma indicizzati per \emph{label}: la
-        \emph{retention} tipica è di 30 giorni, con possibilità di archiviazione a lungo
-        termine in storage a basso costo.
-\end{itemize}
-I tempi concreti di \emph{retention} sono configurati in funzione delle esigenze di indagine
-e del costo di \emph{storage} accettabile per il singolo cliente.
+Infine, sul piano dell'applicabilità a casi d'uso concreti, il sistema di
+osservabilità realizzato apre a scenari di valore diretto per i clienti di Sia
+Informatica: dal \textbf{monitoraggio attivo delle installazioni} con
+\emph{alerting} mirato sulle SLO, alla \textbf{diagnosi rapida di anomalie} a
+partire dai \emph{log} di un singolo utente tramite l'arricchimento
+automatico delle \emph{trace} con l'identità, fino alla \textbf{capacity
+planning} basata sull'andamento storico delle metriche aggregate per
+installazione e per modulo.
 
-\section{Valutazione personale e sviluppi futuri}
+\section{Valutazione personale}
 
-Dal punto di vista personale, lo stage ha permesso di lavorare a stretto contatto con un
-\emph{framework} enterprise reale, cimentandosi sia con la progettazione (scelte di
-cardinalità, \emph{sampling}, correlazione \emph{cross-signal}) sia con la
-meta-programmazione del processo di sviluppo tramite \emph{Claude skill}. La collaborazione
-con il \emph{team} aziendale e il confronto continuo sulle scelte architetturali sono stati
-parte integrante del percorso formativo.
+L'attività di stage si è rivelata molto utile per la crescita personale e
+professionale, permettendo di acquisire nuove conoscenze e competenze in ambiti
+di osservabilità, \emph{testing} automatico e metodologie di lavoro
+AI-assistite, che sono stati approfonditi e applicati in modo concreto su un
+\emph{framework enterprise} reale. L'ambito dell'osservabilità è stato
+studiato in modo approfondito, permettendo di esplorare in autonomia un campo
+con ripercussioni decisamente interessanti nel mondo dello sviluppo software,
+non visto né praticato in corsi universitari, e che si è rivelato
+un'esperienza assolutamente rilevante.
 
-Tra gli sviluppi futuri più promettenti si collocano:
-\begin{itemize}
-    \item introduzione del \emph{tail-based sampling} tramite \emph{Collector}, che
-        permetterebbe di conservare integralmente le trace di richieste lente o in errore
-        anche con un \emph{ratio} globale basso;
-    \item definizione di metriche \emph{RED} (Rate, Errors, Duration) e \emph{USE}
-        (Utilization, Saturation, Errors) in forma automatizzata per ogni nuovo modulo;
-    \item definizione di \emph{Service Level Objective} (SLO) e \emph{alerting} basato sul
-        \emph{burn-rate} dell'\emph{error budget};
-    \item integrazione di \emph{continuous profiling} tramite \emph{Pyroscope}, già presente
-        nello stack Grafana, per correlare trace e profili di CPU/memoria;
-    \item estensione del pattern di \emph{skill engineering} ad altri ambiti del framework,
-        oltre alla telemetria (es.\ generazione di \emph{CRUD}, di \emph{controller}, di
-        \emph{dashboard} di \emph{business}).
-\end{itemize}
+Spesso ambiti sconosciuti possono essere rilevanti da un punto di vista
+professionale, e questo è stato un esempio di come andare oltre i preconcetti
+e immergersi in un ambito ampiamente teorico, come la progettazione di una
+tassonomia di metriche con cardinalità controllata o l'uso degli
+\emph{exemplar} per collegare metrica e \emph{trace}, si riveli in realtà
+un'occasione di crescita e di apprendimento, richiedendo necessariamente di
+praticare a fondo uno studio mirato delle attività svolte. In questi casi, la
+passione per il conoscere guida e anticipa la necessità di apprendere, dando
+un'importante possibilità di conoscere e maturare, altrimenti non offerta in
+modo così vicino alle realtà aziendali rimanendo in ambito puramente
+accademico.
+
+Particolarmente significativa è stata la possibilità di lavorare a stretto
+contatto con un \emph{framework} \emph{enterprise} reale, cimentandosi sia con
+la progettazione (scelte di cardinalità, \emph{sampling}, correlazione
+\emph{cross}-segnale) sia con la \emph{meta}-programmazione del processo di
+sviluppo tramite la creazione di agenti AI specializzati e di \emph{skill}
+procedurali. Questa seconda dimensione, in particolare, ha trasformato il mio
+modo di intendere il rapporto fra sviluppatore e strumenti di intelligenza
+artificiale: non più un assistente che risponde a richieste puntuali, ma un
+\emph{pair engineer} disciplinato dalle convenzioni del \emph{framework}, in
+grado di propagare in modo coerente uno stesso pattern a decine di moduli con
+una qualità di output verificabile dallo sviluppatore. La collaborazione con il
+\emph{team} aziendale e il confronto continuo sulle scelte architetturali sono
+stati parte integrante del percorso formativo, con un'attività di supporto
+costante che ha lasciato ampia libertà di organizzazione e di sviluppo
+autonomo, restando vicino alle mie necessità di studente.
+
+Il progetto rappresenta per me una crescita che matura quanto compreso e visto
+in questi ultimi anni, permettendo di applicare in modo nuovo concetti per la
+maggior parte sconosciuti e con tecnologie attuali, calandomi in un contesto
+\emph{enterprise} concreto, usando librerie e \emph{stack} di riferimento e
+sviluppando un pensiero critico nell'analisi delle scelte di osservabilità,
+affinando ulteriormente una visione d'insieme dei corsi fin qui frequentati
+nel mio percorso di laurea triennale, perfezionando il mio metodo di studio e
+il mio modo di affrontare un progetto di codifica con ripercussioni operative
+in produzione. Quanto studiato rappresenta un'importante partenza per il mio
+futuro, accademico e non, aggiornandomi su un ambito decisamente attuale,
+l'osservabilità dei sistemi distribuiti e l'\emph{AI engineering}, di sicuro
+interesse per possibili sviluppi futuri.
+
+
+\end{document}
