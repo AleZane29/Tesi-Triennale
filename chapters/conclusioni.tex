@@ -89,35 +89,29 @@ obiettivi:
         replicabilità della propagazione di telemetria e test ai diversi
         moduli.
 \end{itemize}
-
 Oltre a quanto previsto in fase di pianificazione, il tempo liberato grazie
 all'agente AI ha permesso l'approfondimento di funzionalità non
-precedentemente preventivate: 
-\begin{itemize}
-    \item \textbf{arricchimento automatico delle \emph{trace} con l'identità dell'utente
-        autenticato}, ottenuto tramite un \emph{processor} \gls{otel} centralizzato in
-        \texttt{BaseApplicationBuilder} che intercetta ogni \emph{span} radice e ne propaga
-        l'\texttt{enduser.id} senza richiedere modifiche al codice dei singoli moduli;
-    \item \textbf{integrazione del meccanismo degli \emph{exemplars}}, che collega ogni
-        campione di metrica al \texttt{TraceId} della richiesta che lo ha generato,
-        abilitando la navigazione diretta dalla dashboard Grafana al \emph{trace} di Tempo
-        e completando la catena diagnostica
-        metrica~$\rightarrow$~\emph{trace}~$\rightarrow$~utente~$\rightarrow$~\emph{log};
-    \item \textbf{estensione dell'istrumentazione a moduli inizialmente non in scope}
-        (\emph{Sia.Devextreme.Crud}, \emph{Sia.Devextreme.Kanban} e ulteriori moduli
-        ancillari), realizzata tramite \emph{Claude skill} e agenti AI
-        che ha permesso la propagazione coerente del pattern \texttt{SiaXxxDiagnostics};
-    \item \textbf{popolamento delle dashboard Grafana con pannelli aggiuntivi} per la
-        diagnosi a grana fine (latenza per endpoint, distribuzione degli errori per modulo,
-        \emph{top users} per consumo di risorse), versionate nel repository tramite
-        \emph{provisioning} dichiarativo;
-    \item \textbf{produzione di una suite di \emph{Claude skill} procedurali} che
-        codificano in forma riutilizzabile le convenzioni del framework (telemetria,
-        \emph{controller}, \emph{service}, \emph{repository}, \emph{CRUD}, \emph{grid},
-        ecc.), trasformando un esito incidentale dello stage in un asset metodologico
-        permanente per il team.
-\end{itemize}
-
+precedentemente preventivate. L'arricchimento automatico delle \emph{trace}
+con l'identità dell'utente autenticato è stato ottenuto tramite un
+\emph{processor} \gls{otel} centralizzato in \texttt{BaseApplicationBuilder},
+che intercetta ogni \emph{span} radice e ne propaga l'\texttt{enduser.id} senza
+richiedere modifiche al codice dei singoli moduli. A questo si è aggiunta
+l'integrazione degli \emph{exemplar}, che collegano ogni campione di metrica al
+\texttt{TraceId} della richiesta che lo ha generato, completando la catena
+diagnostica metrica~$\rightarrow$~\emph{trace}~$\rightarrow$~utente~$\rightarrow$~\emph{log}.
+Grazie alle \emph{Claude skill} e agli agenti AI sviluppati, è stato possibile
+estendere l'istrumentazione a moduli inizialmente fuori scope,
+\texttt{Sia.Devextreme.Crud}, \texttt{Sia.Devextreme.Kanban} e ulteriori moduli,
+propagando in modo coerente il pattern \texttt{SiaXxxDiagnostics}.
+Le dashboard Grafana sono state arricchite con pannelli aggiuntivi per la
+diagnosi a grana fine (latenza per \emph{endpoint}, distribuzione degli errori
+per modulo, \emph{top users} per consumo di risorse), versionati nel repository
+tramite \emph{provisioning} dichiarativo. L'insieme delle \emph{skill}
+procedurali prodotte, che codificano le convenzioni del framework per
+telemetria, \emph{controller}, \emph{service}, \emph{repository}, \emph{CRUD}
+e \emph{grid} ha trasformato un esito incidentale dello stage in un asset
+metodologico permanente per il team.
+\\
 I requisiti funzionali, qualitativi e di vincolo descritti nel
 capitolo~\ref{cap:analisi-requisiti} sono stati soddisfatti nella loro
 totalità, compresi quelli desiderabili e quelli aggiuntivi proposti in corso
@@ -126,17 +120,16 @@ nell'appendice~\ref{app:requisiti}.
 
 \section{Conoscenze acquisite e analisi del lavoro svolto}
 
-Il tirocinio svolto ha soddisfatto le aspettative principalmente da un punto di
-vista conoscitivo, dato che mi ha permesso di capire le implicazioni
+Il tirocinio svolto ha permesso un arricchimento principalmente delle mie conoscenze,
+permettendo di apprendere ed affrontare le implicazioni
 dell'osservabilità in un \emph{framework enterprise} reale e di comprendere come
 una pratica di lavoro AI-assistita disciplinata possa rappresentare, se ben
 applicata, un passo importante per la produttività e per la qualità del
 software prodotto. Il punto più rilevante di questo tirocinio è stato
 certamente l'integrazione di un sistema di osservabilità in un \emph{framework}
 che ne era sprovvisto, accompagnata dalla nascita di un'infrastruttura di
-\emph{testing} a copertura della logica e dei dati del \emph{framework} stesso.
-
-L'attività è stata impegnativa e, nonostante il supporto del \emph{team}
+\emph{testing} a copertura della logica e dei dati del \emph{framework} stesso.\\
+L'attività è stata impegnativa e, nonostante il supporto del team
 aziendale, la parte progettuale e di effettivo sviluppo ha richiesto uno studio
 mirato di standard e linguaggi di query (\gls{otel}, PromQL, TraceQL, LogQL)
 non affrontati nel percorso accademico, oltre alla comprensione delle
@@ -144,21 +137,20 @@ convenzioni interne del \emph{framework} \emph{Sia.Core}. Le scelte
 implementative e la loro realizzazione sono state attività intense ma sono state
 affrontate con successo, permettendomi di acquisire conoscenze e competenze in
 ambiti di osservabilità, \emph{testing} automatico e \emph{AI engineering}
-decisamente importanti per un percorso di Laurea Triennale come il mio.
-
+decisamente importanti per un percorso di Laurea Triennale come il mio.\\
 Di massima, è possibile descrivere le principali conoscenze maturate
 nell'ambito progettuale:
 
 \begin{itemize}
     \item \textbf{standard \gls{otel} e modello dei segnali}: la comprensione
         del modello a \emph{trace}, metriche, \emph{log} ed \emph{exemplar},
-        delle convenzioni semantiche (\emph{semantic conventions}) e del
+        delle convenzioni semantiche e del
         protocollo di trasporto OTLP, ha permesso di progettare una telemetria
         coerente con un linguaggio comune adottato dall'intera comunità OTel,
         evitando soluzioni proprietarie e garantendo la portabilità dei segnali
         verso qualsiasi backend OTel-compatibile;
     \item \textbf{stack \emph{Grafana LGTM} e linguaggi di query}: lo studio di
-        \emph{Loki}, \emph{Tempo} e \emph{Mimir/Prometheus}, con i rispettivi
+        \emph{Loki}, \emph{Tempo} e \emph{Prometheus}, con i rispettivi
         linguaggi PromQL, TraceQL e LogQL, ha permesso di comprendere i
         \emph{trade-off} di ciascun \emph{backend} (cardinalità in Prometheus,
         \emph{retention} dei segnali, indicizzazione in Loki) e di costruire
@@ -193,13 +185,7 @@ nell'ambito progettuale:
         sono competenze del tutto nuove rispetto al percorso accademico ed
         estremamente attuali in un mercato del lavoro che integra sempre più
         intensamente strumenti di intelligenza artificiale nei processi di
-        sviluppo. La definizione del \emph{workflow}
-        Plan~$\rightarrow$~Confirm~$\rightarrow$~Implement, l'uso disciplinato
-        delle \emph{skill} per la propagazione coerente di telemetria e test, e
-        l'integrazione \gls{mcp} con \emph{Grafana} e database hanno permesso di
-        ottenere, in 300 ore, una copertura funzionale ed estensiva
-        difficilmente raggiungibile con un approccio tradizionale a parità di
-        risorse.
+        sviluppo.
 \end{itemize}
 
 \section{Scenari di applicabilità e sviluppi futuri}
@@ -207,63 +193,68 @@ nell'ambito progettuale:
 Il sistema di osservabilità realizzato e l'infrastruttura di \emph{testing}
 introdotta rappresentano un punto di partenza importante per lo sviluppo
 ulteriore del \emph{framework} \emph{Sia.Core} e si prestano a essere estesi in
-diverse direzioni.
-
+diverse direzioni.\\
 Sul piano operativo della telemetria, un primo sviluppo riguarda l'aspetto
 della \textbf{\emph{retention} dei dati}. Ogni segnale ha caratteristiche di
 \emph{storage} differenti: le \emph{trace} su \emph{Tempo} sono voluminose per
 singolo campione ma a bassa densità (sono campionate) e si prestano a una
 \emph{retention} medio-breve (7--14 giorni), sufficiente per la diagnosi di
-incidenti recenti; le metriche su \emph{Prometheus/Mimir} sono aggregate e
+incidenti recenti; le metriche su \emph{Prometheus} sono aggregate e
 compatte, e la \emph{retention} può estendersi a 90 giorni o più, permettendo
 il confronto di tendenze nel tempo; i \emph{log} su \emph{Loki} sono voluminosi
 ma indicizzati per \emph{label}, con \emph{retention} tipica di 30 giorni e
 possibilità di archiviazione a lungo termine in \emph{storage} a basso costo. I
 tempi concreti di \emph{retention} potranno essere configurati in funzione delle
 esigenze di indagine e del costo di \emph{storage} accettabile per il singolo
-cliente.
-
-Tra gli sviluppi futuri di natura più tecnica si collocano:
--------RIMUOVERE L'ITEMIZE E RENDERE DISCORSIVO-----------------
-\begin{itemize}
-    \item l'introduzione del \textbf{\emph{tail-based sampling}} tramite il
-        \emph{Collector} \gls{otel}, che permetterebbe di conservare
-        integralmente le \emph{trace} di richieste lente o in errore anche con
-        un \emph{ratio} globale basso, ottimizzando il rapporto tra costo di
-        \emph{storage} e valore diagnostico;
-    \item la definizione automatizzata di \textbf{metriche \emph{RED}} (Rate,
-        Errors, Duration) e \textbf{\emph{USE}} (Utilization, Saturation,
-        Errors) per ogni nuovo modulo, in modo da garantire una copertura
-        omogenea e immediata delle nuove istrumentazioni;
-    \item la definizione di \textbf{\emph{Service Level Objective} (SLO)} e di
-        \textbf{\emph{alerting} basato sul \emph{burn-rate} dell'\emph{error
-        budget}}, evolvendo il sistema da una osservabilità reattiva a una
-        gestione proattiva dell'affidabilità;
-    \item l'integrazione di \textbf{\emph{continuous profiling} tramite
-        \emph{Pyroscope}}, già presente nello \emph{stack} \emph{Grafana LGTM},
-        per correlare \emph{trace} e profili di CPU/memoria nei punti di
-        maggiore latenza identificati dagli \emph{exemplar}.
-\end{itemize}
-
-Sul piano della metodologia AI-assistita, lo sviluppo futuro più promettente è
-l'\textbf{estensione del pattern di \emph{skill engineering}} ad altri ambiti
-del \emph{framework}, oltre alla telemetria e al \emph{testing}: la
-generazione assistita di \emph{controller}, di \emph{service}, di
-\emph{repository}, di nuovi CRUD e \emph{grid}, e di dashboard di
-\emph{business intelligence}. Le \emph{skill} prodotte durante lo stage hanno
-dimostrato che un'investimento iniziale nella codifica delle convenzioni del
-\emph{framework} sotto forma di \emph{skill} procedurali si ripaga rapidamente
-in termini di velocità e qualità degli interventi successivi, e questo schema
-può essere replicato per coprire l'intera superficie del \emph{framework}.
-
-Infine, sul piano dell'applicabilità a casi d'uso concreti, il sistema di
-osservabilità realizzato apre a scenari di valore diretto per i clienti di Sia
-Informatica: dal \textbf{monitoraggio attivo delle installazioni} con
-\emph{alerting} mirato sulle SLO, alla \textbf{diagnosi rapida di anomalie} a
-partire dai \emph{log} di un singolo utente tramite l'arricchimento
-automatico delle \emph{trace} con l'identità, fino alla \textbf{capacity
-planning} basata sull'andamento storico delle metriche aggregate per
-installazione e per modulo.
+cliente.\\
+L'analisi dei dati telemetrici raccolti consentirà di individuare eventuali 
+nuovi colli di bottiglia e anomalie prestazionali emerse durante l'utilizzo 
+del sistema in ambienti reali. In presenza di rallentamenti o comportamenti 
+anomali, sarà quindi possibile \textbf{estendere progressivamente il livello di 
+instrumentazione}, introducendo ulteriori segnali di telemetria e aumentando 
+il grado di dettaglio del tracciamento nelle componenti maggiormente critiche.\\
+Questo approccio incrementale permetterà di approfondire specifiche porzioni della 
+logica applicativa responsabili delle degradazioni prestazionali, facilitando 
+l'identificazione delle cause alla radice e supportando interventi di ottimizzazione 
+più mirati. Inoltre, la disponibilità di metriche, \emph{trace} e log correlati 
+consentirà di analizzare il comportamento del sistema da prospettive differenti, 
+migliorando la capacità diagnostica e riducendo i tempi necessari all'individuazione 
+dei problemi.\\
+Un ulteriore sviluppo dell'infrastruttura di telemetria riguarda la definizione 
+di soglie operative (\emph{threshold}) sui principali indicatori di prestazione, 
+con l'obiettivo di \textbf{introdurre un sistema di \emph{alerting} automatico}.\\
+Attraverso strumenti come \emph{Grafana Alerting} e le metriche raccolte tramite 
+\emph{OpenTelemetry}, sarebbe possibile configurare notifiche automatiche verso i 
+team di sviluppo e manutenzione in presenza di anomalie, quali picchi di latenza, 
+aumento del tasso di errori o degradazione delle prestazioni di specifici moduli 
+applicativi.\\
+Un sistema di questo tipo consentirebbe di adottare un approccio maggiormente 
+proattivo al monitoraggio, riducendo i tempi di individuazione dei problemi e 
+permettendo interventi tempestivi prima che i rallentamenti abbiano un impatto 
+significativo sugli utenti finali. Inoltre, la possibilità di definire soglie 
+differenti in base al modulo o al contesto di utilizzo renderebbe il monitoraggio 
+più flessibile e adattabile ai diversi scenari applicativi.\\
+Sul piano della metodologia di sviluppo AI-assistita adottata durante lo stage, 
+uno degli sviluppi futuri più promettenti riguarda l’evoluzione dell’agente dedicato 
+alla telemetria.\\
+L’obiettivo è estenderne le capacità oltre la semplice raccolta o propagazione dei 
+segnali osservabili, introducendo funzionalità di \textbf{analisi automatica, interpretazione 
+dei dati e generazione di report} sintetici destinati ai team di sviluppo.\\
+In prospettiva, l’agente potrebbe essere istruito a correlare metriche, \emph{trace} 
+e \emph{log} provenienti dai diversi moduli del framework, individuando automaticamente
+anomalie, regressioni prestazionali o pattern ricorrenti di errore. A partire da tali 
+informazioni, sarebbe possibile produrre report riassuntivi leggibili anche senza 
+una conoscenza approfondita degli strumenti di osservabilità.\\
+Un approccio di questo tipo consentirebbe ai developer di ottenere una panoramica 
+immediata dello stato del framework, riducendo la necessità di interrogare manualmente 
+dashboard, query PromQL o sistemi di tracing.\\
+L’agente assumerebbe quindi un ruolo più vicino a quello di un assistente operativo 
+per l’osservabilità, capace non solo di raccogliere dati, ma anche di trasformarli in 
+indicazioni utili e direttamente azionabili.\\
+Nel lungo periodo, tale evoluzione potrebbe portare alla realizzazione di sistemi 
+semi-autonomi di analisi, in grado di suggerire automaticamente nuove instrumentazioni, 
+individuare aree del codice che richiedono approfondimenti telemetrici o proporre 
+interventi di ottimizzazione sulla base dei pattern osservati in produzione.
 
 \section{Valutazione personale}
 
@@ -275,8 +266,7 @@ AI-assistite, che sono stati approfonditi e applicati in modo concreto su un
 studiato in modo approfondito, permettendo di esplorare in autonomia un campo
 con ripercussioni decisamente interessanti nel mondo dello sviluppo software,
 non visto né praticato in corsi universitari, e che si è rivelato
-un'esperienza assolutamente rilevante.
-
+un'esperienza assolutamente rilevante.\\
 Spesso ambiti sconosciuti possono essere rilevanti da un punto di vista
 professionale, e questo è stato un esempio di come andare oltre i preconcetti
 e immergersi in un ambito ampiamente teorico, come la progettazione di una
@@ -287,13 +277,11 @@ praticare a fondo uno studio mirato delle attività svolte. In questi casi, la
 passione per il conoscere guida e anticipa la necessità di apprendere, dando
 un'importante possibilità di conoscere e maturare, altrimenti non offerta in
 modo così vicino alle realtà aziendali rimanendo in ambito puramente
-accademico.
-
+accademico.\\
 Particolarmente significativa è stata la possibilità di lavorare a stretto
 contatto con un \emph{framework} \emph{enterprise} reale, cimentandosi sia con
 la progettazione (scelte di cardinalità, \emph{sampling}, correlazione
-\emph{cross}-segnale) sia con la \emph{meta}-programmazione del processo di
-sviluppo tramite la creazione di agenti AI specializzati e di \emph{skill}
+\emph{cross}-segnale) sia con la creazione di agenti AI specializzati e di \emph{skill}
 procedurali. Questa seconda dimensione, in particolare, ha trasformato il mio
 modo di intendere il rapporto fra sviluppatore e strumenti di intelligenza
 artificiale: non più un assistente che risponde a richieste puntuali, ma un
@@ -303,12 +291,11 @@ una qualità di output verificabile dallo sviluppatore. La collaborazione con il
 \emph{team} aziendale e il confronto continuo sulle scelte architetturali sono
 stati parte integrante del percorso formativo, con un'attività di supporto
 costante che ha lasciato ampia libertà di organizzazione e di sviluppo
-autonomo, restando vicino alle mie necessità di studente.
-
+autonomo, restando vicino alle mie necessità di studente.\\
 Il progetto rappresenta per me una crescita che matura quanto compreso e visto
 in questi ultimi anni, permettendo di applicare in modo nuovo concetti per la
 maggior parte sconosciuti e con tecnologie attuali, calandomi in un contesto
-\emph{enterprise} concreto, usando librerie e \emph{stack} di riferimento e
+\emph{enterprise} concreto, usando librerie e tecnologie di riferimento e
 sviluppando un pensiero critico nell'analisi delle scelte di osservabilità,
 affinando ulteriormente una visione d'insieme dei corsi fin qui frequentati
 nel mio percorso di laurea triennale, perfezionando il mio metodo di studio e
