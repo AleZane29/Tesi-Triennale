@@ -100,11 +100,14 @@ principale, come i filtri, i \emph{signal computed} e il \emph{debounce} del fil
 globale verificato con \emph{fake timer}.
 
 Questi test non richiedono né \emph{browser} né \emph{backend} attivo, girano in
-pochi secondi e sono deterministici. Ciò che non possono coprire --- il
+pochi secondi e sono deterministici. Ciò che non possono testare: il
 \emph{rendering} reale del template, l'integrazione con le librerie UI di terze
-parti, le interazioni utente --- è territorio dei test \emph{end-to-end}.
+parti, le interazioni utente; è coperto dei test \emph{end-to-end}.
 
 \subsection{Test end-to-end con Playwright}
+
+I test \emph{end-to-end} (E2E) sono utilizzati per verificare che l'esperienza utente
+rispetti le aspettative: tempi di caricamento, funzionalità esposte correttamente, ...
 
 I test \emph{end-to-end} (E2E) rappresentano il livello più alto della piramide: il
 \emph{frontend} Angular e il \emph{backend} .NET sono entrambi avviati realmente, e
