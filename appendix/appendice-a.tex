@@ -195,92 +195,10 @@ implementa il contratto condiviso \texttt{IControllerDiagnostics} (pattern
 concreta.
 
 \begin{figure}[h]
-\centering
-\begin{tikzpicture}[
-    node distance=6mm and 14mm,
-    every node/.style={font=\footnotesize},
-    iface/.style={
-        rectangle split, rectangle split parts=2,
-        draw, thick, rounded corners=1pt,
-        rectangle split draw splits=true,
-        align=left, inner sep=3pt, text width=50mm,
-        fill=green!5
-    },
-    cls/.style={
-        rectangle split, rectangle split parts=2,
-        draw, thick, rounded corners=1pt,
-        rectangle split draw splits=true,
-        align=left, inner sep=3pt, text width=60mm,
-        fill=blue!3
-    },
-    diag/.style={
-        rectangle split, rectangle split parts=2,
-        draw, thick, rounded corners=1pt,
-        rectangle split draw splits=true,
-        align=left, inner sep=3pt, text width=66mm,
-        fill=orange!10
-    },
-    nested/.style={
-        rectangle split, rectangle split parts=2,
-        draw, thick, rounded corners=1pt,
-        rectangle split draw splits=true,
-        align=left, inner sep=3pt, text width=56mm,
-        fill=orange!4
-    },
-    impl/.style={-{Triangle[length=3mm, width=3mm, open]}, thick},
-    dep/.style={-{Stealth[length=2.5mm]}, thick, dashed}
-]
-
-\node[iface] (i) {
-    \textbf{\textlangle\textlangle{}interface\textrangle\textrangle{} IControllerDiagnostics}
-    \nodepart{second}
-    \texttt{+ ControllerErrors : Counter<long>}
-};
-
-\node[cls, right=18mm of i] (base) {
-    \textbf{BaseApiController}
-    \nodepart{second}
-    \texttt{\# RecordMetricError(}\\
-    \quad \texttt{IControllerDiagnostics,}\\
-    \quad \texttt{Exception, operation)}
-};
-
-\node[diag, below=14mm of i] (diag) {
-    \textbf{Sia\{Modulo\}Diagnostics}
-    \nodepart{second}
-    \texttt{+ Source : ActivitySource}\\
-    \texttt{+ Meter : Meter}\\
-    \texttt{+ OperationCount : Counter<long>}\\
-    \texttt{+ OperationDuration : Histogram<double>}\\
-    \texttt{+ ControllerErrors : Counter<long>}\\
-    \texttt{+ AsControllerDiagnostics : IControllerDiagnostics}
-};
-
-\node[nested, below=6mm of diag] (adapter) {
-    \textbf{ControllerDiagnosticsAdapter} \emph{(private sealed, nested)}
-    \nodepart{second}
-    \texttt{ControllerErrors =}\\ \quad \texttt{Sia\{Modulo\}Diagnostics.ControllerErrors}
-};
-
-\node[cls, right=18mm of diag] (ctrl) {
-    \textbf{Sia\{Modulo\}Controller}
-    \nodepart{second}
-    \texttt{catch (Exception ex) \{}\\
-    \quad \texttt{RecordMetricError(}\\
-    \quad\quad \texttt{Diagnostics.AsControllerDiagnostics,}\\
-    \quad\quad \texttt{ex, nameof(Op));}\\
-    \texttt{\}}
-};
-
-\draw[impl] (adapter.north) -- node[right, font=\scriptsize]{\emph{implements}} (diag.south);
-\draw[impl] (adapter.west) .. controls +(-2,0) and +(-0.5,-2) .. node[left, font=\scriptsize]{\emph{implements}} (i.south);
-\draw[dep] (ctrl.north) -- node[right, font=\scriptsize]{extends} (base.south);
-\draw[dep] (ctrl.west)  -- node[above, font=\scriptsize]{\emph{usa AsControllerDiagnostics}} (diag.east);
-\draw[dep] (base.south) -- node[right, font=\scriptsize]{dipende da}  (i.east);
-
-\end{tikzpicture}
-\caption{Struttura generica del pattern \texttt{Sia\{Modulo\}Diagnostics} con \texttt{ControllerDiagnosticsAdapter} annidato. Il controller invoca \texttt{RecordMetricError} del metodo condiviso \texttt{BaseApiController}, passando il singleton \texttt{AsControllerDiagnostics}; l'Adapter riconcilia il \texttt{Counter} per-modulo con il contratto comune \texttt{IControllerDiagnostics}.}
-\label{fig:diag-diagnostics-pattern}
+    \centering
+    \includegraphics[width=0.8\linewidth]{../images/UMLClassi/UMLSiaDiagnostics.png}
+    \caption{Struttura generica del pattern \texttt{Sia\{Modulo\}Diagnostics} con \texttt{ControllerDiagnosticsAdapter} annidato. Il controller invoca \texttt{RecordMetricError} del metodo condiviso \texttt{BaseApiController}, passando il singleton \texttt{AsControllerDiagnostics}; l'Adapter riconcilia il \texttt{Counter} per-modulo con il contratto comune \texttt{IControllerDiagnostics}.}
+    \label{fig:diag-diagnostics-pattern}
 \end{figure}
 
 \section{Arricchimento del contesto utente}
@@ -301,60 +219,10 @@ ASP.NET Core e \texttt{SqlClient} --- riceve i \emph{tag} utente senza
 modifiche al codice del modulo.
 
 \begin{figure}[h]
-\centering
-\begin{tikzpicture}[
-    node distance=5mm and 12mm,
-    every node/.style={font=\footnotesize},
-    cls/.style={
-        rectangle split, rectangle split parts=2,
-        draw, thick, rounded corners=1pt,
-        rectangle split draw splits=true,
-        align=left, inner sep=3pt, text width=52mm,
-        fill=blue!3
-    },
-    comp/.style={
-        rectangle, draw, thick, rounded corners=1pt,
-        align=center, inner sep=3pt, text width=34mm,
-        fill=orange!10
-    },
-    use/.style={-{Stealth[length=2.5mm]}, thick},
-    dep/.style={-{Stealth[length=2.5mm]}, thick, dashed}
-]
-
-\node[cls] (mw) {
-    \textbf{EnrichActivityWithUserMiddleware}
-    \nodepart{second}
-    \texttt{+ InvokeAsync(HttpContext)}\\
-    \quad legge claim \texttt{userId}, \texttt{userName}\\
-    \quad \texttt{Baggage.SetBaggage("enduser.id", \ldots)}
-};
-
-\node[comp, right=of mw] (bag) {\textbf{Baggage}\\ (\emph{OpenTelemetry context})};
-
-\node[cls, below=of bag] (proc) {
-    \textbf{BaggageActivityProcessor} : \textbf{ActivityProcessor}
-    \nodepart{second}
-    \texttt{+ OnStart(Activity)}\\
-    \quad legge \texttt{Baggage.Current}\\
-    \quad copia voci \texttt{enduser.*} su \texttt{Activity.SetTag}
-};
-
-\node[comp, right=of proc] (act) {\textbf{Activity}\\ (\emph{span in corso})};
-
-\node[cls, below=of mw] (diag) {
-    \textbf{Sia\{Modulo\}Diagnostics}
-    \nodepart{second}
-    \texttt{Source.StartActivity("sia.xxx.op")}
-};
-
-\draw[use] (mw.east) -- node[above, font=\scriptsize]{scrive} (bag.west);
-\draw[use] (bag.south) -- node[right, font=\scriptsize]{legge} (proc.north);
-\draw[use] (proc.east) -- node[above, font=\scriptsize]{\texttt{SetTag}} (act.west);
-\draw[dep] (diag.east) -- node[above, font=\scriptsize]{crea} (proc.west);
-
-\end{tikzpicture}
-\caption{Flusso di arricchimento automatico delle \texttt{Activity} con l'identità utente. Il \emph{middleware} pubblica \texttt{enduser.id} e \texttt{enduser.name} nel \texttt{Baggage} di OpenTelemetry; il \texttt{BaggageActivityProcessor} li copia come \emph{tag} su ogni \texttt{Activity} creata, comprese quelle prodotte dalle classi \texttt{Sia\{Modulo\}Diagnostics}.}
-\label{fig:diag-enduser}
+    \centering
+    \includegraphics[width=0.8\linewidth]{../images/UMLClassi/EnrichEnduserTag.png}
+    \caption{Flusso di arricchimento automatico delle \texttt{Activity} con l'identità utente. Il \emph{middleware} pubblica \texttt{enduser.id} e \texttt{enduser.name} nel \texttt{Baggage} di OpenTelemetry; il \texttt{BaggageActivityProcessor} li copia come \emph{tag} su ogni \texttt{Activity} creata, comprese quelle prodotte dalle classi \texttt{Sia\{Modulo\}Diagnostics}.}
+    \label{fig:diag-enduser}
 \end{figure}
 
 \chapter{Listati di codice rappresentativi}

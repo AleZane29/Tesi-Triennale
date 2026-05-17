@@ -1,10 +1,10 @@
 \chapter{Progettazione}
 \label{cap:progettazione}
 
-\intro{In questo capitolo si esporranno le caratteristiche tecniche della soluzione prodotta, descrivendo la progettazione e l'architettura adottata}\\
+\intro{In questo capitolo si esporranno le caratteristiche tecniche della soluzione prodotta, descrivendo la progettazione e l'architettura adottata di telemetria e test}\\
 
 
-\section{Osservabilit\`a nei sistemi distribuiti}
+\section{Osservabilità nei sistemi distribuiti}
 
 L'osservabilità è la proprietà di un sistema software che permette di comprenderne
 lo stato interno esaminando esclusivamente i dati prodotti in output. Nel contesto delle
@@ -508,7 +508,7 @@ diagrammi delle classi in stile \gls{uml} semplificato:
         \texttt{ResourceBuilder} ed esportano via
         \texttt{OtlpExporter} (figura~\ref{fig:diag-pipeline});
     \item la struttura generica del pattern
-        \texttt{Sia\{Modulo\}Diagnostics} con il
+        \texttt{Sia\{Modulo\}Diagnostics} con il\\
         \texttt{ControllerDiagnosticsAdapter} annidato
         (figura~\ref{fig:diag-diagnostics-pattern});
     \item il flusso di arricchimento automatico delle \texttt{Activity}
@@ -518,3 +518,155 @@ diagrammi delle classi in stile \gls{uml} semplificato:
 
 Per non interrompere il flusso narrativo del capitolo, i tre diagrammi e le
 relative descrizioni di dettaglio sono raccolti nell'appendice~\ref{app:diagrammi-classi}.
+
+\section{Implementazione dei test automatici}
+
+\subsection{Contesto}
+
+Prima dell’intervento, la validazione del comportamento applicativo avveniva
+principalmente tramite verifiche manuali dell’interfaccia utente. Questo approccio
+rendeva complesso modificare i moduli centrali del framework con sufficiente
+sicurezza, poiché ogni cambiamento introduceva il rischio di regressioni difficili
+da individuare in modo sistematico.\\
+L’assenza di una suite automatizzata comportava inoltre:
+
+\begin{itemize}
+    \item la mancanza di una rete di sicurezza durante attività di \emph{refactoring};
+    \item tempi elevati per la validazione delle modifiche;
+    \item difficoltà nell’individuazione precoce di difetti;
+    \item assenza di una \emph{baseline} condivisa sul comportamento atteso del sistema.
+\end{itemize}
+L’obiettivo dello stage è stato quindi introdurre una metodologia di testing
+riproducibile e integrabile nei processi di sviluppo, capace di verificare sia
+la correttezza della logica applicativa sia il comportamento dell’interfaccia
+utente in scenari realistici.
+
+\subsection{Strategia di testing adottata}
+
+La strategia implementata è stata suddivisa in più livelli, ciascuno dedicato
+alla validazione di aspetti differenti del sistema.
+La strategia adottata distingue quattro tipologie di test con responsabilità
+complementari: Unit test frontend, test \emph{end-to-end} frontend, unit test backend
+e integration test backend.
+L’introduzione di più livelli di test ha permesso di ottenere una copertura più
+ampia del sistema, combinando verifiche veloci e isolate con controlli completi
+sul comportamento integrato dell’applicazione.
+
+\subsubsection{Unit test backend}
+
+Gli \emph{unit test} backend hanno l’obiettivo di verificare in isolamento la
+logica applicativa implementata lato server, senza coinvolgere componenti esterni
+come database reali, servizi remoti o infrastrutture di rete.\\
+Questo tipo di test consente di validare rapidamente il comportamento delle
+singole unità software, riducendo il rischio di regressioni durante le modifiche
+al codice e facilitando le attività di manutenzione e \emph{refactoring}.\\
+Nel progetto sviluppato durante lo stage, tali test sono stati utilizzati per
+validare il comportamento dei servizi applicativi del framework e delle API
+utilizzate dal frontend. In particolare, sono state verificate la corretta
+gestione delle richieste, la propagazione delle eccezioni, il comportamento
+dei repository e la logica associata ai moduli instrumentati con OpenTelemetry.\\
+L’utilizzo di dipendenze simulate (\emph{mock}) ha permesso di eseguire i test
+in modo deterministico e veloce, senza richiedere l’avvio dell’intera
+infrastruttura applicativa.
+
+\subsubsection{Integration test backend}
+
+I test di integrazione backend verificano il corretto funzionamento congiunto
+dei diversi componenti dell’applicazione: accesso al database, persistenza dei dati,
+serializzazione, servizi applicativi e infrastruttura del framework.
+A differenza degli \emph{unit test}, questi test non isolano le dipendenze tramite
+\emph{mock}, ma eseguono operazioni reali su un ambiente controllato, così da
+riprodurre scenari più vicini al comportamento effettivo del sistema in produzione.\\
+Nel progetto sono state adottate tre tipologie principali di test di integrazione.
+La prima riguarda i test \gls{crud},
+chiamati \textbf{lifecycle test}, come suggerito dal nome, verificano l'intero ciclo di vita 
+di un entità sul database, controllando che tutte e quattro le operazioni vadano a termine correttamente.\\
+La seconda categoria, \textbf{smoke test}, ha lo scopo di esercitare ogni singola configurazione 
+per componente presente in produzione,
+intercettando \emph{stored procedure} malformate, \emph{connection name} non
+risolvibili o configurazioni errate di colonne. Iterando su tutti i componenti 
+presenti nel database e per ciascuno 
+effettua una chiamata reale all'\emph{endpoint} di lettura
+(es. \texttt{POST /api/grid-core/page} o \texttt{GET /api/CrudData/page}),
+asserendo che la risposta sia \texttt{200 OK} con \emph{payload} JSON valido. \\
+Infine, sono presenti \textbf{test summary} specifici per i componenti griglia, durante i quali
+vengono testati gli \emph{endpoint} responsabili del calcolo aggregato (\texttt{sum}, 
+\texttt{avg}, \texttt{count}, \texttt{min}, \texttt{max}), verificando che le 
+colonne configurate (tramite \emph{perspective} JSON) con funzionalità di aggregazione, funzionino correttamente.\\
+L’utilizzo di dati reali provenienti dal database consente di validare non solo
+la correttezza del codice applicativo, ma anche l’affidabilità e la consistenza
+dei dati presenti nel sistema. Questo approccio permette di individuare problemi
+che difficilmente emergerebbero tramite semplici \emph{mock}, come incongruenze
+nei dati, errori di mapping, vincoli non rispettati o differenze tra schema
+atteso e stato effettivo del database.
+
+\subsubsection{Unit test frontend}
+
+Gli \emph{unit test} sono scritti con \textbf{Vitest} e hanno l’obiettivo di verificare
+in isolamento le singole unità logiche dell’applicazione frontend, senza coinvolgere
+componenti esterni come il browser, il \emph{backend} o il \emph{rendering} reale
+dell’interfaccia grafica.  
+Questo tipo di test permette di validare il comportamento di funzioni, servizi e
+componenti applicativi in modo rapido e deterministico, riducendo il rischio di
+regressioni durante l’evoluzione del software.\\
+In generale, gli \emph{unit test} verificano aspetti quali:
+\begin{itemize}
+    \item la correttezza della logica applicativa;
+    \item la gestione dello stato interno dei componenti;
+    \item la trasformazione e validazione dei dati;
+    \item la gestione degli errori e dei casi limite;
+    \item il corretto comportamento di metodi puri e funzioni di utilità.
+\end{itemize}
+Nel progetto sviluppato durante lo stage, i test hanno riguardato principalmente
+la logica frontend implementata in TypeScript, includendo servizi applicativi,
+componenti Angular e direttive personalizzate. In particolare, sono stati verificati
+la gestione dello stato
+dei componenti, i meccanismi di raccolta e filtraggio dei dati, oltre al comportamento
+di funzionalità interattive come selezione, ordinamento e aggiornamento dinamico
+dell’interfaccia.\\
+Questi test non richiedono né un browser reale né servizi esterni attivi, risultando
+quindi molto veloci nell’esecuzione e facilmente integrabili nei processi automatici
+di validazione del software.
+
+\subsubsection{Test end-to-end con Playwright}
+
+I test \emph{end-to-end} (\emph{E2E}) sono stati sviluppati tramite
+\textbf{Playwright} e hanno lo scopo di verificare il comportamento
+complessivo dell’applicazione simulando l’interazione di un utente reale
+con l’interfaccia web.\\
+A differenza degli unit test, i test E2E eseguono l’applicazione in un browser
+reale e validano l’integrazione tra frontend, backend e servizi coinvolti.
+Questo approccio permette di intercettare problemi che emergono solo durante
+l’esecuzione completa del sistema, come errori di rendering, problemi di
+sincronizzazione, regressioni dell’interfaccia o malfunzionamenti nei flussi
+utente.\\
+Come esposto precedentemente i test E2E sono utilizzati per verificare
+l'esperienza utente, in questa categoria ricadono requisiti come:
+la corretta navigazione tra le pagine, il comportamento delle principali 
+funzionalità applicative, la corretta visualizzazione degli elementi grafici,
+la persistenza e l’aggiornamento dei dati nell’interfaccia grafica.
+Nel progetto, tali test sono stati utilizzati per validare il comportamento
+reale dei componenti più complessi del framework, come griglie dati,
+form dinamiche, operazioni CRUD e flussi di autenticazione.
+Sono stati inoltre utilizzati per verificare la corretta propagazione delle
+modifiche introdotte dagli agenti AI, riducendo il rischio di regressioni
+funzionali nei moduli condivisi.
+Il costo da pagare è la velocità di esecuzione:
+ogni test richiede secondi, non millisecondi e la dipendenza dallo stato del
+sistema. Per questo i test E2E si concentrano sui flussi utente strategici,
+lasciando la copertura della logica di dettaglio agli \emph{unit test}.
+
+\subsection{Vantaggi ottenuti}
+
+L'impatto più immediato dell'introduzione dei test è stata la scoperta di difetti
+latenti che non sarebbero emersi prima di un incidente in produzione.
+Per gli sviluppi futuri invece, l’automazione dei test ha reso possibile l’integrazione 
+delle verifiche all’interno del flusso di sviluppo quotidiano, riducendo il numero di
+regressioni e migliorando la qualità complessiva del processo di sviluppo.
+L’esecuzione automatica delle suite ha ridotto significativamente il tempo
+necessario alla validazione delle modifiche e ha aumentato la confidenza nei
+refactoring dei moduli centrali del framework.
+Inoltre, la disponibilità di test automatici si è rivelata particolarmente utile nel
+contesto dello sviluppo AI-assistito: gli agenti di codifica potevano infatti
+produrre modifiche su più moduli, mentre le suite automatiche fornivano una
+validazione immediata del comportamento atteso.
