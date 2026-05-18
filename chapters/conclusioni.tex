@@ -117,6 +117,17 @@ capitolo~\ref{cap:analisi-requisiti} sono stati soddisfatti nella loro
 totalità, compresi quelli desiderabili e quelli aggiuntivi proposti in corso
 d'opera. Le tabelle complete di tracciamento sono consultabili
 nell'appendice~\ref{app:requisiti}.
+\\
+Oltre al risultato architetturale, la telemetria introdotta ha permesso di
+individuare alcuni problemi reali del \emph{framework} che prima rimanevano
+nascosti. In particolare sono emerse alcune \emph{stored procedure}
+sensibilmente pi\`u lente del previsto su richieste sincrone, episodi di
+\emph{pool starvation} sulle connessioni al database in concomitanza con il
+traffico di \emph{long-polling}, e alcune chiamate \gls{api} ridondanti
+originate dal \emph{frontend} che ripetevano la stessa richiesta a ogni
+cambio di vista. L'identificazione di questi casi, prima invisibili nei canali
+di monitoraggio esistenti, ha consentito di migliorare le performance
+prima che producessero impatto sugli utenti finali.
 
 \section{Conoscenze acquisite e analisi del lavoro svolto}
 
