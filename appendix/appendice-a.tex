@@ -166,9 +166,9 @@ l'arricchimento automatico di ogni \texttt{Activity} con i \emph{tag}
 nel \texttt{TracerProvider}, copia ogni \emph{entry} di \emph{baggage} con
 prefisso \texttt{enduser.} come \emph{tag} sull'\texttt{Activity} nel proprio
 \emph{hook} \texttt{OnStart}. L'effetto è che qualsiasi \texttt{Activity}
-creata durante la richiesta --- sia dalle classi
+creata durante la richiesta, sia dalle classi
 \texttt{Sia\{Modulo\}Diagnostics}, sia dalle instrumentazioni automatiche di
-ASP.NET Core e \texttt{SqlClient} --- riceve i \emph{tag} utente senza
+ASP.NET Core e \texttt{SqlClient}, riceve i \emph{tag} utente senza
 modifiche al codice del modulo.
 
 \begin{figure}[h]
