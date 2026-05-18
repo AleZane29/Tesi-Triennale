@@ -8,7 +8,6 @@ Esempio di citazione nel pie' di pagina citazione\footcite{womak:lean-thinking}
 # Capitoli da sistemare
 
 - Aggiornare tecnologie adottate
-- Aggiornare diagramma delle classi (Sistemare primo diagramma che è cambiato)
 - METTERE IN CONCLUSIONI UN CAPITOLO CON RECAP DEI CONTRIBUTI EFFETTIVI
   (riconoscimento delle query/API/logica applicativa problematiche, quanto tempo
   si è recuperato)
