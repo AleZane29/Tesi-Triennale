@@ -8,9 +8,6 @@ Esempio di citazione nel pie' di pagina citazione\footcite{womak:lean-thinking}
 # Capitoli da sistemare
 
 - Aggiornare tecnologie adottate
-- METTERE IN CONCLUSIONI UN CAPITOLO CON RECAP DEI CONTRIBUTI EFFETTIVI
-  (riconoscimento delle query/API/logica applicativa problematiche, quanto tempo
-  si è recuperato)
 
 # To do
 
@@ -19,10 +16,9 @@ Esempio di citazione nel pie' di pagina citazione\footcite{womak:lean-thinking}
 - Togliere RFID dal glossario e metterlo a piè di pagina con una breve
   spiegazione
 - Introdurre skill claude code (e spiegarle una a una)
-- Parlare dei report generati con MCP sulla telemetria in produzione
-
 - Sistemare descrizione capitoli (sia intro di ciascuno che introduzione a
   inizio tesi)
+  
 - Controllare che i riferimenti ai requisiti siano giusti (sezione scelte
   architetturali)
 - Evidenziare i termini in linguaggio tecnico con il corsivo
