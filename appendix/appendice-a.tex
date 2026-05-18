@@ -227,14 +227,14 @@ triangolo vuoto per la relazione di implementazione di interfaccia.
 
                                                                                                                                                                                                                 
                     ┌──────────────────────────────────────────────────┐                                                                                                                                        
-                    │   BaseApplicationBuilder.ConfigureBuilder        │
+                    │   BaseApplicationBuilder                         │
                     ├──────────────────────────────────────────────────┤                                                                                                                                        
-                    │ gate: OpenTelemetry:Enabled                      │                                                                                                                                      
-                    │ + costruisce ResourceBuilder                     │
-                    │ + registra i 3 provider OTel                     │
-                    │ + registra middleware enduser/CORS               │
+                    │ + ConfigureBuilder(ApplicationBuilderParamsDTO)  │                                                                                                                 se otel attivo:                    
+                    │  costruisce ResourceBuilder                      │
+                    │  registra i 3 provider OTel                      │
+                    │  registra middleware enduser/CORS                │
                     └─┬───────────────────┬───────────────────┬────────┘
-                      │                   │                   │
+                    crea                 crea                crea
          ┌────────────┘                   │                   └────────────┐
          ▼                                ▼                                ▼
   ┌──────────────────────────┐  ┌───────────────────────────┐  ┌────────────────────────────────┐
