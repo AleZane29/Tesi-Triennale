@@ -3,7 +3,6 @@
 
 \intro{In questo capitolo si esporranno le caratteristiche tecniche della soluzione prodotta, descrivendo la progettazione e l'architettura adottata di telemetria e test}\\
 
-
 \section{Osservabilità nei sistemi distribuiti}
 
 L'osservabilità è la proprietà di un sistema software che permette di comprenderne
@@ -22,7 +21,6 @@ sistematica di tre categorie di segnali:
 \end{itemize}
 
 \end{itemize}
-
 La forza di un sistema di osservabilità moderno non risiede nell'utilizzo isolato di
 questi segnali, bensì nella loro correlazione: poter passare da una metrica
 anomala alla trace corrispondente, e da questa ai log emessi durante quella specifica
@@ -34,8 +32,7 @@ richiesta, costituisce uno strumento diagnostico di grande efficacia.
 un modello unificato e vendor-neutral per la produzione, la raccolta e l'esportazione di
 segnali di osservabilit\`a. \`E il risultato della fusione tra i progetti \emph{OpenCensus}
 e \emph{OpenTracing}, avvenuta nel 2019 sotto l'egida della Cloud Native Computing
-Foundation (CNCF).
-
+Foundation (CNCF).\\
 I principi fondamentali di \gls{otel} rilevanti per questo progetto sono:
 
 \begin{itemize}
@@ -51,22 +48,18 @@ I principi fondamentali di \gls{otel} rilevanti per questo progetto sono:
 
 \section{Architettura della telemetria}
 
-Il sistema di telemetria sviluppato si basa su una distinzione tra due macro-componenti principali: la \textbf{produzione dei dati} lato applicazione e la \textbf{raccolta e visualizzazione} lato infrastruttura.
-
+Il sistema di telemetria sviluppato si basa su una distinzione tra due macro-componenti principali: la \textbf{produzione dei dati} lato applicazione e la \textbf{raccolta e visualizzazione} lato infrastruttura.\\
 L’applicazione backend, sviluppata in ambiente \textit{.NET}, utilizza lo standard open-source OpenTelemetry per generare i tre principali segnali di osservabilità: \textit{trace}, \textit{metriche} e \textit{log}. Questi dati vengono successivamente inviati a un’infrastruttura centralizzata basata sullo stack Grafana, che ne consente l’analisi e la visualizzazione.
 
 \subsection{Produzione dei dati di telemetria}
 
-La generazione dei dati avviene direttamente all’interno dell’applicazione backend tramite diverse tecnologie integrate.
-
-Le \textbf{trace} vengono prodotte utilizzando OpenTelemetry, che si appoggia alle API native di .NET (\texttt{ActivitySource} e \texttt{Activity}) per rappresentare le operazioni eseguite dal sistema sotto forma di \textit{span}. Ogni richiesta viene quindi tracciata lungo tutto il suo ciclo di vita, includendo chiamate HTTP, operazioni sui database e logica applicativa.
-
+La generazione dei dati avviene direttamente all’interno dell’applicazione backend tramite diverse tecnologie integrate.\\
+Le \textbf{trace} vengono prodotte utilizzando OpenTelemetry, che si appoggia alle API native di .NET (\texttt{ActivitySource} e \texttt{Activity}) per rappresentare le operazioni eseguite dal sistema sotto forma di \textit{span}. Ogni richiesta viene quindi tracciata lungo tutto il suo ciclo di vita, includendo chiamate HTTP, operazioni sui database e logica applicativa.\\
 Le \textbf{metriche} vengono generate attraverso due approcci distinti:
 \begin{itemize}
 \item metriche di \textit{performance}, raccolte automaticamente da OpenTelemetry (ad esempio durata delle richieste HTTP o utilizzo delle risorse);
 \item metriche di \textit{business}, definite manualmente tramite le API \texttt{Meter} di .NET, per monitorare aspetti specifici del dominio applicativo.
 \end{itemize}
-
 I \textbf{log} vengono invece gestiti tramite la libreria Serilog, che consente la produzione di log strutturati e la loro esportazione verso l’infrastruttura di osservabilità. Grazie all’integrazione con OpenTelemetry, i log risultano automaticamente correlati alle trace tramite identificativi condivisi (\textit{TraceId} e \textit{SpanId}).
 
 \subsection{Integrazione con OpenTelemetry Collector ed ecosistema Grafana}
@@ -79,7 +72,6 @@ Tutti questi dati vengono inviati a un componente intermedio, l’\textit{OpenTe
 \item \textbf{Elaborazione}: possibilità di applicare trasformazioni, filtri o arricchimenti ai dati raccolti;
 \item \textbf{Esportazione}: inoltro dei dati verso i sistemi di destinazione tramite specifici \textit{exporter}.
 \end{itemize}
-
 Nel progetto, il Collector è configurato per instradare i diversi tipi di dati verso componenti distinti dello stack Grafana:
 \begin{itemize}
 \item le \textbf{trace} vengono esportate verso Tempo, permettendo l’analisi dei flussi di esecuzione e delle dipendenze tra servizi;
@@ -93,7 +85,6 @@ Nel progetto, il Collector è configurato per instradare i diversi tipi di dati 
     \caption{Architettura OTel Collector}
     \label{fig:arch-otel-collector}
 \end{figure}
-
 Grafana rappresenta il punto di accesso unificato a queste informazioni, offrendo strumenti per la visualizzazione e l’analisi dei dati di telemetria. In particolare, permette di costruire dashboard personalizzate basate su metriche, esplorare i log e navigare le trace, abilitando una visione completa e correlata del comportamento del sistema.
 Questa architettura consente di separare la raccolta dei dati dalla loro visualizzazione, migliorando la scalabilità e la flessibilità del sistema di monitoraggio, oltre a facilitare eventuali estensioni future.
 
@@ -125,18 +116,17 @@ costruito, senza conoscere i dettagli del pipeline.
 Il campionamento è gestito da un sampler custom, che
 combina una logica \emph{ratio-based} per le \emph{root span} con ereditarietà
 della decisione per le \emph{child span}.\\
-
 Se lo span ha un parent valido (\texttt{TraceId} e \texttt{SpanId} non nulli),
 il sampler eredita la decisione del parent senza ricalcolo. Questo garantisce la
 coerenza interna della trace: se la root viene campionata, tutte le child span,
 vengono raccolte integralmente.\\
-
 Per le root span, il sampler risolve il ratio da applicare tramite \texttt{ResolveRatio}:
 il nome dell'activity (es.\ \texttt{sia.grid.page}) viene confrontato con i prefissi
 derivati dai nomi source configurati in appsettings (es.\ \texttt{Sia.Grid}
 $\to$ \texttt{sia.grid.}). I prefissi sono ordinati per lunghezza decrescente, così
 il match più specifico ha sempre precedenza su quello più generale. Se nessun prefisso
 corrisponde, si applica il ratio globale \texttt{SamplingRatio}.
+
 \subsubsection{Arricchimento automatico del contesto utente}
 \label{sec:enduser-middleware}
 
@@ -320,6 +310,7 @@ Le metriche, come le trace del modulo Sia.Grid, contengono tutte l'attributo \te
 \end{table}
 
 \subsection{Tracciamento dell'identità utente}
+\label{sec:modello-enduser}
 
 Ogni trace generata da una chiamata autenticata riporta automaticamente l'identità
 dell'utente tramite i tag \texttt{enduser.id} ed \texttt{enduser.name}, senza che i
@@ -342,8 +333,8 @@ già \texttt{enduser.*}.
 
 \subsection{Exemplar: collegamento diretto da metrica a trace}
 \label{sec:modello-exemplars}
-Le metriche aggregate dicono \emph{quanto} e \emph{quando} qualcosa è andato storto, ma
-non \emph{quale} richiesta specifica ne è responsabile. Un picco sul percentile $p_{99}$
+Le metriche aggregate dicono quanto e quando qualcosa è andato storto, ma
+non quale richiesta specifica ne è responsabile. Un picco sul percentile $p_{99}$
 della latenza, ad esempio, non rivela di per sé la chiamata incriminata. Gli
 \emph{exemplar} colmano questo divario: sono campioni concreti allegati ai dati aggregati
 di una metrica che trasportano il \texttt{TraceId} della richiesta che li ha prodotti.
@@ -362,8 +353,8 @@ disponibile, azzerando l'overhead sulle richieste non campionate.
 \label{sec:design-patterns}
 
 Oltre ai pattern architetturali generali citati nella sezione~\ref{sec:design-patterns-intro},
-la soluzione utilizza due \emph{design pattern} della letteratura classica (Gamma et
-al.\footcite{gof:design-patterns}) per risolvere problemi ricorrenti dell'instrumentazione.
+la soluzione utilizza due \emph{design pattern} della letteratura classica (Design Patterns
+\cite{gof:design-patterns}) per risolvere problemi ricorrenti dell'instrumentazione.
 
 \subsection{Pattern Adapter per il counter di errore dei controller}
 \label{subsec:pattern-adapter-controller-errors}
@@ -402,9 +393,8 @@ il controller invoca sempre
 senza conoscere l'implementazione concreta.\\
 Il listato canonico, riferito al modulo \texttt{Sia.Devextreme.Crud}, è
 riportato nell'appendice~\ref{app:listing-adapter}
-(listati~\ref{lst:adapter-diagnostics-app} e~\ref{lst:recordmetricerror-call-app}).
-
-\paragraph{Vantaggi.}
+(listati~\ref{lst:adapter-diagnostics-app} e~\ref{lst:recordmetricerror-call-app}).\\
+\\\textbf{Vantaggi.}
 \begin{itemize}
     \item contratto unico a livello \emph{framework}, \emph{counter}
         distinti per modulo (cardinalità controllata);
@@ -416,74 +406,30 @@ riportato nell'appendice~\ref{app:listing-adapter}
         statici esistenti, che rimangono invariati.
 \end{itemize}
 
-\subsection{Pattern Adapter}
-
-\textbf{Contesto:} \\
-Il framework fornisce un metodo condiviso
-\texttt{BaseApiController.RecordMetricError(IControllerDiagnostics, Exception, string)} che
-incapsula la logica di \emph{unwrap} di \texttt{SiaLoggerException.OriginalException} e
-l'applicazione dei \emph{tag} \texttt{exception.type} e \texttt{sia.operation} su una metrica
-\texttt{Counter}. Ogni modulo con controller deve riusare tale metodo, ma ciascun modulo ha
-il proprio \texttt{Counter<long> ControllerErrors} registrato sul proprio \texttt{Meter} con
-naming \texttt{sia.\{modulo\}.controller.errors}.\\
-\\
-\textbf{Problema:}\\ 
-Il metodo condiviso dichiara un parametro del tipo astratto
-\texttt{IControllerDiagnostics}. I moduli però espongono un contatore concreto come membro
-statico di una classe \texttt{Sia\{Modulo\}Diagnostics}. Occorre riconciliare il contratto
-astratto con la pluralità di implementazioni concrete, senza duplicare la logica di
-\emph{unwrap} in ogni controller.\\
-\\
-\textbf{Soluzione:}\\
- Per ciascun modulo viene definita una classe annidata
-\texttt{private sealed class ControllerDiagnosticsAdapter : IControllerDiagnostics}, che
-adatta il \emph{counter} statico del modulo al contratto comune. La classe
-\texttt{Sia\{Modulo\}Diagnostics} espone poi un singleton
-\texttt{public static readonly IControllerDiagnostics AsControllerDiagnostics}. Il controller
-chiama sempre:
-\[
-\texttt{RecordMetricError(Sia\{Modulo\}Diagnostics.AsControllerDiagnostics, ex, nameof(Metodo))}
-\]
-senza conoscere l'implementazione concreta.
-
-\paragraph{Vantaggi.}
-\begin{itemize}
-    \item contratto unico a livello framework, \emph{counter} distinti per modulo (cardinalità
-        controllata);
-    \item logica di \emph{unwrap} e applicazione \emph{tag} scritta una sola volta;
-    \item zero ripetizione nel controller: ogni \texttt{catch} diventa una singola riga.
-\end{itemize}
-Riferimento canonico: \texttt{SiaDevextremeCrudDiagnostics.AsControllerDiagnostics} nel
-modulo \texttt{Sia.Devextreme.Crud}.
-
 \subsection{Pattern Factory}
 
 Il pattern \emph{Factory} è applicato in più punti del pipeline \gls{otel} per mantenere in un
 unico luogo la traduzione da configurazione \emph{appsettings} a oggetti del runtime
-OpenTelemetry.
-
-\textbf{Costruzione del \emph{sampler}}\\
+OpenTelemetry.\\
+\\\textbf{Costruzione del \emph{sampler}}\\
 La creazione di \texttt{SiaParentBasedSampler}
 avviene in un metodo \emph{factory} che, letti il valore globale \texttt{SamplingRatio} e i
 \emph{ratio} per-\emph{source} da \emph{appsettings}, restituisce l'istanza del \emph{sampler}
 configurata correttamente. L'invocazione avviene una sola volta in
-\texttt{BaseApplicationBuilder}; il resto del pipeline consuma un oggetto già pronto.
-
-\textbf{Registrazione di \texttt{Meter} e \texttt{ActivitySource}}\\
+\texttt{BaseApplicationBuilder}; il resto del pipeline consuma un oggetto già pronto.\\
+\\\textbf{Registrazione di \texttt{Meter} e \texttt{ActivitySource}}\\
 Le classi
 \texttt{Sia\{Modulo\}Diagnostics} agiscono come \emph{static factory} centralizzata per gli
 strumenti di osservabilità del modulo: istanziano al \emph{type loading} il \texttt{Meter}, gli
 \texttt{ActivitySource}, e i \texttt{Counter}/\texttt{Histogram} esposti come membri statici
 pubblici. Il codice applicativo non istanzia mai direttamente uno strumento OTel, ma accede
-sempre all'istanza fornita dalla classe \texttt{Diagnostics} del proprio modulo.
-
-\textbf{Costruzione del \texttt{ResourceBuilder}}\\
+sempre all'istanza fornita dalla classe \texttt{Diagnostics} del proprio modulo.\\
+\\\textbf{Costruzione del \texttt{ResourceBuilder}}\\
 Gli attributi di \emph{resource}
 (\texttt{service.name}, \texttt{sia.product\_type}, \texttt{sia.customer\_name}) vengono letti
 da \emph{appsettings} e applicati a un unico \texttt{Resource} condiviso da \emph{trace},
 metriche e \emph{log}, garantendone la coerenza cross-segnale. Anche questa costruzione avviene
-in un metodo \emph{factory} interno a \texttt{BaseApplicationBuilder}.
-
+in un metodo \emph{factory} interno a \texttt{BaseApplicationBuilder}.\\
 \textbf{Vantaggi}\\
 \begin{itemize}
     \item la configurazione da \emph{appsettings} viene tradotta in oggetti OTel in un solo
@@ -515,7 +461,6 @@ diagrammi delle classi in stile \gls{uml} semplificato:
         con l'identità utente, dal \emph{middleware} ASP.NET Core al
         \texttt{BaggageActivityProcessor} (figura~\ref{fig:diag-enduser}).
 \end{itemize}
-
 Per non interrompere il flusso narrativo del capitolo, i tre diagrammi e le
 relative descrizioni di dettaglio sono raccolti nell'appendice~\ref{app:diagrammi-classi}.
 
