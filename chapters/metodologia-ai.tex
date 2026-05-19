@@ -1,7 +1,7 @@
 \chapter{Metodologia assistita da agenti AI}
 \label{cap:metodologia-ai}
 
-\intro{Il presente capitolo descrive la metodologia di lavoro adottata durante lo stage, incentrata sull'uso di un agente di codifica basato su un modello linguistico di grandi dimensioni (\gls{llm}) come \emph{pair engineer} strutturato. Vengono illustrati gli ambiti di utilizzo, il workflow \emph{Plan $\rightarrow$ Confirm $\rightarrow$ Implement}, i benefici in termini di tempo e le mitigazioni adottate per i limiti noti.}\\
+\intro{Il presente capitolo descrive in che modo è stata impiegata l'AI durante lo stage, incentrato sull'uso di un agente di codifica basato su un modello linguistico di grandi dimensioni (\gls{llm}) come \emph{pair engineer} strutturato. Vengono illustrati gli ambiti di utilizzo, il workflow adottato, i benefici in termini di tempo e le mitigazioni adottate per i limiti noti.}\\
 
 \section{Contesto e motivazione}
 
@@ -32,7 +32,7 @@ critici per il progetto invece che sulla documentazione integrale di ciascuna te
 \subsection{Prove di implementazione}
 
 Durante la fase di progettazione, l'agente è stato usato per produrre rapidamente varianti di
-\emph{proof of concept} (\gls{poc}) su scelte ancora da validare: che moduli testare, quale fosse 
+\gls{poc} su scelte ancora da validare: che moduli testare, quale fosse 
 il carico computazionale introdotto, l'ambiente di hosting più conveniente (\emph{Docker} o servizi Windows).
 Avere a disposizione codice compilabile in pochi minuti ha consentito di provare e
 scartare alternative, invece di decidere a priori sulla base della sola documentazione.
@@ -61,42 +61,27 @@ convenzioni, \emph{anti-pattern} e \emph{template} di codice per uno specifico a
 carica la \emph{skill} appropriata quando riceve un task pertinente, garantendo che
 moduli instrumentati in momenti diversi rispettino le stesse convenzioni.
 
-\subsection{Propagazione dei test automatici sul \emph{backend}}
+\subsection{Propagazione dei test automatici}
 
-Lo stesso schema \emph{agente specializzato + skill procedurali} è stato replicato per
-l'introduzione e la propagazione dei test automatici sul \emph{backend} del framework. È
-stato definito un agente \texttt{sia-server-test-developer} (\texttt{.claude/agents/}) che
-codifica la struttura della \emph{suite} (\emph{Unit}, \emph{Smoke}, \emph{Lifecycle},
-\emph{Summary}), lo stack tecnologico (xUnit + NSubstitute + FluentAssertions per gli
-\emph{unit}, \texttt{Microsoft.AspNetCore.Mvc.Testing} + \texttt{SkippableFact} per gli
-\emph{integration}), il \emph{naming} obbligatorio dei test
-(\texttt{Method\_Scenario\_Result}), il pattern \emph{Arrange/Act/Assert} esplicito, il
-\emph{trait} \texttt{Category="Integration"} per la separazione in pipeline CI e le
-convenzioni di \texttt{EmbeddedResource} per scenari e \emph{skip list}.
-
-A complemento dell'agente sono state definite due \emph{skill} dedicate al pattern più
-ripetitivo della \emph{suite}, l'aggiunta di un nuovo \emph{lifecycle test}
-\emph{data-driven}, una per ciascun controller mutativo coperto:
-\begin{itemize}
-    \item \texttt{sia-crud-lifecycle-scenario}: schema JSON dello \texttt{CrudLifecycleScenario},
-        \emph{flow} \texttt{INSERT $\rightarrow$ GET $\rightarrow$ UPDATE $\rightarrow$ GET $\rightarrow$ DELETE $\rightarrow$ GET}
-        sul \texttt{CrudDataController}, supporto a \emph{soft delete}
-        (\texttt{deleteMode}, \texttt{softDeleteExpectedFields}) e a \emph{primary key
-        composite} (\texttt{keyFields} come \emph{list});
-    \item \texttt{sia-grid-lifecycle-scenario}: schema gemello sul \texttt{GridDataController},
-        con le specificità del \emph{payload} (\texttt{PageRequestDTO} non vuoto, prefisso
-        \texttt{\_} sulle PK nel \emph{body} di \texttt{DELETE}) e il riuso della stessa
-        \emph{collection} serializzata della \emph{suite} CRUD.
-\end{itemize}
-
-Il beneficio osservato sul \emph{backend} è analogo a quello registrato sulla telemetria:
-una volta validato il pattern sul primo \emph{lifecycle} (\texttt{crud-companyprofile} per
-il CRUD, \texttt{grid-languages} per la Grid), l'estensione a un nuovo componente diventa
-una richiesta semantica all'agente (``\emph{aggiungi il \emph{lifecycle test} su
-\texttt{crud-orders}}'') che produce in pochi minuti il file \texttt{Scenarios/<id>.json},
-la dichiarazione \texttt{EmbeddedResource} nel \texttt{.csproj} e l'\texttt{InlineData}
-nella \emph{theory} corrispondente, senza che lo sviluppatore debba memorizzare
-convenzioni distribuite tra più file di configurazione.
+La stessa metodologia è stata replicata per l'introduzione e la propagazione dei test
+automatici, sia lato \emph{backend} sia lato \emph{frontend}. In entrambi i casi è stato
+definito un agente dedicato che codifica la struttura della \emph{suite}, lo stack
+tecnologico di riferimento e le convenzioni di \emph{naming} e organizzazione dei file,
+così che ogni nuovo test risulti coerente con quelli già esistenti.\\
+Sul \emph{backend} l'agente copre le categorie di test unitari, \emph{smoke},
+\emph{lifecycle} e \emph{summary}, ed è affiancato da due \emph{skill} specifiche per la creazione di 
+nuovi \emph{lifecycle test}, essendo quest'ultimo il pattern più ripetitivo della \emph{suite}.
+Una \emph{skill} è orientata al modulo CRUD, nella quale viene spiegato al \gls{llm} a cosa serve quel test, vincoli specifici 
+dei test e dove raccogliere i dati necessari per la scrittura dei test; un'altra è specifica del modulo Grid e
+ricopre le stesse funzioni della \emph{skill} precedente ma relative ai componenti griglia. 
+Sul \emph{frontend} l'agente è invece focalizzato sui test di usabilità
+end-to-end basati su \emph{Playwright}, sull'organizzazione dei \emph{page object} e
+sulla scrittura di scenari resilienti rispetto al rendering asincrono dei componenti.\\
+Il beneficio osservato è analogo a quello registrato sulla telemetria: una volta
+validato il pattern su un primo caso di riferimento, l'estensione a un nuovo componente
+diventa una richiesta semantica all'agente, che in pochi minuti produce i file di
+scenario e le dichiarazioni necessarie, senza che lo sviluppatore debba ricordare
+convenzioni distribuite tra più punti del progetto.
 
 \section{Workflow Agenti AI}
 \label{sec:workflow-plan}
@@ -137,8 +122,8 @@ L'uso di un agente \gls{llm} comporta rischi noti che sono stati mitigati in mod
 \begin{description}
     \item[Allucinazioni su metriche/label.] L'agente tende a inventare nomi di metriche o
         \emph{label} plausibili ma inesistenti. \textbf{Mitigazione}: regola obbligatoria di
-        validazione tramite \gls{mcp} Grafana (\texttt{list\_prometheus\_metric\_names},
-        \texttt{list\_prometheus\_label\_values}) prima di chiudere ogni task dashboard.
+        validazione tramite \gls{mcp} Grafana, verificando l'esistenza di metriche e label in Grafana
+        prima di chiudere ogni modifica delle dashboard.
     \item[Overfitting del prompt.] Le \emph{skill} iniziali, scritte a partire dal primo
         modulo instrumentato (\texttt{Sia.Base}), contenevano riferimenti troppo specifici
         (nomi di metriche, \emph{tag}, stored procedure). \textbf{Mitigazione}: riscrittura
