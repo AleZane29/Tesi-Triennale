@@ -190,10 +190,10 @@ dall'\gls{api} \texttt{System.Diagnostics.Metrics} di \emph{.NET}:
     attive).
 \end{description}
 
-La progettazione delle metriche ha seguito due criteri guida. Il primo \`e la \emph{bassa
-cardinalit\`a}: i tag con alta variabilit\`a (es.\ identificatori numerici di record) sono
+La progettazione delle metriche ha seguito due criteri guida. Il primo è la bassa cardinalità: 
+i tag con alta variabilità (es. identificatori numerici di record) sono
 applicati solo agli span, mai alle metriche, per evitare un'esplosione del numero di serie
-temporali in Prometheus. Il secondo \`e la \emph{pre-aggregazione}: le metriche vengono
+temporali in Prometheus. Il secondo è la pre-aggregazione: le metriche vengono
 aggregate lato applicazione prima dell'esportazione, con overhead nettamente inferiore
 rispetto alla raccolta di trace complete.
 
