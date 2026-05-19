@@ -65,8 +65,15 @@ Consente di creare dashboard interattive a partire da diverse fonti di dati (com
     \label{fig:logo-grafana}
 \end{figure}
 
-\subsection*{Serilog}
-Libreria di \emph{logging} strutturato per .NET, scelta per la produzione e la gestione dei \emph{log} applicativi. Supporta nativamente il \emph{sink} OTLP, permettendo l'esportazione dei \emph{log} verso il \emph{Collector} OpenTelemetry e la correlazione automatica con le \emph{trace} tramite \texttt{TraceId} e \texttt{SpanId} iniettati da \texttt{Activity.Current}.
+\subsection*{xUnit}
+Framework di testing unitario \emph{open-source} per applicazioni .NET, ampiamente adottato nell'ecosistema Microsoft per la scrittura di test unitari e di integrazione.
+Supporta pattern come: \emph{data-driven test}, l'esecuzione parallela dei test e l'integrazione con librerie complementari quali \emph{NSubstitute} per il mocking e \emph{FluentAssertions} per asserzioni espressive.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.15\linewidth]{../images/technologies/xUnit.png}
+    \caption{Logo xUnit}
+    \label{fig:logo-playwright}
+\end{figure}
 
 \subsection*{Playwright}
 Framework \emph{open-source} per l'automazione dei browser e il testing end-to-end di applicazioni web.
@@ -89,5 +96,10 @@ Offre esecuzione rapida dei test, e funzionalità avanzate come mocking, snapsho
 \end{figure}
 
 \subsection*{Claude Code}
-\emph{Claude Code} è l'agente di codifica basato su modelli linguistici di grandi dimensioni (\gls{llm}) utilizzato durante lo stage come \emph{pair engineer} strutturato per lo studio delle tecnologie, la realizzazione di prototipi e la propagazione della telemetria ai moduli del framework.
-Il \gls{mcp} è il protocollo che consente all'agente di interagire con servizi esterni (in particolare \emph{Grafana}) in modo strutturato, ottenendo dati runtime e invocando operazioni come la creazione e la validazione di dashboard. L'utilizzo combinato di \emph{Claude Code} e \gls{mcp} è descritto in dettaglio nel capitolo~\ref{cap:metodologia-ai}.
+\emph{Claude Code} è l'agente di codifica basato su modelli linguistici di grandi dimensioni (\gls{llm}) utilizzato durante lo stage come \emph{pair engineer} strutturato per lo studio delle tecnologie, la realizzazione di prototipi e la propagazione della telemetria e test ai moduli del framework.
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.25\linewidth]{../images/technologies/Claude.png}
+    \caption{Logo Claude}
+    \label{fig:logo-otel}
+\end{figure}
