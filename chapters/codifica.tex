@@ -127,7 +127,8 @@ registrato in \texttt{BaseApplicationBuilder} subito dopo
 \texttt{Baggage} di \gls{otel}. Un \texttt{ActivityProcessor} custom
 (\texttt{BaggageActivityProcessor}) intercetta poi l'\emph{hook} \texttt{OnStart} di ogni
 \texttt{Activity} e copia ogni \emph{entry} di \emph{baggage} con prefisso \texttt{enduser.}
-come \emph{tag} sull'\texttt{Activity}.
+come \emph{tag} sull'\texttt{Activity}. Nell'appendice~\ref{app:diagrammi-classi} è possibile consultare
+il diagramma delle classi dell'arricchimento utente.
 
 \section{Configurazione degli \emph{exemplars}}
 
