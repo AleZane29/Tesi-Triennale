@@ -50,7 +50,7 @@ Serilog.\\
 Nell'appendice~\ref{fig:diag-pipeline} è presentato il diagramma delle classi relativo
 alla pipeline OpenTelemetry.
 
-\section{Classi \texttt{Sia\{Modulo\}Diagnostics}}
+\section{Classi di diagnostica per modulo}
 
 Ciascun modulo instrumentato espone una classe statica
 \texttt{Sia\{Modulo\}Diagnostics} nel \emph{namespace} \texttt{Sia.\{Modulo\}.Diagnostics}.
@@ -65,12 +65,11 @@ La classe definisce come membri statici \texttt{readonly}:
         (\texttt{sia.\{modulo\}.controller.errors}) e il singleton
         \texttt{AsControllerDiagnostics} dell'Adapter verso \texttt{IControllerDiagnostics}.
 \end{itemize}
-
 Nel codice applicativo, l'istrumentazione manuale di un'operazione avviene con:
-\[
+\\
 \texttt{Sia\{Modulo\}Diagnostics.ActivitySource.StartActivity(\textquotedbl sia.\{modulo\}.operazione\textquotedbl);}
-\]
-seguito da \texttt{activity?.SetTag(\ldots)} per gli attributi specifici. Per le durate si
+\\
+seguito da \texttt{activity.SetTag(\ldots)} per gli attributi specifici. Per le durate si
 usa un \emph{helper} \texttt{TrackQuery} che combina in un unico blocco la creazione della
 \emph{span}, la misurazione del tempo e la registrazione dell'\texttt{Histogram}
 corrispondente.
@@ -81,46 +80,16 @@ L'implementazione del pattern descritto nella sezione~\ref{sec:design-patterns} 
 in ogni modulo con controller. Il framework fornisce:
 \begin{itemize}
     \item l'interfaccia \texttt{Sia.Base.Diagnostics.IControllerDiagnostics}, con il contratto
-        \texttt{Counter<long> ControllerErrors \{ get; \}};
-    \item il metodo \texttt{protected static BaseApiController.RecordMetricError(IControllerDiagnostics, Exception, string operation)}, che effettua l'\emph{unwrap} di\\
+        \texttt{Counter<long> ControllerErrors \{ get; \}}
+    \item il metodo \texttt{protected static BaseApiController.RecordMetricError(\\IControllerDiagnostics, Exception, string operation)}, che effettua l'\emph{unwrap} di\\
         \texttt{SiaLoggerException.OriginalException} e applica i \emph{tag}
         \texttt{exception.type} e \texttt{sia.operation}.
 \end{itemize}
 
 Nel modulo (esempio riferito a \texttt{Sia.Devextreme.Crud}) la classe \texttt{Diagnostics}
-si presenta, nei suoi elementi essenziali, come segue:
-\begin{verbatim}
-public static class SiaDevextremeCrudDiagnostics
-{
-    public static readonly Meter Meter = new("Sia.Devextreme.Crud", "1.0.0");
+si presenta, nei suoi elementi essenziali, come segue: ~\ref{app:listing-adapter}
 
-    public static readonly Counter<long> ControllerErrors =
-        Meter.CreateCounter<long>("sia.devextreme.crud.controller.errors");
-
-    public static readonly IControllerDiagnostics AsControllerDiagnostics =
-        new ControllerDiagnosticsAdapter();
-
-    private sealed class ControllerDiagnosticsAdapter : IControllerDiagnostics
-    {
-        public Counter<long> ControllerErrors =>
-            SiaDevextremeCrudDiagnostics.ControllerErrors;
-    }
-}
-\end{verbatim}
-
-Nei controller, ogni \texttt{catch} richiama il metodo condiviso:
-\begin{verbatim}
-catch (Exception ex)
-{
-    RecordMetricError(
-        SiaDevextremeCrudDiagnostics.AsControllerDiagnostics,
-        ex,
-        nameof(GetData));
-    throw;
-}
-\end{verbatim}
-
-\section{\emph{Middleware} di arricchimento utente}
+\section{Middleware di arricchimento utente}
 
 Il \emph{middleware} \texttt{Application.Shared.Telemetry.EnrichActivityWithUserMiddleware} è
 registrato in \texttt{BaseApplicationBuilder} subito dopo
@@ -129,22 +98,22 @@ registrato in \texttt{BaseApplicationBuilder} subito dopo
 \texttt{Baggage} di \gls{otel}. Un \texttt{ActivityProcessor} custom
 (\texttt{BaggageActivityProcessor}) intercetta poi l'\emph{hook} \texttt{OnStart} di ogni
 \texttt{Activity} e copia ogni \emph{entry} di \emph{baggage} con prefisso \texttt{enduser.}
-come \emph{tag} sull'\texttt{Activity}. Nell'appendice~\ref{app:diagrammi-classi} è possibile consultare
+come \emph{tag} sull'\texttt{Activity}. Nell'appendice~\ref{app:diag-enduser} è possibile consultare
 il diagramma delle classi dell'arricchimento utente.
 
-\section{Configurazione degli \emph{exemplars}}
+\section{Configurazione degli exemplars}
 
-Nel provider \texttt{Meter} del pipeline è presente l'istruzione
-\texttt{SetExemplarFilter(ExemplarFilterType.TraceBased)}. Questa configurazione istruisce
+L'istruzione \texttt{SetExemplarFilter(ExemplarFilterType.TraceBased)} presente nel provider 
+\texttt{Meter} del pipeline, istruisce
 \gls{otel} ad allegare un \emph{exemplar} a un campione di metrica solo quando esiste una
 trace \emph{sampled} nel contesto corrente. L'\emph{exemplar} riporta il \texttt{TraceId}
 (e il \texttt{SpanId}) del campione, permettendo in Grafana la navigazione diretta dalla
 metrica alla trace.
 
-\section{\emph{Log} Serilog con \emph{sink} OTLP}
+\section{Log Serilog con sink OTLP}
 
-Il \emph{logger} è configurato in \texttt{Sia.Logger} tramite Serilog. Il \emph{sink} OTLP
-(\texttt{Serilog.Sinks.OpenTelemetry}) è registrato in sostituzione dei \emph{sink} precedenti,
+Il \emph{sink} OTLP (\texttt{Serilog.Sinks.OpenTelemetry}) 
+è registrato in sostituzione dei \emph{sink} precedenti,
 mantenendo il formato strutturato dei \emph{log}. Serilog legge il contesto di
 \texttt{Activity.Current} e arricchisce automaticamente ogni evento con \texttt{TraceId} e
 \texttt{SpanId}, soddisfacendo il requisito RFN-4 di correlazione \emph{log}-\emph{trace}.
@@ -217,13 +186,11 @@ Prima dell'intervento di telemetria, il modulo esponeva già i dati tramite:
 
 \subsection{Scelte progettuali}
 
-Il modulo presenta due caratteristiche che lo distinguono dagli altri moduli instrumentati.
-
+Il modulo presenta due caratteristiche che lo distinguono dagli altri moduli instrumentati.\\
 La prima è l'assenza di un controller: gli \texttt{IHealthCheck} sono invocati
 dall'infrastruttura ASP.NET Core, non da endpoint applicativi. Di conseguenza
 \texttt{SiaHealthChecksServersDiagnostics} non implementa \texttt{IControllerDiagnostics}
-e non espone il counter \texttt{ControllerErrors}.
-
+e non espone il counter \texttt{ControllerErrors}.\\
 La seconda è la natura \emph{istantanea} dei dati raccolti. CPU\%, temperatura, GB di
 RAM liberi e spazio su disco non sono grandezze cumulative: l'uso di \texttt{Counter} o
 \texttt{Histogram} sarebbe improprio. Lo strumento corretto è l'\texttt{ObservableGauge},
@@ -258,7 +225,6 @@ Il modulo produce tre span custom, organizzate gerarchicamente.
 \hline
 \end{tabularx}
 \end{table}
-
 Le trace HTTP generate automaticamente da \texttt{HttpClient} restano figlie di
 \texttt{...send}, permettendo di ispezionare nella stessa trace sia la logica
 applicativa sia il dettaglio del POST verso il manager.
@@ -290,7 +256,6 @@ Accanto alle metriche cumulative standard (cycle, check, send), il modulo espone
 \hline
 \end{tabular}
 \end{table}
-
 I tag hanno domini piccoli e chiusi (\texttt{sia.check} $\in \{cpu,\allowbreak\ cpu\_temperature,\allowbreak\ ram,\allowbreak\ disk,\allowbreak\ sql\}$,
 \texttt{sia.status} $\in \{Healthy, Unhealthy\}$), mantenendo la cardinalità sotto
 controllo indipendentemente dal numero di installazioni monitorate.
