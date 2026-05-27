@@ -1,7 +1,7 @@
 \chapter{Codifica}
 \label{cap:codifica}
 
-\intro{Il presente capitolo illustra l'organizzazione del codice prodotto e i dettagli implementativi della soluzione di telemetria, riprendendo le scelte progettuali descritte nel capitolo~\ref{cap:progettazione} e mostrando come si traducono nella struttura effettiva del framework \emph{Sia.Server.Framework}.}\\
+\intro{Il presente capitolo illustra l'organizzazione del codice prodotto e i dettagli implementativi della soluzione di telemetria, riprendendo le scelte progettuali descritte nel capitolo~\ref{cap:progettazione} e mostrando come si traducono nella struttura effettiva del framework\\
 
 \section{Organizzazione del codice}
 
@@ -18,7 +18,6 @@ Il codice di telemetria è distribuito su due livelli del framework:
         \texttt{Meter}, \texttt{Counter}, \texttt{Histogram}, e la dashboard Grafana
         \texttt{\{nome\}.dashboard.json} versionata insieme al codice.
 \end{itemize}
-
 Questa suddivisione garantisce che un nuovo modulo, per integrare la telemetria, debba solo
 creare la propria classe \texttt{Diagnostics} e registrare il proprio \texttt{Meter} e
 \texttt{ActivitySource} nel pipeline già costruito, senza conoscere i dettagli del
