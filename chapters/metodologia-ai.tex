@@ -159,7 +159,7 @@ contestuali.
 Un modello linguistico di grandi dimensioni (\emph{Large Language Model}, LLM) è, nella
 sua forma base, un sistema chiuso: conosce ciò che è stato scritto fino alla sua data di
 addestramento e risponde in linguaggio naturale, ma non può aprire un file, interrogare un
-database, chiamare un'API o agire nel mondo esterno. Questa limitazione non dipende
+database, chiamare un'\gls{api} o agire nel mondo esterno. Questa limitazione non dipende
 dall'intelligenza del modello, dipende dall'assenza di un canale strutturato attraverso
 cui il modello possa ricevere dati aggiornati e restituire azioni concrete.\\
 Prima dell'avvento di \gls{mcp}, ogni integrazione tra un LLM e un sistema esterno richiedeva
@@ -192,7 +192,7 @@ ruoli coinvolti sono tre.
     riceve risposte.
   \item[Server \gls{mcp}:] Il servizio che espone dati e funzionalità all'LLM. Può girare
     in locale (processo figlio, comunicazione via \emph{stdio}) o in remoto (connessione
-    via HTTP con Server-Sent Events). Un server \gls{mcp} può rappresentare un'API esterna,
+    via HTTP con Server-Sent Events). Un server \gls{mcp} può rappresentare un'\gls{api} esterna,
     un database, un file system, uno strumento di automazione, o qualsiasi sistema
     che si voglia rendere accessibile all'agente.
 \end{description}
@@ -245,7 +245,7 @@ può offrire al server.
 La portata dell'innovazione si può cogliere quando si analizza il protocollo come, non soltanto un modo
 più comodo per collegare gli LLM a qualche strumento locale, bensì a \gls{mcp} come 
 l'\textbf{infrastruttura per i microservizi agentici}.\\
-Nel modello tradizionale, un microservizio espone una REST API che altri servizi chiamano
+Nel modello tradizionale, un microservizio espone una REST \gls{api} che altri servizi chiamano
 in modo deterministico: il chiamante sa esattamente quale endpoint invocare, con quali
 parametri, e interpreta la risposta secondo uno schema fisso. In un'architettura agentica,
 il chiamante è un LLM che ragiona sul problema, decide autonomamente quali tool invocare e
@@ -255,9 +255,7 @@ per ogni modello.\\
 Un server \gls{mcp} che espone dati in tempo reale, da una piattaforma di visualizzazione dati come \emph{Grafana},
 da un database operativo, da un framework per lo sviluppo di test (es. \emph{Playwright}), diventa un blocco riutilizzabile
 dell'ecosistema agentico: qualsiasi agente compatibile con \gls{mcp} può scoprirlo, negoziare
-le sue capacità e usarlo, esattamente come un'applicazione scopre e usa un dispositivo
-USB. La standardizzazione sposta il valore dall'integrazione alla
-logica applicativa.
+le sue capacità e usarlo.
 
 % =============================================================================
 \subsection{Sicurezza}
@@ -265,7 +263,7 @@ logica applicativa.
 % =============================================================================
 
 L'ampiezza dei permessi che un server \gls{mcp} può richiedere, accesso al filesystem,
-esecuzione di query, chiamate a API esterne, rende la sicurezza un tema centrale che
+esecuzione di query, chiamate a \gls{api} esterne, rende la sicurezza un tema centrale che
 la specifica affronta esplicitamente attraverso quattro principi.\\
 Il primo è il \textbf{consenso esplicito dell'utente}: nessun tool può essere invocato
 senza che l'utente abbia approvato l'azione, e le descrizioni dei tool non devono essere
