@@ -55,7 +55,6 @@ di \emph{resource}), sono state definite \emph{Claude skill} dedicate:
     \item \texttt{sia-telemetry-grafana}: \emph{dashboard} Grafana, query PromQL/TraceQL/LogQL,
         strumenti \gls{mcp}.
 \end{itemize}
-
 Ogni \emph{skill} è un contratto procedurale, non un semplice \emph{prompt}, che descrive
 convenzioni, \emph{anti-pattern} e \emph{template} di codice per uno specifico aspetto. L'agente
 carica la \emph{skill} appropriata quando riceve un task pertinente, garantendo che
@@ -101,7 +100,6 @@ al primo caso visto), è stato adottato un \emph{workflow} strutturato in tre fa
         \emph{checklist} operativa, nella quale vengono tracciati in ordine, i singoli interventi 
         eseguiti dall'agente.
 \end{enumerate}
-
 Il \emph{workflow} produce un artefatto tracciabile per ogni intervento: \texttt{plan.md} e
 \texttt{task.md} restano nel repository e fungono da registro decisionale.
 
