@@ -95,7 +95,7 @@ triangolo vuoto per la relazione di implementazione di interfaccia.
   La figura~\ref{fig:diag-pipeline} mostra il pipeline \gls{otel} centralizzato:
   i tre provider \texttt{TracerProvider}, \texttt{MeterProvider} e
   \texttt{LoggerProvider} sono costruiti una sola volta da
-  \texttt{BaseApplicationBuilder.ConfigureBuilder}. 
+  \texttt{BaseApplication\\Builder.ConfigureBuilder}. 
   \\Sul \texttt{TracerProvider} viene installato
   il \texttt{SiaParentBasedSampler} (con \texttt{SamplingRatio} globale e
   override per-source via \texttt{SamplingRatios}), seguito dal
@@ -109,8 +109,8 @@ triangolo vuoto per la relazione di implementazione di interfaccia.
   \texttt{IncludedData} comprendente \texttt{TraceId}, \texttt{SpanId} e
   \emph{message template} (testo del log). 
   \\Sul \texttt{MeterProvider} \`e attivo l'\emph{exemplar filter}
-  \texttt{TraceBased} e quattro \texttt{ExplicitBucketHistogramConfiguration}
-  custom per estendere la coda dei bucket
+  \texttt{TraceBased} e quattro configurazioni custom:
+\texttt{ExplicitBucketHistogramConfiguration} per estendere la coda dei bucket
   oltre il default da 10s.
   \\Tutti i segnali condividono lo
   stesso \texttt{Resource} con gli attributi \texttt{service.name},

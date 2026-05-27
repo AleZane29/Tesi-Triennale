@@ -93,14 +93,14 @@ In merito al sistema sviluppato si possono individuare come attori:
         \item UC9.4 --- Gestione di una query non valida (estensione).
     \end{itemize}
 \end{itemize}
-
-\begin{figure}[!h]
+\newpage
+\begin{usecase}{1}{Generazione assistita di unit test backend}
+\begin{figure}[h]
     \centering
     \includegraphics[width=0.9\columnwidth]{usecase/UC1}
-    \caption{UC1: SGenerazione assistita di unit test backend}
+    \caption{UC1: Generazione assistita di unit test backend}
 \end{figure}
 
-\begin{usecase}{1}{Generazione assistita di unit test backend}
 \usecaseactors{Sviluppatore, Agente AI}
 \usecasepre{L'ambiente di sviluppo del \emph{framework} \emph{Sia.Core} è aperto, l'agente AI è configurato con la \emph{skill} dedicata agli \emph{unit test} \emph{backend} e nel progetto è presente il \emph{test runner} \emph{.NET}}
 \usecasedesc{Lo sviluppatore vuole introdurre \emph{unit test} su un servizio o un \emph{repository} del \emph{framework backend} privo di copertura adeguata, avvalendosi dell'agente AI}
@@ -183,6 +183,12 @@ In merito al sistema sviluppato si possono individuare come attori:
 \end{usecase}
 
 \begin{usecase}{2}{Generazione assistita di integration test su DB}
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{usecase/UC2}
+    \caption{UC2: Generazione assistita di integration test su DB}
+\end{figure}
+
 \usecaseactors{Sviluppatore, Agente AI}
 \usecasepre{Il \gls{mcp} è configurato verso il database del \emph{framework} e l'agente AI dispone delle \emph{skill} dedicate agli \emph{integration test}}
 \usecasedesc{Lo sviluppatore vuole verificare l'attendibilità dei dati nel database, il corretto comportamento di una procedura SQL o la coerenza di una prospettiva di configurazione di un componente, sfruttando l'agente AI e l'accesso diretto via \gls{mcp}}
@@ -247,7 +253,7 @@ In merito al sistema sviluppato si possono individuare come attori:
 }
 \label{uc:integration-test-generate}
 \end{usecase}
-\newpage
+
 \begin{usecase}{2.4}{Revisione e integrazione nella suite}
 \usecaseactors{Sviluppatore}
 \usecasepre{Il test è stato generato in bozza (UC2.3)}
@@ -263,6 +269,12 @@ In merito al sistema sviluppato si possono individuare come attori:
 \end{usecase}
 
 \begin{usecase}{3}{Generazione assistita di unit test e E2E frontend}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\columnwidth]{usecase/UC3}
+    \caption{UC3: Generazione assistita di unit test e E2E frontend}
+\end{figure}
+
 \usecaseactors{Sviluppatore, Agente AI}
 \usecasepre{L'ambiente di sviluppo \emph{Angular} del \emph{framework} è aperto, l'agente AI dispone delle \emph{skill} dedicate al \emph{testing frontend} e gli strumenti di \emph{unit test} e di test \emph{end-to-end} sono installati}
 \usecasedesc{Lo sviluppatore vuole introdurre \emph{unit test} sulla logica di un componente \emph{Angular} e/o test \emph{end-to-end} su un flusso utente, avvalendosi dell'agente AI}
@@ -343,7 +355,14 @@ In merito al sistema sviluppato si possono individuare come attori:
 \label{uc:test-frontend-review}
 \end{usecase}
 
+\newpage
 \begin{usecase}{4}{Esecuzione della suite di test e produzione del report di copertura}
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{usecase/UC4}
+    \caption{UC4: Esecuzione della suite di test e produzione del report di copertura}
+\end{figure}
+
 \usecaseactors{Sviluppatore, Sia.Core}
 \usecasepre{La suite di test (\emph{unit}, \emph{integration} ed \emph{end-to-end}) è integrata nel processo di \emph{build}}
 \usecasedesc{Lo sviluppatore lancia l'esecuzione completa della suite per ottenere un esito complessivo e un report di copertura aggiornato del codice}
@@ -429,6 +448,12 @@ In merito al sistema sviluppato si possono individuare come attori:
 \end{usecase}
 
 \begin{usecase}{5}{Propagazione della telemetria a un nuovo modulo}
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{usecase/UC5}
+    \caption{UC5: Propagazione della telemetria a un nuovo modulo}
+\end{figure}
+
 \usecaseactors{Sviluppatore, Agente AI}
 \usecasepre{Esiste un modulo del \emph{framework} non ancora coperto da telemetria, sono disponibili le \emph{skill} per la propagazione di \emph{trace}, metriche e \emph{log}, e lo stack \emph{Grafana LGTM} è raggiungibile}
 \usecasedesc{Lo sviluppatore vuole estendere la copertura della telemetria a un nuovo modulo del \emph{framework}, avvalendosi delle \emph{skill} dedicate dell'agente AI per garantire l'aderenza alle convenzioni}
@@ -526,8 +551,14 @@ In merito al sistema sviluppato si possono individuare come attori:
 }
 \label{uc:propagazione-validate}
 \end{usecase}
-
+\newpage
 \begin{usecase}{6}{Visualizzazione di metriche, trace e log di un modulo}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{usecase/UC6}
+    \caption{UC6: Visualizzazione di metriche, trace e log di un modulo}
+\end{figure}
+
 \usecaseactors{Sviluppatore}
 \usecasepre{Lo stack \emph{Grafana LGTM} è raggiungibile, il modulo di interesse è instrumentato e produce segnali, e la dashboard del modulo è disponibile}
 \usecasedesc{Lo sviluppatore consulta in modo correlato metriche, \emph{trace} e \emph{log} di un modulo per ottenerne una visione unificata in un periodo di tempo}
@@ -591,8 +622,15 @@ In merito al sistema sviluppato si possono individuare come attori:
 }
 \label{uc:dashboard-modulo-correlate}
 \end{usecase}
+\newpage
 
 \begin{usecase}{7}{Diagnosi di una richiesta lenta tramite exemplar}
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{usecase/UC7}
+    \caption{UC7: Diagnosi di una richiesta lenta tramite exemplar}
+\end{figure}
+
 \usecaseactors{Sviluppatore}
 \usecasepre{Una dashboard \emph{Grafana} mostra un pannello percentili (es.\ p95/p99) di una metrica di tipo \emph{Histogram} con \emph{exemplar} abilitati e i \emph{log} sono indicizzati in \emph{Loki} con \texttt{TraceId}}
 \usecasedesc{Lo sviluppatore vuole ricostruire la catena diagnostica completa di una richiesta lenta a partire da un campione anomalo sul pannello percentili}
@@ -674,6 +712,12 @@ In merito al sistema sviluppato si possono individuare come attori:
 \end{usecase}
 
 \begin{usecase}{8}{Identificazione dell'utente coinvolto in una trace}
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{usecase/UC8}
+    \caption{UC8: Identificazione dell'utente coinvolto in una trace}
+\end{figure}
+
 \usecaseactors{Sviluppatore}
 \usecasepre{La telemetria del \emph{framework} arricchisce automaticamente ogni \emph{span} con gli attributi \texttt{enduser.id} e \texttt{enduser.name}, e \emph{log} e \emph{trace} sono indicizzati su tali attributi}
 \usecasedesc{Lo sviluppatore vuole risalire all'utente che ha originato una richiesta tracciata e analizzare il suo intero contesto}
@@ -735,8 +779,14 @@ In merito al sistema sviluppato si possono individuare come attori:
 }
 \label{uc:enduser-trace-filter}
 \end{usecase}
-
+\newpage
 \begin{usecase}{9}{Creazione o modifica di una dashboard tramite agente AI e MCP}
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{usecase/UC9}
+    \caption{UC9: Creazione o modifica di una dashboard tramite agente AI e MCP}
+\end{figure}
+
 \usecaseactors{Sviluppatore, Agente AI}
 \usecasepre{Lo stack \emph{Grafana LGTM} è raggiungibile e l'agente AI dispone delle credenziali \gls{mcp} verso \emph{Grafana} e verso le sorgenti dati}
 \usecasedesc{Lo sviluppatore vuole creare o modificare una dashboard delegando all'agente AI sia la formulazione delle query sia la pubblicazione finale}
