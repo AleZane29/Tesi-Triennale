@@ -101,92 +101,48 @@ Per ciascun rischio identificato, è stata definita una possibile strategia di m
     \risksolution{introduzione di attività di validazione e revisione dei test generati, utilizzo di metriche di copertura del codice e iterazione sulle istruzioni fornite all'agente per migliorare progressivamente la qualità dei risultati}
     \label{risk:test-quality}
 \end{risk}
-\vspace{0.2cm}
-\begin{risk}{Cardinalità eccessiva delle metriche}
-    \riskdescription{l'utilizzo improprio di tag ad alta variabilità (es.\ identificativi utente, identificativi di record, parametri di query) come attributi di metriche potrebbe generare un numero esplosivo di serie temporali in Prometheus, compromettendo le prestazioni del backend di storage e l'usabilità delle dashboard}
-    \risksolution{definizione di linee guida chiare sulla scelta degli attributi di metrica, separazione netta tra informazioni adatte a metriche aggregate e informazioni adatte a span e log, revisione delle istruzioni fornite all'agente \emph{Claude Code} per la propagazione della telemetria, e monitoraggio periodico della cardinalità in Prometheus}
-    \label{risk:metrics-cardinality}
-\end{risk}
 
 \section{Pianificazione}
 L’attività di stage è stata pianificata su una durata complessiva di 8 settimane, per un totale di 300 ore.
 \\
 La pianificazione è stata strutturata in modo progressivo, suddividendo il lavoro in fasi settimanali, ciascuna con obiettivi specifici e attività mirate, al fine di garantire un apprendimento graduale e un’integrazione efficace delle tecnologie coinvolte.
+
 \subsection{Pianificazione settimanale}
+
 \subsubsection*{Settimane 1 e 2: Studio dell’architettura del sistema}
-Le prime due settimane sono state dedicate all’analisi dell’architettura dell’applicazione Sia.Core, con particolare attenzione alla separazione tra componente \emph{client-side} e \emph{server-side}.
-\begin{itemize}
-    \item Analisi della struttura del progetto \emph{Angular}: moduli, componenti, servizi, \emph{routing}
-    \item Studio delle convenzioni e pattern architetturali adottati (\emph{lazy loading, state management})
-    \item Revisione del codice esistente con supporto del team di sviluppo
-    \item Analisi della struttura del progetto \emph{.NET 9}: \emph{layer, \gls{api}, middleware, dependency injection}
-    \item Studio dei pattern architetturali utilizzati (\emph{Clean Architecture, CQRS, repository pattern})
-    \item Comprensione dei flussi di dati tra \emph{client} e \emph{server}: \emph{\gls{api} REST}, contratti, autenticazione
-    \item Mappatura dei componenti critici candidati all'integrazione di test e telemetria
-\end{itemize}
+Le prime due settimane sono state dedicate all’analisi dell’architettura dell’applicazione Sia.Core, con particolare attenzione alla separazione tra componente \emph{client-side} e \emph{server-side}. 
+In questa fase sono stati studiati la struttura del progetto \emph{Angular} e del backend \emph{.NET 9}, i principali pattern architetturali adottati dal framework e i flussi di comunicazione tra frontend, \gls{api} e database. 
+L’attività ha incluso anche la revisione del codice esistente insieme al team aziendale e la mappatura preliminare dei componenti più critici candidati all’integrazione di telemetria e test automatici.
 
 \subsubsection*{Settimana 3: Studio degli strumenti e della metodologia AI-assistita}
-La terza settimana è stata dedicata all'apprendimento degli strumenti chiave del progetto: lo stack \emph{OpenTelemetry} + \emph{Grafana LGTM}, gli strumenti di \emph{testing} per \emph{.NET} e \emph{Angular}, e la metodologia di lavoro basata su agenti di intelligenza artificiale.
-\begin{itemize}
-    \item \emph{OpenTelemetry}: studio dei concetti fondamentali (\emph{trace}, metriche, \emph{log}), del modello a \emph{span}, delle convenzioni semantiche e dell'integrazione con \emph{.NET 9}
-    \item \emph{Grafana LGTM}: configurazione istanza locale, connessione ai backend \emph{Loki}, \emph{Grafana}, \emph{Tempo} e \emph{Mimir/Prometheus}, realizzazione di dashboard di base
-    \item Studio degli strumenti di \emph{testing}: framework di \emph{unit test} e \emph{integration test} per \emph{.NET 9}, framework di \emph{unit test} e di test \emph{end-to-end} per \emph{Angular}
-    \item Studio della metodologia AI-assistita: agenti specializzati, \emph{skill} procedurali e \gls{mcp} per l'interrogazione diretta di \emph{Grafana}, database e strumenti di test
-    \item Realizzazione di un ambiente di sviluppo locale integrato con il \emph{pipeline} \gls{otel} completo
-\end{itemize}
+La terza settimana è stata dedicata all'apprendimento degli strumenti chiave del progetto: lo stack \emph{OpenTelemetry} e \emph{Grafana LGTM}, gli strumenti di \emph{testing} per \emph{.NET} e \emph{Angular}, e la metodologia di lavoro basata su agenti di intelligenza artificiale.
+Sono stati approfonditi i concetti fondamentali di osservabilità distribuita, come \emph{trace}, metriche e \emph{log}, oltre alla configurazione di un ambiente locale completo basato sullo stack LGTM. 
+Parallelamente sono stati studiati i framework di testing adottati nel progetto e il modello di lavoro AI-assistito basato su agenti specializzati, \emph{skill} procedurali e integrazioni \gls{mcp} per l’accesso diretto ai sistemi di monitoraggio e ai database.
 
 \subsubsection*{Settimana 4: Progettazione dell'architettura di telemetria e strategia di testing}
 Durante la quarta settimana è stata progettata l'architettura del sistema di telemetria ed è stata definita in parallelo la strategia di \emph{testing} per le due linee di lavoro.
-\begin{itemize}
-    \item Analisi dei moduli centrali del \emph{framework} candidati all'instrumentazione (autenticazione, componenti \emph{Angular} come griglie e \emph{form}, prestazioni hardware, accesso al database)
-    \item Definizione del \emph{pipeline} \gls{otel}: \emph{ActivitySource}, \emph{Meter}, \emph{exporter} OTLP verso il \emph{collector}
-    \item Progettazione del \emph{sampler} a due livelli e delle politiche di campionamento configurabili per sorgente
-    \item Definizione di una tassonomia coerente di metriche, \emph{trace} e attributi, con regole esplicite per evitare l'esplosione della cardinalità lato Prometheus
-    \item Identificazione delle tipologie di test: \emph{unit test} backend, \emph{integration test} su database, procedure SQL e prospettive, \emph{unit test} frontend, test \emph{end-to-end} frontend
-    \item Definizione del flusso di lavoro AI-assistito (agenti specializzati, prompt strutturati, criteri di accettazione, revisione manuale)
-    \item Stesura del documento di progettazione e della strategia di testing condivisi con il team
-\end{itemize}
+L’attività ha riguardato l’identificazione dei moduli del framework da instrumentare, la definizione della pipeline \gls{otel} e la progettazione di una tassonomia coerente di metriche, \emph{trace} e attributi condivisi. 
+Particolare attenzione è stata dedicata al controllo della cardinalità delle metriche lato Prometheus e alla definizione delle diverse tipologie di test da implementare: \emph{unit test}, \emph{integration test} e test \emph{end-to-end}. 
+In parallelo è stato definito il flusso operativo AI-assistito, stabilendo convenzioni, criteri di validazione e modalità di revisione del codice generato dagli agenti.
 
 \subsubsection*{Settimana 5: Implementazione del pipeline OTel e prima suite di test}
 La quinta settimana è stata dedicata all'implementazione del \emph{pipeline} \emph{OpenTelemetry} nel \emph{framework} \emph{.NET 9}, alla prima instrumentazione dei moduli core e alla realizzazione di una prima suite di test con il supporto degli agenti AI.
-\begin{itemize}
-    \item Configurazione del \emph{pipeline} \gls{otel} nel \texttt{BaseApplicationBuilder} con \emph{sampler}, \emph{exporter} OTLP e instrumentazioni automatiche
-    \item Integrazione di \emph{Serilog} con esportazione OTLP per la correlazione \emph{log}--\emph{trace} tramite \texttt{TraceId} e \texttt{SpanId}
-    \item Implementazione del pattern \texttt{SiaXxxDiagnostics} per i moduli di autenticazione e accesso ai dati
-    \item Arricchimento automatico degli \emph{span} con l'identità dell'utente autenticato (\texttt{enduser.id}, \texttt{enduser.name})
-    \item Prima generazione di \emph{unit test} backend e \emph{unit test} frontend con il supporto degli agenti AI
-    \item Validazione \emph{end-to-end} del flusso telemetrico e revisione manuale del codice di test generato
-\end{itemize}
+Sono stati configurati il \emph{pipeline} di raccolta telemetrica, gli \emph{exporter} OTLP e la correlazione tra \emph{log} e \emph{trace} tramite \texttt{TraceId} e \texttt{SpanId}. 
+In questa fase è stato inoltre introdotto il pattern condiviso \texttt{SiaXxxDiagnostics} per uniformare l’esposizione delle metriche e delle \emph{trace} nei diversi moduli del framework. 
+Parallelamente sono stati sviluppati i primi \emph{unit test} backend e frontend, successivamente revisionati e validati manualmente.
 
 \subsubsection*{Settimana 6: Propagazione della telemetria, dashboard e integration test}
 Nella sesta settimana il lavoro si è concentrato sulla propagazione della telemetria a ulteriori moduli del \emph{framework}, sulla configurazione delle dashboard e sull'introduzione degli \emph{integration test} e dei test \emph{end-to-end} frontend.
-\begin{itemize}
-    \item Sviluppo di \emph{skill} procedurali per standardizzare la propagazione della telemetria ai diversi moduli del \emph{framework}
-    \item Instrumentazione dei componenti \emph{Angular} (griglie, \emph{form}), del modulo prestazioni hardware e di ulteriori \gls{api} con \emph{trace} e metriche
-    \item Definizione di metriche di tipo \emph{Histogram} con \emph{exemplar} per abilitare la navigazione dalla metrica aggregata alla \emph{trace} corrispondente
-    \item Configurazione delle dashboard \emph{Grafana} con variabili \emph{template} per filtrare per servizio, installazione e cliente, sfruttando il \gls{mcp} per l'interrogazione diretta dello stack \emph{LGTM}
-    \item Sviluppo di \emph{integration test} sull'attendibilità dei dati nel database, sulle procedure SQL e sulle prospettive di configurazione dei componenti
-    \item Sviluppo dei test \emph{end-to-end} frontend per la verifica del comportamento dell'applicazione dal punto di vista dell'utente finale
-\end{itemize}
+Sono stati sviluppati strumenti e \emph{skill} procedurali per standardizzare l’instrumentazione dei moduli applicativi, inclusi componenti \emph{Angular}, \gls{api} e moduli di accesso ai dati. 
+Contestualmente sono state create dashboard \emph{Grafana} parametrizzabili per servizio e cliente, sfruttando il protocollo \gls{mcp} per l’interrogazione diretta dello stack di osservabilità. 
+Sul fronte del testing sono stati introdotti \emph{integration test} basati su dati reali provenienti dal database e test \emph{end-to-end} orientati alla validazione dell’esperienza utente.
 
 \subsubsection*{Settimana 7: Validazione del sistema integrato, tuning delle dashboard e suite di test}
 La settima settimana ha previsto la validazione complessiva del sistema di telemetria su ambiente di \emph{staging}, l'ottimizzazione delle dashboard e l'esecuzione della suite completa di test.
-\begin{itemize}
-    \item Verifica della telemetria \emph{end-to-end}: dall'evento applicativo al \emph{collector} \gls{otel}, fino alla dashboard \emph{Grafana}
-    \item Validazione dell'\emph{overhead} introdotto dalla telemetria sulle prestazioni applicative
-    \item Verifica della cardinalità delle metriche in Prometheus e correzione di eventuali attributi problematici
-    \item Ottimizzazione delle dashboard \emph{Grafana}: \emph{alert}, soglie, visualizzazioni avanzate e correlazione \emph{cross}-segnale (metrica $\rightarrow$ \emph{trace} via \emph{exemplar} $\rightarrow$ \emph{log} via \texttt{TraceId})
-    \item Esecuzione della suite completa di test (\emph{unit}, \emph{integration} e \emph{E2E}) su ambiente di \emph{staging}, analisi della copertura del codice e correzione dei test falliti
-    \item Stesura del report intermedio sullo stato del sistema di osservabilità e sulla qualità della suite di test
-\end{itemize}
+In particolare sono stati verificati il corretto funzionamento del flusso telemetrico \emph{end-to-end}, l’overhead introdotto dalla telemetria e la cardinalità effettiva delle metriche raccolte in Prometheus. 
+Parallelamente è stata eseguita l’intera suite di test automatizzati, analizzando eventuali fallimenti e migliorando la copertura del codice.
 
 \subsubsection*{Settimana 8: Messa in produzione e documentazione finale}
 L'ultima settimana è stata dedicata alla messa in produzione della soluzione di telemetria, al consolidamento della suite di test e alla redazione della documentazione finale.
-\begin{itemize}
-    \item Preparazione e revisione finale dell'ambiente di produzione
-    \item \emph{Deploy} della configurazione \emph{OpenTelemetry}, del \emph{collector} e delle dashboard \emph{Grafana LGTM} in produzione
-    \item Consolidamento della suite di test e integrazione nel processo di \emph{build} con report di copertura del codice
-    \item Stesura della documentazione tecnica finale (architettura del sistema di osservabilità, convenzioni di instrumentazione, dashboard, suite di test, agenti AI e \emph{skill} prodotti)
-    \item Stesura della relazione di stage con analisi critica del lavoro svolto
-    \item Presentazione finale dei risultati al team aziendale
-\end{itemize}
+Le attività hanno incluso il \emph{deploy} della configurazione \emph{OpenTelemetry} e delle dashboard \emph{Grafana LGTM}, l’integrazione stabile dei test automatici nel processo di \emph{build} e la produzione della documentazione tecnica relativa all’architettura di osservabilità, alle convenzioni di instrumentazione e agli agenti AI sviluppati durante lo stage. 
+

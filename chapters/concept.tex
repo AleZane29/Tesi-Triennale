@@ -37,14 +37,14 @@ In merito al sistema sviluppato si possono individuare come attori:
         \item UC1.3 --- Analisi del codice e generazione dei test.
         \item UC1.4 --- Revisione e integrazione nella suite.
     \end{itemize}
-    \item UC2 --- Generazione assistita di \emph{integration test} su database, procedure SQL e prospettive di configurazione.
+    \item UC2 --- Generazione assistita di \emph{integration test} su database.
     \begin{itemize}
         \item UC2.1 --- Selezione dell'oggetto da validare.
         \item UC2.2 --- Interrogazione del database e delle prospettive via \gls{mcp}.
         \item UC2.3 --- Generazione dell'\emph{integration test}.
         \item UC2.4 --- Revisione e integrazione nella suite.
     \end{itemize}
-    \item UC3 --- Generazione assistita di \emph{unit test} e test \emph{end-to-end} lato \emph{frontend}.
+    \item UC3 --- Generazione assistita di \emph{unit test} e test \emph{end-to-end} \emph{frontend}.
     \begin{itemize}
         \item UC3.1 --- Identificazione del componente o del flusso utente da coprire.
         \item UC3.2 --- Generazione di \emph{unit test} per la logica del componente.
@@ -62,14 +62,14 @@ In merito al sistema sviluppato si possono individuare come attori:
     \begin{itemize}
         \item UC5.1 --- Identificazione del modulo da instrumentare.
         \item UC5.2 --- Invocazione della \emph{skill} di propagazione della telemetria.
-        \item UC5.3 --- Introduzione del pattern \texttt{SiaXxxDiagnostics} e registrazione della sorgente nel \emph{pipeline} \gls{otel}.
+        \item UC5.3 --- Introduzione della classe di diagnostica e registrazione della sorgente nel \emph{pipeline} \gls{otel}.
         \item UC5.4 --- Definizione di metriche con cardinalità controllata.
         \item UC5.5 --- Validazione dei segnali sullo stack \emph{Grafana LGTM}.
     \end{itemize}
     \item UC6 --- Visualizzazione delle metriche, \emph{trace} e \emph{log} di un modulo tramite dashboard \emph{Grafana LGTM}.
     \begin{itemize}
         \item UC6.1 --- Apertura della dashboard del modulo.
-        \item UC6.2 --- Selezione di servizio, installazione e cliente tramite variabili \emph{template}.
+        \item UC6.2 --- Selezione delle tramite variabili \emph{template}.
         \item UC6.3 --- Consultazione correlata di metriche, \emph{trace} e \emph{log}.
     \end{itemize}
     \item UC7 --- Diagnosi di una richiesta lenta a partire da un pannello percentili, tramite \emph{exemplar} verso la \emph{trace} e navigazione ai \emph{log} correlati.
@@ -96,17 +96,9 @@ In merito al sistema sviluppato si possono individuare come attori:
 
 \begin{figure}[!h]
     \centering
-    \includegraphics[width=0.9\columnwidth]{usecase/scenario-principale}
-    \caption{Use Case - UC0: Scenario principale}
+    \includegraphics[width=0.9\columnwidth]{usecase/UC1}
+    \caption{UC1: SGenerazione assistita di unit test backend}
 \end{figure}
-
-\begin{usecase}{0}{Scenario principale}
-\usecaseactors{Sviluppatore}
-\usecasepre{Lo sviluppatore ha aperto l'ambiente di sviluppo del \emph{framework} \emph{Sia.Core}, con l'agente AI configurato e lo stack \emph{Grafana LGTM} raggiungibile}
-\usecasedesc{L'ambiente mette a disposizione gli strumenti per generare e revisionare la suite di test, propagare la telemetria ai moduli del \emph{framework} e consultare le dashboard di osservabilità}
-\usecasepost{Il sistema è pronto per permettere una nuova interazione}
-\label{uc:scenario-principale}
-\end{usecase}
 
 \begin{usecase}{1}{Generazione assistita di unit test backend}
 \usecaseactors{Sviluppatore, Agente AI}
@@ -190,7 +182,7 @@ In merito al sistema sviluppato si possono individuare come attori:
 \label{uc:unit-test-backend-review}
 \end{usecase}
 
-\begin{usecase}{2}{Generazione assistita di integration test su DB, procedure SQL e prospettive}
+\begin{usecase}{2}{Generazione assistita di integration test su DB}
 \usecaseactors{Sviluppatore, Agente AI}
 \usecasepre{Il \gls{mcp} è configurato verso il database del \emph{framework} e l'agente AI dispone delle \emph{skill} dedicate agli \emph{integration test}}
 \usecasedesc{Lo sviluppatore vuole verificare l'attendibilità dei dati nel database, il corretto comportamento di una procedura SQL o la coerenza di una prospettiva di configurazione di un componente, sfruttando l'agente AI e l'accesso diretto via \gls{mcp}}
@@ -255,7 +247,7 @@ In merito al sistema sviluppato si possono individuare come attori:
 }
 \label{uc:integration-test-generate}
 \end{usecase}
-
+\newpage
 \begin{usecase}{2.4}{Revisione e integrazione nella suite}
 \usecaseactors{Sviluppatore}
 \usecasepre{Il test è stato generato in bozza (UC2.3)}
@@ -270,7 +262,7 @@ In merito al sistema sviluppato si possono individuare come attori:
 \label{uc:integration-test-review}
 \end{usecase}
 
-\begin{usecase}{3}{Generazione assistita di unit test e E2E lato frontend}
+\begin{usecase}{3}{Generazione assistita di unit test e E2E frontend}
 \usecaseactors{Sviluppatore, Agente AI}
 \usecasepre{L'ambiente di sviluppo \emph{Angular} del \emph{framework} è aperto, l'agente AI dispone delle \emph{skill} dedicate al \emph{testing frontend} e gli strumenti di \emph{unit test} e di test \emph{end-to-end} sono installati}
 \usecasedesc{Lo sviluppatore vuole introdurre \emph{unit test} sulla logica di un componente \emph{Angular} e/o test \emph{end-to-end} su un flusso utente, avvalendosi dell'agente AI}
@@ -490,7 +482,7 @@ In merito al sistema sviluppato si possono individuare come attori:
 \label{uc:propagazione-invoke}
 \end{usecase}
 
-\begin{usecase}{5.3}{Introduzione di SiaXxxDiagnostics e registrazione della sorgente OTel}
+\begin{usecase}{5.3}{Introduzione della classe di diagnostica e registrazione in OTel}
 \usecaseactors{Agente AI}
 \usecasepre{L'agente dispone del conteso per la propagazione sul modulo target (UC5.2)}
 \usecasedesc{L'agente introduce nel modulo il pattern \texttt{SiaXxxDiagnostics}, definisce \texttt{ActivitySource} e \texttt{Meter} e registra la nuova sorgente nel \emph{pipeline} \gls{otel} del \emph{framework}}
@@ -571,7 +563,7 @@ In merito al sistema sviluppato si possono individuare come attori:
 \label{uc:dashboard-modulo-open}
 \end{usecase}
 
-\begin{usecase}{6.2}{Selezione di servizio, installazione e cliente tramite variabili template}
+\begin{usecase}{6.2}{Selezione delle variabili template}
 \usecaseactors{Sviluppatore}
 \usecasepre{La dashboard è aperta (UC6.1)}
 \usecasedesc{Lo sviluppatore seleziona dai \emph{dropdown} delle variabili \emph{template} servizio, installazione e cliente per circoscrivere la visualizzazione}

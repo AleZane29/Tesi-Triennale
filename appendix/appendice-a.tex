@@ -130,9 +130,7 @@ triangolo vuoto per la relazione di implementazione di interfaccia.
     \makebox[\textwidth][c]{%
         \includegraphics[width=1.25\textwidth]{../images/UMLClassi/OtelPipeline.png}
     }
-    \caption{Pipeline OpenTelemetry centralizzato in \texttt{BaseApplicationBuilder}: i tre provider (trace, metriche, log) condividono lo stesso \texttt{Resource} ed esportano via OTLP gRPC; sul
-  \texttt{TracerProvider} sono attive le instrumentazioni AspNetCore (con \texttt{Filter} per route), HttpClient, SqlClient e \texttt{Npgsql}; sul \texttt{MeterProvider} \`e abilitato l'\emph{exemplar filter}
-   \texttt{TraceBased} e quattro histogram Views custom; i middleware completano l'arricchimento per-richiesta.}
+    \caption{Diagramma delle classi della Pipeline OpenTelemetry}
   \label{fig:diag-pipeline}
 \end{figure}
 \newpage
@@ -154,7 +152,7 @@ concreta.
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\linewidth]{../images/UMLClassi/UMLSiaDiagnostics.png}
-    \caption{Struttura generica del pattern \texttt{Sia\{Modulo\}Diagnostics} con \texttt{ControllerDiagnosticsAdapter} annidato. Il controller invoca \texttt{RecordMetricError} del metodo condiviso \texttt{BaseApiController}, passando il singleton \texttt{AsControllerDiagnostics}; l'Adapter riconcilia il \texttt{Counter} per-modulo con il contratto comune \texttt{IControllerDiagnostics}.}
+    \caption{Diagramma delle classi del pattern di diagnostica}    
     \label{fig:diag-diagnostics-pattern}
 \end{figure}
 \newpage
@@ -178,7 +176,7 @@ modifiche al codice del modulo.
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\linewidth]{../images/UMLClassi/EnrichEnduserTag.png}
-    \caption{Flusso di arricchimento automatico delle \texttt{Activity} con l'identità utente. Il \emph{middleware} pubblica \texttt{enduser.id} e \texttt{enduser.name} nel \texttt{Baggage} di OpenTelemetry; il \texttt{BaggageActivityProcessor} li copia come \emph{tag} su ogni \texttt{Activity} creata, comprese quelle prodotte dalle classi \texttt{Sia\{Modulo\}Diagnostics}.}
+    \caption{Diagramma delle classi dell'arrichimento trace con dati utente}    
     \label{fig:diag-enduser}
 \end{figure}
 
