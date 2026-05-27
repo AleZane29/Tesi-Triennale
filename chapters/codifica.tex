@@ -18,7 +18,6 @@ Il codice di telemetria è distribuito su due livelli del framework:
         \texttt{Meter}, \texttt{Counter}, \texttt{Histogram}, e la dashboard Grafana
         \texttt{\{nome\}.dashboard.json} versionata insieme al codice.
 \end{itemize}
-
 Questa suddivisione garantisce che un nuovo modulo, per integrare la telemetria, debba solo
 creare la propria classe \texttt{Diagnostics} e registrare il proprio \texttt{Meter} e
 \texttt{ActivitySource} nel pipeline già costruito, senza conoscere i dettagli del
