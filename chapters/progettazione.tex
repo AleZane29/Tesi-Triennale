@@ -164,8 +164,7 @@ richiesta tracciata. Questo abilita la navigazione bidirezionale tra log e trace
 
 Una \emph{trace} \`e l'insieme completo di un'operazione end-to-end, identificata da un
 unico \texttt{trace\_id}. \`E composta da una gerarchia di \emph{span}, ciascuno con un
-proprio \texttt{span\_id} e, ad eccezione della root, un \texttt{parent\_span\_id}.
-
+proprio \texttt{span\_id} e, ad eccezione della root, un \texttt{parent\_span\_id}.\\
 Nel sistema, le trace sono prodotte da tre tipologie di sorgenti: instrumentazione
 automatica HTTP (richieste in ingresso via AspNetCore, chiamate in uscita via HttpClient);
 instrumentazione automatica database (query SQL Server via SqlClient, query PostgreSQL via
@@ -189,7 +188,6 @@ dall'\gls{api} \texttt{System.Diagnostics.Metrics} di \emph{.NET}:
     valori istantanei non cumulativi (es. numero di connessioni
     attive).
 \end{description}
-
 La progettazione delle metriche ha seguito due criteri guida. Il primo è la bassa cardinalità: 
 i tag con alta variabilità (es. identificatori numerici di record) sono
 applicati solo agli span, mai alle metriche, per evitare un'esplosione del numero di serie
@@ -327,7 +325,7 @@ nell'ambito della stessa richiesta portano gli stessi \texttt{enduser.*} della r
 \end{description}
 Gli attributi \texttt{enduser.*} non vengono mai aggiunti come tag delle metriche: 
 farlo farebbe crescere il numero di serie temporali di Prometheus
-linearmente con il numero di utenti, violando RQN-2. La correlazione metrica~$\to$~utente
+linearmente con il numero di utenti, violando RQN-2. La correlazione \emph{metrica~$\to$~utente}
 si ottiene invece tramite gli exemplar: dalla metrica si naviga alla trace, che porta
 già \texttt{enduser.*}.
 
