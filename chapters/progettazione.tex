@@ -78,6 +78,8 @@ Nel progetto, il Collector è configurato per instradare i diversi tipi di dati 
 \item le \textbf{metriche} vengono inviate a Prometheus, rendendo possibile il monitoraggio delle prestazioni e la creazione di dashboard;
 \item i \textbf{log} vengono esportati verso Loki, consentendo la consultazione centralizzata e la correlazione con trace e metriche .
 \end{itemize}
+Grafana rappresenta il punto di accesso unificato a queste informazioni, offrendo strumenti per la visualizzazione e l’analisi dei dati di telemetria. In particolare, permette di costruire dashboard personalizzate basate su metriche, esplorare i log e navigare le trace, abilitando una visione completa e correlata del comportamento del sistema.
+Questa architettura consente di separare la raccolta dei dati dalla loro visualizzazione, migliorando la scalabilità e la flessibilità del sistema di monitoraggio, oltre a facilitare eventuali estensioni future.
 
 \begin{figure}[h]
     \centering
@@ -85,8 +87,34 @@ Nel progetto, il Collector è configurato per instradare i diversi tipi di dati 
     \caption{Architettura OTel Collector}
     \label{fig:arch-otel-collector}
 \end{figure}
-Grafana rappresenta il punto di accesso unificato a queste informazioni, offrendo strumenti per la visualizzazione e l’analisi dei dati di telemetria. In particolare, permette di costruire dashboard personalizzate basate su metriche, esplorare i log e navigare le trace, abilitando una visione completa e correlata del comportamento del sistema.
-Questa architettura consente di separare la raccolta dei dati dalla loro visualizzazione, migliorando la scalabilità e la flessibilità del sistema di monitoraggio, oltre a facilitare eventuali estensioni future.
+
+\subsection{Protocolli e canali di comunicazione}
+
+Ogni segnale telemetrico percorre un canale distinto, scelto in base alle
+caratteristiche del dato e ai requisiti di affidabilità del trasporto.\\
+L'applicazione .NET invia tutti i segnali all'OTel Collector attraverso il
+protocollo \gls{otlp}, che utilizza \emph{Protobuf} come formato di
+serializzazione. \emph{Protobuf} è un formato binario: a parità di informazione
+trasportata, occupa una frazione dello spazio di un formato testuale come JSON,
+riducendo la banda consumata e il tempo di serializzazione. Per il trasporto,
+\gls{otlp} supporta due alternative: \gls{grpcg} sulla porta 4317, che offre
+multiplexing delle richieste su una singola connessione persistente ed è il canale
+primario del progetto; HTTP sulla porta 4318, mantenuto come canale secondario per
+ambienti in cui \gls{grpcg} è bloccato da proxy o firewall.\\
+Raccolti dal Collector, i tre segnali vengono instradati verso database separati
+con protocolli differenziati. I \emph{log} raggiungono Grafana Loki sulla porta
+3100 tramite OTLP HTTP con serializzazione \emph{Protobuf}. Le \emph{trace}
+raggiungono Grafana Tempo sulla porta 4417 tramite \gls{grpcg} con \emph{Protobuf}.
+Le \emph{metriche} seguono
+invece un percorso diverso: il Collector le espone sulla porta 8889 tramite
+\emph{remote write} HTTP con \emph{Protobuf}, e Prometheus le raccoglie con
+\emph{scrape} periodico. Questa scelta riflette la natura delle metriche, dati
+aggregati e periodici, non eventi discreti, per i quali il modello \emph{pull}
+di Prometheus è più efficiente di una connessione persistente.\\
+Grafana si connette infine ai tre database tramite HTTP con formato JSON: un
+protocollo testuale leggibile, appropriato per le query interattive delle
+dashboard dove la latenza di serializzazione è trascurabile rispetto ai tempi
+di risposta dell'utente.
 
 \subsection{Scelte architetturali}
 
@@ -195,7 +223,6 @@ temporali in Prometheus. Il secondo è la pre-aggregazione: le metriche vengono
 aggregate lato applicazione prima dell'esportazione, con overhead nettamente inferiore
 rispetto alla raccolta di trace complete.
 
-\newpage
 \subsection{Tassonomia degli attributi}
 
 \subsubsection{Resource attributes (comuni a tutti i segnali)}
@@ -422,13 +449,14 @@ strumenti di osservabilità del modulo: istanziano al \emph{type loading} il \te
 \texttt{ActivitySource}, e i \texttt{Counter}/\texttt{Histogram} esposti come membri statici
 pubblici. Il codice applicativo non istanzia mai direttamente uno strumento OTel, ma accede
 sempre all'istanza fornita dalla classe \texttt{Diagnostics} del proprio modulo.\\
+\pagebreak
 \\\textbf{Costruzione del \texttt{ResourceBuilder}}\\
 Gli attributi di \emph{resource}
 (\texttt{service.name}, \texttt{sia.product\_type}, \texttt{sia.customer\_name}) vengono letti
 da \emph{appsettings} e applicati a un unico \texttt{Resource} condiviso da \emph{trace},
 metriche e \emph{log}, garantendone la coerenza cross-segnale. Anche questa costruzione avviene
 in un metodo \emph{factory} interno a \texttt{BaseApplicationBuilder}.\\
-\textbf{Vantaggi}\\
+\\\textbf{Vantaggi}
 \begin{itemize}
     \item la configurazione da \emph{appsettings} viene tradotta in oggetti OTel in un solo
         punto, semplificando i test e le variazioni per ambiente;
