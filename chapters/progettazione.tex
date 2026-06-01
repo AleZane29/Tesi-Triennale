@@ -43,7 +43,7 @@ I principi fondamentali di \gls{otel} rilevanti per questo progetto sono:
         HttpClient, SqlClient), \gls{otel} fornisce librerie che non richiedono modifiche
         al codice applicativo.
   \item \textbf{Estensibilit\`a.} \`E possibile aggiungere attributi custom, definire
-        metriche applicative proprie e configurare sampler e processor personalizzati.
+        metriche applicative proprie e configurare \gls{samplerg} e processor personalizzati.
 \end{itemize}
 
 \section{Architettura della telemetria}
@@ -54,11 +54,11 @@ L’applicazione backend, sviluppata in ambiente \textit{.NET}, utilizza lo stan
 \subsection{Produzione dei dati di telemetria}
 
 La generazione dei dati avviene direttamente all’interno dell’applicazione backend tramite diverse tecnologie integrate.\\
-Le \textbf{trace} vengono prodotte utilizzando OpenTelemetry, che si appoggia alle API native di .NET (\texttt{ActivitySource} e \texttt{Activity}) per rappresentare le operazioni eseguite dal sistema sotto forma di \textit{span}. Ogni richiesta viene quindi tracciata lungo tutto il suo ciclo di vita, includendo chiamate HTTP, operazioni sui database e logica applicativa.\\
+Le \textbf{trace} vengono prodotte utilizzando OpenTelemetry, che si appoggia alle \gls{api} native di .NET (\texttt{ActivitySource} e \texttt{Activity}) per rappresentare le operazioni eseguite dal sistema sotto forma di \textit{span}. Ogni richiesta viene quindi tracciata lungo tutto il suo ciclo di vita, includendo chiamate HTTP, operazioni sui database e logica applicativa.\\
 Le \textbf{metriche} vengono generate attraverso due approcci distinti:
 \begin{itemize}
 \item metriche di \textit{performance}, raccolte automaticamente da OpenTelemetry (ad esempio durata delle richieste HTTP o utilizzo delle risorse);
-\item metriche di \textit{business}, definite manualmente tramite le API \texttt{Meter} di .NET, per monitorare aspetti specifici del dominio applicativo.
+\item metriche di \textit{business}, definite manualmente tramite le \gls{api} \texttt{Meter} di .NET, per monitorare aspetti specifici del dominio applicativo.
 \end{itemize}
 I \textbf{log} vengono invece gestiti tramite la libreria Serilog, che consente la produzione di log strutturati e la loro esportazione verso l’infrastruttura di osservabilità. Grazie all’integrazione con OpenTelemetry, i log risultano automaticamente correlati alle trace tramite identificativi condivisi (\textit{TraceId} e \textit{SpanId}).
 
@@ -66,9 +66,9 @@ I \textbf{log} vengono invece gestiti tramite la libreria Serilog, che consente 
 
 Per la gestione e la visualizzazione dei dati di telemetria è stata adottata un’architettura basata su OpenTelemetry Collector e sullo stack Grafana (LGTM: Loki, Grafana, Tempo e Prometheus).
 I dati di telemetria generati dall’applicazione backend, vengono inizialmente prodotti tramite le librerie OpenTelemetry, .NET Meters e Serilog, e poi vengono esportati in formato compatibile OpenTelemetry.
-Tutti questi dati vengono inviati a un componente intermedio, l’\textit{OpenTelemetry Collector}, tramite protocollo OTLP (OpenTelemetry Protocol). Il Collector svolge un ruolo centrale nell’architettura di osservabilità, fungendo da punto di raccolta e smistamento dei dati. Le sue principali responsabilità includono:
+Tutti questi dati vengono inviati a un componente intermedio, l’\textit{OpenTelemetry Collector}, tramite protocollo \gls{otlp} (OpenTelemetry Protocol). Il Collector svolge un ruolo centrale nell’architettura di osservabilità, fungendo da punto di raccolta e smistamento dei dati. Le sue principali responsabilità includono:
 \begin{itemize}
-\item \textbf{Ricezione dei dati}: acquisizione di trace, metriche e log dall’applicazione tramite endpoint OTLP;
+\item \textbf{Ricezione dei dati}: acquisizione di trace, metriche e log dall’applicazione tramite endpoint \gls{otlp};
 \item \textbf{Elaborazione}: possibilità di applicare trasformazioni, filtri o arricchimenti ai dati raccolti;
 \item \textbf{Esportazione}: inoltro dei dati verso i sistemi di destinazione tramite specifici \textit{exporter}.
 \end{itemize}
@@ -92,7 +92,7 @@ Questa architettura consente di separare la raccolta dei dati dalla loro visuali
 
 Ogni segnale telemetrico percorre un canale distinto, scelto in base alle
 caratteristiche del dato e ai requisiti di affidabilità del trasporto.\\
-L'applicazione .NET invia tutti i segnali all'OTel Collector attraverso il
+L'applicazione .NET invia tutti i segnali all'\gls{otel} Collector attraverso il
 protocollo \gls{otlp}, che utilizza \emph{Protobuf} come formato di
 serializzazione. \emph{Protobuf} è un formato binario: a parità di informazione
 trasportata, occupa una frazione dello spazio di un formato testuale come JSON,
@@ -103,7 +103,7 @@ primario del progetto; HTTP sulla porta 4318, mantenuto come canale secondario p
 ambienti in cui \gls{grpcg} è bloccato da proxy o firewall.\\
 Raccolti dal Collector, i tre segnali vengono instradati verso database separati
 con protocolli differenziati. I \emph{log} raggiungono Grafana Loki sulla porta
-3100 tramite OTLP HTTP con serializzazione \emph{Protobuf}. Le \emph{trace}
+3100 tramite \gls{otlp} HTTP con serializzazione \emph{Protobuf}. Le \emph{trace}
 raggiungono Grafana Tempo sulla porta 4417 tramite \gls{grpcg} con \emph{Protobuf}.
 Le \emph{metriche} seguono
 invece un percorso diverso: il Collector le espone sulla porta 8889 tramite
@@ -141,14 +141,14 @@ costruito, senza conoscere i dettagli del pipeline.
 
 \subsubsection{Campionamento}
 
-Il campionamento è gestito da un sampler custom, che
+Il campionamento è gestito da un \gls{samplerg} custom, che
 combina una logica \emph{ratio-based} per le \emph{root span} con ereditarietà
 della decisione per le \emph{child span}.\\
 Se lo span ha un parent valido (\texttt{TraceId} e \texttt{SpanId} non nulli),
-il sampler eredita la decisione del parent senza ricalcolo. Questo garantisce la
+il \gls{samplerg} eredita la decisione del parent senza ricalcolo. Questo garantisce la
 coerenza interna della trace: se la root viene campionata, tutte le child span,
 vengono raccolte integralmente.\\
-Per le root span, il sampler risolve il ratio da applicare tramite \texttt{ResolveRatio}:
+Per le root span, il \gls{samplerg} risolve il ratio da applicare tramite \texttt{ResolveRatio}:
 il nome dell'activity (es.\ \texttt{sia.grid.page}) viene confrontato con i prefissi
 derivati dai nomi source configurati in appsettings (es.\ \texttt{Sia.Grid}
 $\to$ \texttt{sia.grid.}). I prefissi sono ordinati per lunghezza decrescente, così
@@ -246,7 +246,7 @@ Attributi presenti in tutte le metriche, trace e log di tutti i moduli.
 \end{table}
 
 \subsubsection{Attributi del modulo Sia.Base}
-Tutti i tag utilizzati nel modulo Sia.Base, modulo che si occupa delle chiamate CRUD al database, sono i medesimi sia per le trace che per le metriche.
+Tutti i tag utilizzati nel modulo Sia.Base, modulo che si occupa delle chiamate \gls{crud} al database, sono i medesimi sia per le trace che per le metriche.
 
 \begin{table}[h]
 \centering
@@ -344,10 +344,10 @@ Il meccanismo si articola in due componenti trasparenti al codice applicativo:
 \begin{description}
   \item[un middleware ASP.NET Core] (\texttt{EnrichActivityWithUserMiddleware}), registrato dopo \texttt{UseAuthentication()},
 legge gli attributi \texttt{userId} e \texttt{userName} da \texttt{HttpContext.User} e le
-pubblica nel Baggage \gls{otel}.
+pubblica nel \gls{baggageg} \gls{otel}.
  \item[un \texttt{ActivityProcessor} custom] (\texttt{BaggageActivityProcessor}) intercetta l'hook \texttt{OnStart} di ogni nuova
 \texttt{Activity} e copia le entry con prefisso \texttt{enduser.} come tag sullo span.
-Poiché il baggage viene ereditato dalle child span, tutte le query SQL generate
+Poiché il \gls{baggageg} viene ereditato dalle child span, tutte le query SQL generate
 nell'ambito della stessa richiesta portano gli stessi \texttt{enduser.*} della root.
 \end{description}
 Gli attributi \texttt{enduser.*} non vengono mai aggiunti come tag delle metriche: 
@@ -439,7 +439,7 @@ OpenTelemetry.\\
 \\\textbf{Costruzione del \emph{sampler}}\\
 La creazione di \texttt{SiaParentBasedSampler}
 avviene in un metodo \emph{factory} che, letti il valore globale \texttt{SamplingRatio} e i
-\emph{ratio} per-\emph{source} da \emph{appsettings}, restituisce l'istanza del \emph{sampler}
+\emph{ratio} per-\emph{source} da \emph{appsettings}, restituisce l'istanza del \gls{samplerg}
 configurata correttamente. L'invocazione avviene una sola volta in
 \texttt{BaseApplicationBuilder}; il resto del pipeline consuma un oggetto già pronto.\\
 \\\textbf{Registrazione di \texttt{Meter} e \texttt{ActivitySource}}\\
@@ -447,7 +447,7 @@ Le classi
 \texttt{Sia\{Modulo\}Diagnostics} agiscono come \emph{static factory} centralizzata per gli
 strumenti di osservabilità del modulo: istanziano al \emph{type loading} il \texttt{Meter}, gli
 \texttt{ActivitySource}, e i \texttt{Counter}/\texttt{Histogram} esposti come membri statici
-pubblici. Il codice applicativo non istanzia mai direttamente uno strumento OTel, ma accede
+pubblici. Il codice applicativo non istanzia mai direttamente uno strumento \gls{otel}, ma accede
 sempre all'istanza fornita dalla classe \texttt{Diagnostics} del proprio modulo.\\
 \pagebreak
 \\\textbf{Costruzione del \texttt{ResourceBuilder}}\\
@@ -458,10 +458,10 @@ metriche e \emph{log}, garantendone la coerenza cross-segnale. Anche questa cost
 in un metodo \emph{factory} interno a \texttt{BaseApplicationBuilder}.\\
 \\\textbf{Vantaggi}
 \begin{itemize}
-    \item la configurazione da \emph{appsettings} viene tradotta in oggetti OTel in un solo
+    \item la configurazione da \emph{appsettings} viene tradotta in oggetti \gls{otel} in un solo
         punto, semplificando i test e le variazioni per ambiente;
     \item i moduli vedono solo istanze pronte all'uso, senza conoscere il pipeline;
-    \item è possibile sostituire la \emph{factory} con una variante \emph{no-op} per i test
+    \item è possibile sostituire la \emph{factory} con una variante \emph{mock} per i test
         senza toccare il codice di business.
 \end{itemize}
 
@@ -618,7 +618,7 @@ funzionalità applicative, la corretta visualizzazione degli elementi grafici,
 la persistenza e l’aggiornamento dei dati nell’interfaccia grafica.
 Nel progetto, tali test sono stati utilizzati per validare il comportamento
 reale dei componenti più complessi del framework, come griglie dati,
-form dinamiche, operazioni CRUD e flussi di autenticazione.
+form dinamiche, operazioni \gls{crud} e flussi di autenticazione.
 Sono stati inoltre utilizzati per verificare la corretta propagazione delle
 modifiche introdotte dagli agenti AI, riducendo il rischio di regressioni
 funzionali nei moduli condivisi.

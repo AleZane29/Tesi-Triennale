@@ -10,7 +10,7 @@ Il codice di telemetria è distribuito su due livelli del framework:
 \begin{itemize}
     \item un livello \textbf{condiviso} (\texttt{Application.Shared.Telemetry} e
         \texttt{BaseApplicationBuilder}), che configura il pipeline \gls{otel},
-        registra \emph{sampler}, \emph{processor} e \emph{exporter}, e definisce le
+        registra \gls{samplerg}, \emph{processor} e \emph{exporter}, e definisce le
         convenzioni comuni (attributi di \emph{resource}, \emph{middleware}
         di arricchimento utente);
     \item un livello \textbf{per-modulo} (\texttt{Sia.\{Modulo\}/Diagnostics/}), che contiene
@@ -21,7 +21,7 @@ Il codice di telemetria è distribuito su due livelli del framework:
 Questa suddivisione garantisce che un nuovo modulo, per integrare la telemetria, debba solo
 creare la propria classe \texttt{Diagnostics} e registrare il proprio \texttt{Meter} e
 \texttt{ActivitySource} nel pipeline già costruito, senza conoscere i dettagli del
-\emph{sampler} o degli \emph{exporter}.
+\gls{samplerg} o degli \emph{exporter}.
 
 \section{Pipeline OpenTelemetry}
 
@@ -36,12 +36,12 @@ utilizzati sono:
         richieste HTTP in ingresso e in uscita;
     \item \texttt{OpenTelemetry.Instrumentation.SqlClient} per le \emph{trace} automatiche
         delle query su SQL Server;
-    \item \texttt{OpenTelemetry.Exporter.OpenTelemetryProtocol} per l'esportazione OTLP verso
+    \item \texttt{OpenTelemetry.Exporter.OpenTelemetryProtocol} per l'esportazione \gls{otlp} verso
         il \emph{Collector}.
 \end{itemize}
 La configurazione dichiara nell'ordine: il \texttt{ResourceBuilder} con gli attributi
 comuni (\texttt{service.name}, \texttt{sia.product\_type}, \texttt{sia.customer\_name}), il
-provider di \emph{trace} (\texttt{WithTracing}) con \emph{sampler} e \emph{processor}
+provider di \emph{trace} (\texttt{WithTracing}) con \gls{samplerg} e \emph{processor}
 custom, il provider di metriche (\texttt{WithMetrics}) con il filtro exemplar
 \texttt{TraceBased}, e il provider di \emph{log} (\texttt{WithLogging}) integrato con
 Serilog.\\
@@ -51,7 +51,7 @@ alla pipeline OpenTelemetry.
 \section{Classi di diagnostica per modulo}
 
 Ciascun modulo instrumentato espone una classe statica
-\texttt{Sia\{Modulo\}Diagnostics} nel \emph{namespace} \texttt{Sia.\{Modulo\}.Diagnostics}.
+\texttt{Sia\{Modulo\}Diagnostics}.
 La classe definisce come membri statici \texttt{readonly}:
 
 \begin{itemize}
@@ -90,9 +90,9 @@ si presenta, nei suoi elementi essenziali, come segue:~\ref{app:listing-adapter}
 
 Il \emph{middleware} \texttt{Application.Shared.Telemetry.EnrichActivityWithUserMiddleware} è
 registrato in \texttt{BaseApplicationBuilder} subito dopo
-\texttt{app.UseAuthentication()}. La sua responsabilità è leggere le \emph{claim}
+\texttt{app.UseAuthentication()}. La sua responsabilità è leggere gli attributi
 \texttt{userId} e \texttt{userName} dal \texttt{HttpContext.User} e pubblicarle nel
-\texttt{Baggage} di \gls{otel}.\\ Un \texttt{ActivityProcessor} custom
+\gls{baggageg} di \gls{otel}.\\ Un \texttt{ActivityProcessor} custom
 (\texttt{BaggageActivityProcessor}) intercetta poi l'\emph{hook} \texttt{OnStart} di ogni
 \texttt{Activity} e copia ogni \emph{entry} di \emph{baggage} con prefisso \texttt{enduser.}
 come \emph{tag} sull'\texttt{Activity}. Nell'appendice~\ref{app:diag-enduser} è possibile consultare

@@ -58,7 +58,7 @@ obiettivi:
         accesso al database, ecc.), con regole esplicite che evitano l'esplosione
         della cardinalità lato Prometheus;
     \item \textbf{O4. Definizione delle strategie di campionamento}: sono
-        state realizzate a due livelli (\emph{sampler} globale e
+        state realizzate a due livelli (\gls{samplerg} globale e
         \emph{processor} per-\emph{source}), con \emph{ratio} configurabili per
         ambiente tramite \emph{appsettings};
     \item \textbf{O5. Arricchimento automatico delle \emph{trace} ed
@@ -108,7 +108,7 @@ diagnosi a grana fine (latenza per \emph{endpoint}, distribuzione degli errori
 per modulo, \emph{top users} per consumo di risorse), versionati nel repository
 tramite \emph{provisioning} dichiarativo. L'insieme delle \emph{skill}
 procedurali prodotte, che codificano le convenzioni del framework per
-telemetria, \emph{controller}, \emph{service}, \emph{repository}, \emph{CRUD}
+telemetria, \emph{controller}, \emph{service}, \emph{repository}, \gls{crud}
 e \emph{grid} ha trasformato un esito incidentale dello stage in un asset
 metodologico permanente per il team.
 \\
@@ -156,10 +156,10 @@ nell'ambito progettuale:
     \item \textbf{standard \gls{otel} e modello dei segnali}: la comprensione
         del modello a \emph{trace}, metriche, \emph{log} ed \emph{exemplar},
         delle convenzioni semantiche e del
-        protocollo di trasporto OTLP, ha permesso di progettare una telemetria
-        coerente con un linguaggio comune adottato dall'intera comunità OTel,
+        protocollo di trasporto \gls{otlp}, ha permesso di progettare una telemetria
+        coerente con un linguaggio comune adottato dall'intera comunità \gls{otel},
         evitando soluzioni proprietarie e garantendo la portabilità dei segnali
-        verso qualsiasi backend OTel-compatibile;
+        verso qualsiasi backend \gls{otel}-compatibile;
     \item \textbf{stack \emph{Grafana LGTM} e linguaggi di query}: lo studio di
         \emph{Loki}, \emph{Tempo} e \emph{Prometheus}, con i rispettivi
         linguaggi PromQL, TraceQL e LogQL, ha permesso di comprendere i
@@ -168,7 +168,7 @@ nell'ambito progettuale:
         dashboard navigabili che sfruttano la correlazione \emph{cross}-segnale,
         elemento centrale di una vera osservabilità;
     \item \textbf{libreria \emph{Serilog} e \emph{sink} OTLP}: l'integrazione
-        di \emph{Serilog} con esportazione OTLP e la propagazione automatica di
+        di \emph{Serilog} con esportazione \gls{otlp} e la propagazione automatica di
         \texttt{TraceId} e \texttt{SpanId} hanno consentito di ottenere una
         correlazione \emph{log}-\emph{trace} senza modifiche nel codice
         applicativo, un risultato che dimostra come scelte architetturali
@@ -177,9 +177,9 @@ nell'ambito progettuale:
     \item \textbf{infrastruttura di \emph{testing}}: lo studio di \emph{xUnit},
         \emph{NSubstitute}, \emph{FluentAssertions} per il \emph{backend} e di
         \emph{Vitest} e \emph{Playwright} per il \emph{frontend}, unito alla
-        progettazione di \emph{fixture} riutilizzabili
+        progettazione di \gls{fixtureg} riutilizzabili
         (\texttt{SiaWebApplicationFactory}) e di scenari \emph{lifecycle}
-        \emph{data-driven} per CRUD e Grid, ha permesso di acquisire
+        \emph{data-driven} per \gls{crud} e Grid, ha permesso di acquisire
         competenze concrete su un'attività, la scrittura di test su un
         \emph{framework} esistente, spesso solo accennata nei corsi
         universitari;

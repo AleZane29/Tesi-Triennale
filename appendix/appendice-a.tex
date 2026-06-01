@@ -14,7 +14,7 @@ sezione~\ref{sec:codice-requisiti}.
 \hline
 RFO-1  & Tracciamento del percorso completo di ogni richiesta HTTP in ingresso, incluse le operazioni di accesso al database & UC5, UC6 \\
 \hline
-RFO-2  & Le operazioni CRUD verso il database devono essere riconoscibili tramite attributi che espongono il metodo e la \emph{repository} da cui è stata scatenata la richiesta & UC5, UC6 \\
+RFO-2  & Le operazioni \gls{crud} verso il database devono essere riconoscibili tramite attributi che espongono il metodo e la \emph{repository} da cui è stata scatenata la richiesta & UC5, UC6 \\
 \hline
 RFO-3  & Esposizione di metriche operative per i moduli centrali del \emph{framework} (autenticazione, componenti \emph{Angular} come griglie e \emph{form}, prestazioni hardware, accesso al database) & UC5, UC6 \\
 \hline
@@ -74,7 +74,7 @@ RVO-4 & I test end-to-end del frontend devono utilizzare Playwright come tecnolo
 \hline
 RVO-5 & Lo stack di osservabilità deve utilizzare OpenTelemetry come protocollo di raccolta dei segnali & Stagista \\
 \hline
-RVO-6 & La piattaforma di visualizzazione deve essere Grafana con stack LGTM & Stagista \\
+RVO-6 & La piattaforma di visualizzazione deve essere Grafana con stack \emph{LGTM} & Stagista \\
 \hline
 RVO-7 & Le impostazioni devono essere modificabili per ambiente (sviluppo, \emph{staging}, produzione) tramite \emph{appsettings} & Aziendale \\
 \hline
@@ -99,13 +99,13 @@ triangolo vuoto per la relazione di implementazione di interfaccia.
   \\Sul \texttt{TracerProvider} viene installato
   il \texttt{SiaParentBasedSampler} (con \texttt{SamplingRatio} globale e
   override per-source via \texttt{SamplingRatios}), seguito dal
-  \texttt{BaggageActivityProcessor} che copia i valori di \texttt{Baggage} con
+  \texttt{BaggageActivityProcessor} che copia i valori di \gls{baggageg} con
   prefisso \texttt{"enduser."} come tag su ogni \emph{span} figlia; le route
   rumorose (es. \texttt{api/base-hub}) sono soppresse tramite
   \texttt{options.Filter} sull'instrumentation ASP.NET Core e tramite il
   middleware \texttt{SuppressOptionsActivityMiddleware}.
   \\Il \texttt{LoggerProvider} corrisponde al
-  \emph{sink} OTLP di Serilog, con \texttt{LogsMinimumLevel} configurabile e
+  \emph{sink} \gls{otlp} di Serilog, con \texttt{LogsMinimumLevel} configurabile e
   \texttt{IncludedData} comprendente \texttt{TraceId}, \texttt{SpanId} e
   \emph{message template} (testo del log). 
   \\Sul \texttt{MeterProvider} \`e attivo l'\emph{exemplar filter}
@@ -162,11 +162,11 @@ concreta.
 La figura~\ref{fig:diag-enduser} mostra le collaborazioni che realizzano
 l'arricchimento automatico di ogni \texttt{Activity} con i \emph{tag}
 \texttt{enduser.id} e \texttt{enduser.name}. Il
-\texttt{EnrichActivityWithUserMiddleware} legge le \emph{claim} da
-\texttt{HttpContext.User} e pubblica le voci nel \texttt{Baggage}; il
+\texttt{EnrichActivityWithUserMiddleware} legge gli attributi da
+\texttt{HttpContext.User} e pubblica le voci nel \gls{baggageg}; il
 \texttt{BaggageActivityProcessor}, registrato come \texttt{ActivityProcessor}
-nel \texttt{TracerProvider}, copia ogni \emph{entry} di \emph{baggage} con
-prefisso \texttt{enduser.} come \emph{tag} sull'\texttt{Activity} nel proprio
+nel \texttt{TracerProvider}, copia ogni \emph{entry} di \gls{baggageg} con
+prefisso "\texttt{enduser.}" come \emph{tag} sull'\texttt{Activity} nel proprio
 \emph{hook} \texttt{OnStart}. L'effetto è che qualsiasi \texttt{Activity}
 creata durante la richiesta, sia dalle classi
 \texttt{Sia\{Modulo\}Diagnostics}, sia dalle instrumentazioni automatiche di
@@ -192,7 +192,7 @@ con minime variazioni di \emph{naming}.
 \label{app:listing-adapter}
 
 Il listato~\ref{lst:adapter-diagnostics-app} mostra la classe statica
-\texttt{Sia\{Modulo\}Diagnostics} per il modulo CRUD, con il
+\texttt{Sia\{Modulo\}Diagnostics} per il modulo \gls{crud}, con il
 \texttt{ControllerDiagnosticsAdapter} annidato che riconcilia il
 \texttt{Counter} statico del modulo con il contratto comune
 \texttt{IControllerDiagnostics}. Il listato~\ref{lst:recordmetricerror-call-app}

@@ -6,8 +6,8 @@
 \section{Contesto e motivazione}
 
 La pianificazione dello stage prevedeva una durata di 300 ore distribuite su 8 settimane,
-a fronte di un ambito ampio: apprendimento di tecnologie nuove (OpenTelemetry SDK .NET,
-stack \emph{Grafana} LGTM, PromQL/TraceQL/LogQL, Serilog OTLP, \emph{Playwright}), realizzazione
+a fronte di un ambito ampio: apprendimento di tecnologie nuove (OpenTelemetry \gls{sdk} .NET,
+stack \emph{Grafana} LGTM, PromQL/TraceQL/LogQL, Serilog \gls{otlp}, \emph{Playwright}), realizzazione
 di prototipi, instrumentazione di più moduli del framework \emph{Sia.Web} e produzione della
 relativa documentazione. Per colmare il gap di conoscenza in merito alle tecnologie e lo studio
 della soluzione \emph{Sia.Web}, si è fatto ricorso all’utilizzo di agenti di intelligenza artificiale. 
@@ -46,12 +46,12 @@ instrumentazione su moduli diversi introducesse incoerenze (naming, cardinalità
 di \emph{resource}), sono state definite \emph{Claude skill} dedicate:
 
 \begin{itemize}
-    \item \texttt{sia-telemetry-setup}: configurazione del pipeline OTel, \emph{sampler},
+    \item \texttt{sia-telemetry-setup}: configurazione del pipeline OTel, \gls{samplerg},
         \emph{exporter}, \emph{appsettings};
     \item \texttt{sia-telemetry-traces}: \emph{span}, \emph{tag}, \emph{helper} \texttt{TrackQuery};
     \item \texttt{sia-telemetry-metrics}: metriche, \emph{naming}, cardinalità, pattern
         \texttt{RecordMetricError};
-    \item \texttt{sia-telemetry-logs}: Serilog OTLP, correlazione \emph{log}-\emph{trace};
+    \item \texttt{sia-telemetry-logs}: Serilog \gls{otlp}, correlazione \emph{log}-\emph{trace};
     \item \texttt{sia-telemetry-grafana}: \emph{dashboard} Grafana, query PromQL/TraceQL/LogQL,
         strumenti \gls{mcp}.
 \end{itemize}
@@ -70,7 +70,7 @@ così che ogni nuovo test risulti coerente con quelli già esistenti.\\
 Sul \emph{backend} l'agente copre le categorie di test unitari, \emph{smoke},
 \emph{lifecycle} e \emph{summary}, ed è affiancato da due \emph{skill} specifiche per la creazione di 
 nuovi \emph{lifecycle test}, essendo quest'ultimo il pattern più ripetitivo della \emph{suite}.
-Una \emph{skill} è orientata al modulo CRUD, nella quale viene spiegato al \gls{llm} a cosa serve quel test, vincoli specifici 
+Una \emph{skill} è orientata al modulo \gls{crud}, nella quale viene spiegato al \gls{llm} a cosa serve quel test, vincoli specifici 
 dei test e dove raccogliere i dati necessari per la scrittura dei test; un'altra è specifica del modulo Grid e
 ricopre le stesse funzioni della \emph{skill} precedente ma relative ai componenti griglia. 
 Sul \emph{frontend} l'agente è invece focalizzato sui test di usabilità
@@ -154,13 +154,13 @@ contestuali.
 
 \subsection{Il problema che MCP risolve}
 
-Un modello linguistico di grandi dimensioni (\emph{Large Language Model}, LLM) è, nella
+Un modello linguistico di grandi dimensioni \gls{llm} è, nella
 sua forma base, un sistema chiuso: conosce ciò che è stato scritto fino alla sua data di
 addestramento e risponde in linguaggio naturale, ma non può aprire un file, interrogare un
 database, chiamare un'\gls{api} o agire nel mondo esterno. Questa limitazione non dipende
 dall'intelligenza del modello, dipende dall'assenza di un canale strutturato attraverso
 cui il modello possa ricevere dati aggiornati e restituire azioni concrete.\\
-Prima dell'avvento di \gls{mcp}, ogni integrazione tra un LLM e un sistema esterno richiedeva
+Prima dell'avvento di \gls{mcp}, ogni integrazione tra un \gls{llm} e un sistema esterno richiedeva
 un connettore ad hoc: codice scritto una volta per quella specifica combinazione di
 modello e strumento, da riscrivere ogni volta che cambiava uno dei due. Con la
 proliferazione dei modelli e degli strumenti, il costo di manutenzione di questa matrice
@@ -180,14 +180,14 @@ ecosistema.
 ruoli coinvolti sono tre.
 
 \begin{description}
-  \item[Host:] L'applicazione che ospita l'LLM e avvia le connessioni \gls{mcp}. Può essere
+  \item[Host:] L'applicazione che ospita l'\gls{llm} e avvia le connessioni \gls{mcp}. Può essere
     un'interfaccia conversazionale come Claude Desktop, un IDE con assistente integrato,
     o un servizio backend autonomo. L'host è responsabile del consenso dell'utente e
     del controllo di accesso: decide quali server \gls{mcp} connettere e con quali permessi.
   \item[Client:] Il componente interno all'host che gestisce il ciclo di vita della
     connessione verso uno specifico server \gls{mcp}: negozia le capacità, invia richieste,
     riceve risposte.
-  \item[Server \gls{mcp}:] Il servizio che espone dati e funzionalità all'LLM. Può girare
+  \item[Server \gls{mcp}:] Il servizio che espone dati e funzionalità all'\gls{llm}. Può girare
     in locale (processo figlio, comunicazione via \emph{stdio}) o in remoto (connessione
     via HTTP con Server-Sent Events). Un server \gls{mcp} può rappresentare un'\gls{api} esterna,
     un database, un file system, uno strumento di automazione, o qualsiasi sistema
@@ -224,7 +224,7 @@ può offrire al server.
 \subsubsection{Primitive lato client}
 
 \begin{description}
-  \item[Sampling] Consente al server di avviare interazioni ricorsive con l'LLM,
+  \item[Sampling] Consente al server di avviare interazioni ricorsive con l'\gls{llm},
     delegando al client (e quindi all'utente) il controllo su quali prompt vengono
     effettivamente inviati al modello e cosa il server può vedere delle risposte.
   \item[Roots] Permette al server di interrogare il client sulle radici del filesystem
@@ -240,12 +240,12 @@ può offrire al server.
 % =============================================================================
 
 La portata dell'innovazione si può cogliere quando si analizza il protocollo come, non soltanto un modo
-più comodo per collegare gli LLM a qualche strumento locale, bensì a \gls{mcp} come 
+più comodo per collegare gli \gls{llm} a qualche strumento locale, bensì a \gls{mcp} come 
 l'\textbf{infrastruttura per i microservizi agentici}.\\
 Nel modello tradizionale, un microservizio espone una REST \gls{api} che altri servizi chiamano
 in modo deterministico: il chiamante sa esattamente quale endpoint invocare, con quali
 parametri, e interpreta la risposta secondo uno schema fisso. In un'architettura agentica,
-il chiamante è un LLM che ragiona sul problema, decide autonomamente quali tool invocare e
+il chiamante è un \gls{llm} che ragiona sul problema, decide autonomamente quali tool invocare e
 in quale ordine, e compone i risultati in modo flessibile. \gls{mcp} è il contratto che rende
 possibile questa composizione senza che ogni strumento debba essere scritto appositamente
 per ogni modello.\\
@@ -279,13 +279,13 @@ in grado di limitare l’accesso ai dati sensibili e di ridurre la superficie di
 
 \subsection{Applicazione nel progetto}
 
-Nel contesto del progetto \emph{Sia.Core}, MCP è stato impiegato per collegare l'agente
+Nel contesto del progetto \emph{Sia.Core}, \gls{mcp} è stato impiegato per collegare l'agente
 di sviluppo direttamente a Grafana, a \emph{Playwright} e a \emph{mssql}, eliminando il
 passaggio manuale di schemi, nomi di metriche e strutture dati tra l'utente e l'agente.\\
 L'impatto più evidente si è registrato nella generazione delle dashboard: prima
 dell'integrazione, l'agente produceva widget plausibili ma spesso errati, metriche
 inesistenti, attributi di filtraggio non presenti nelle serie temporali, tipi di grafico
-inadatti alla natura del dato. Connettere l'agente a Grafana tramite MCP ha ridotto
+inadatti alla natura del dato. Connettere l'agente a Grafana tramite \gls{mcp} ha ridotto
 sensibilmente questi errori, perché il modello poteva interrogare direttamente l'istanza
 e ricevere come contesto i nomi reali delle metriche, le label disponibili e la struttura
 delle trace esistenti in Tempo.\\
@@ -299,7 +299,7 @@ di template definire a livello di dashboard per abilitare il filtraggio per
 organizzare la griglia dei widget per mantenere leggibilità e coerenza visiva tra moduli
 diversi.\\
 Un beneficio analogo si è ottenuto con l'integrazione di \emph{Playwright} e
-\emph{mssql}: in entrambi i casi, l'accesso diretto agli strumenti tramite MCP ha
+\emph{mssql}: in entrambi i casi, l'accesso diretto agli strumenti tramite \gls{mcp} ha
 permesso all'agente di operare su dati reali anziché su assunzioni, riducendo il numero
 di iterazioni necessarie per ottenere un risultato corretto.
 
