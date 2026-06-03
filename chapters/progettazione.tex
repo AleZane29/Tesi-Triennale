@@ -165,11 +165,11 @@ meccanismo è descritto nel dettaglio nella sezione~\ref{sec:modello-enduser}.
 \subsubsection{Correlazione metrica-trace tramite \emph{exemplars}}
 \label{sec:exemplars-design}
 
-Per soddisfare il requisito RFN-11, le metriche di tipo \emph{Histogram} espongono
-\emph{exemplars}, ovvero campioni che portano con sé il \texttt{TraceId} della richiesta che li ha
-generati. Questo abilita la navigazione dal pannello di una metrica aggregata alla trace
-specifica che ha prodotto il campione anomalo, risolvendo la domanda ``quale richiesta ha
-causato questo picco?''. Il meccanismo è descritto nel dettaglio nella
+Per soddisfare il requisito RFN-11, le metriche di tipo \emph{Histogram} espongono degli
+\emph{exemplars}: campioni rappresentativi a cui è associato il \texttt{TraceId} della richiesta che li ha
+generati. Questo collegamento abilita la navigazione dal pannello di una metrica aggregata alla trace
+specifica che ha prodotto il campione anomalo, rendendo immediata la correlazione tra l'anomalia osservata 
+e la richiesta che ne è all'origine. Il meccanismo è descritto nel dettaglio nella
 sezione~\ref{sec:modello-exemplars}.
 
 \subsubsection{Pattern architetturali applicati}
