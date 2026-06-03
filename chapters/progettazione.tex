@@ -76,7 +76,7 @@ Nel progetto, il Collector è configurato per instradare i diversi tipi di dati 
 \begin{itemize}
 \item le \textbf{trace} vengono esportate verso Tempo, permettendo l’analisi dei flussi di esecuzione e delle dipendenze tra servizi;
 \item le \textbf{metriche} vengono inviate a Prometheus, rendendo possibile il monitoraggio delle prestazioni e la creazione di dashboard;
-\item i \textbf{log} vengono esportati verso Loki, consentendo la consultazione centralizzata e la correlazione con trace e metriche .
+\item i \textbf{log} vengono esportati verso Loki, consentendo la consultazione centralizzata e la correlazione con trace e metriche.
 \end{itemize}
 Grafana rappresenta il punto di accesso unificato a queste informazioni, offrendo strumenti per la visualizzazione e l’analisi dei dati di telemetria. In particolare, permette di costruire dashboard personalizzate basate su metriche, esplorare i log e navigare le trace, abilitando una visione completa e correlata del comportamento del sistema.
 Questa architettura consente di separare la raccolta dei dati dalla loro visualizzazione, migliorando la scalabilità e la flessibilità del sistema di monitoraggio, oltre a facilitare eventuali estensioni future.
