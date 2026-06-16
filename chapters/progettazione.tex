@@ -371,7 +371,6 @@ strumenti di osservabilità del modulo: istanziano al \emph{type loading} il \te
 \texttt{ActivitySource}, e i \texttt{Counter}/\texttt{Histogram} esposti come membri statici
 pubblici. Il codice applicativo non istanzia mai direttamente uno strumento \gls{otel}, ma accede
 sempre all'istanza fornita dalla classe \texttt{Diagnostics} del proprio modulo.\\
-\pagebreak
 \\\textbf{Costruzione del \texttt{ResourceBuilder}}\\
 Gli attributi di \emph{resource}
 (\texttt{service.name}, \texttt{sia.product\_type}, \texttt{sia.customer\_name}) vengono letti
