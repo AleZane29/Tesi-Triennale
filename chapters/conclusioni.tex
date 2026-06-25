@@ -2,9 +2,9 @@
 \label{cap:conclusioni}
 
 \intro{Il presente capitolo riporta le conclusioni del lavoro svolto durante lo
-stage, analizzando i risultati ottenuti e gli obiettivi raggiunti, le conoscenze
-acquisite, i possibili sviluppi futuri degli ambiti applicativi toccati dal
-progetto e dando una valutazione personale dell'esperienza maturata.}\\
+      stage, analizzando i risultati ottenuti e gli obiettivi raggiunti, le conoscenze
+      acquisite, i possibili sviluppi futuri degli ambiti applicativi toccati dal
+      progetto e dando una valutazione personale dell'esperienza maturata.}\\
 
 \section{Obiettivi raggiunti e consuntivo finale}
 
@@ -17,101 +17,87 @@ automatico articolata su \emph{unit test} e \emph{integration test} lato
 Le due linee di lavoro, parallele sul piano tecnologico, si sono dimostrate
 complementari sul piano metodologico: la telemetria ha fornito il \emph{feedback}
 necessario a guidare il miglioramento iterativo dei test, mentre i test hanno
-supportato la validazione continua dell'instrumentazione introdotta.
-
+supportato la validazione continua dell'instrumentazione introdotta.\\
 Trasversalmente alle due linee, il lavoro ha adottato un agente di intelligenza
-artificiale come \emph{pair engineer} strutturato, attraverso la creazione di
+artificiale, attraverso la creazione di
 agenti specializzati, di \emph{skill} procedurali e l'integrazione del
 \gls{mcp} per consentire all'agente di interrogare direttamente \emph{Grafana},
-il database e gli strumenti di test. Questo approccio, descritto in dettaglio nel
-capitolo~\ref{cap:metodologia-ai}, ha trasformato un esito incidentale dello
-stage in un asset metodologico permanente per il \emph{team}.
-
+il database e gli strumenti di test.\\
 Il progetto si è sviluppato sulle 8 settimane pianificate, per un totale di 300
 ore. Il monte ore è stato complessivamente rispettato, con una redistribuzione
-interna: le fasi di studio (settimane 1--3) e di prototipazione (settimana 4)
+interna: le fasi di studio, ricerca e prototipazione
 hanno richiesto un numero di ore inferiore al preventivato grazie all'uso
-dell'agente AI come \emph{pair engineer}, permettendo di liberare tempo per
+degli agenti AI, permettendo di liberare tempo per
 l'approfondimento di funzionalità non inizialmente preventivate, descritte nel
-seguito.
-
+seguito.\\
 In merito al raggiungimento degli obiettivi prefissati nel
 capitolo~\ref{cap:descrizione-stage}, si può confermare la soddisfazione di
 ciascuno. Più nello specifico, sono stati raggiunti correttamente i seguenti
 obiettivi:
 
 \begin{itemize}
-    \item \textbf{O1. Analisi dei requisiti di osservabilità e selezione
-        delle tecnologie}: l'analisi ha portato all'adozione dello stack
-        \gls{otel} + \emph{Grafana LGTM}, motivata dai criteri descritti nel
-        capitolo~\ref{cap:tecnologie-adottate};
-    \item \textbf{O2. Progettazione dell'architettura di telemetria}:
-        l'architettura è stata progettata e centralizzata in
-        \texttt{BaseApplicationBuilder}, in modo che ogni nuovo modulo possa
-        aderirvi semplicemente registrando il proprio \texttt{ActivitySource} e
-        \texttt{Meter}, senza conoscere i dettagli interni del
-        \emph{pipeline};
-    \item \textbf{O3. Definizione di una tassonomia coerente di metriche,
-        \emph{trace} e attributi}: la tassonomia è stata stesa per i moduli
-        centrali del \emph{framework} (autenticazione, componenti
-        \emph{Angular} come griglie e \emph{form}, prestazioni hardware,
-        accesso al database, ecc.), con regole esplicite che evitano l'esplosione
-        della cardinalità lato Prometheus;
-    \item \textbf{O4. Definizione delle strategie di campionamento}: sono
-        state realizzate a due livelli (\gls{samplerg} globale e
-        \emph{processor} per-\emph{source}), con \emph{ratio} configurabili per
-        ambiente tramite \emph{appsettings};
-    \item \textbf{O5. Arricchimento automatico delle \emph{trace} ed
-        \emph{exemplar}}: è stato implementato un \emph{processor} \gls{otel}
-        centralizzato che intercetta ogni \emph{span} radice e ne propaga
-        \texttt{enduser.id} ed \texttt{enduser.name}, e sono stati abilitati
-        gli \emph{exemplar} sulle metriche di tipo \emph{Histogram};
-    \item \textbf{O6. Configurazione di Grafana LGTM e produzione delle
-        dashboard}: lo stack è stato configurato con i relativi \emph{backend}
-        di \emph{storage} (Tempo, Loki, Prometheus) e le dashboard sono state
-        versionate nel \emph{repository} tramite \emph{provisioning}
-        dichiarativo, rendendo navigabile la catena diagnostica dal grafico
-        alla singola richiesta;
-    \item \textbf{O7. Infrastruttura di \emph{testing} backend}: è stata
-        introdotta da zero una suite comprensiva di \emph{unit test} sui
-        \emph{controller}, \emph{integration test} di tipo \emph{smoke},
-        \emph{lifecycle} (CRUD/Grid) e \emph{summary}; la sola messa in funzione
-        della prima \emph{suite} ha portato alla luce alcuni difetti applicativi
-        latenti che si sarebbero manifestati esclusivamente presso un cliente
-        specifico, in produzione;
-    \item \textbf{O8. Test \emph{frontend}}: sono stati prodotti
-        \emph{unit test} con \emph{Vitest} per la logica dei componenti
-        \emph{Angular} e test \emph{end-to-end} con \emph{Playwright} per i
-        flussi utente principali, integrati nel processo di \emph{build};
-    \item \textbf{O9. Agenti AI e \emph{skill} procedurali}: è stata
-        prodotta una suite di \emph{Claude skill} e agenti AI che codificano in forma
-        riutilizzabile le convenzioni del \emph{framework}, garantendo la
-        replicabilità della propagazione di telemetria e test ai diversi
-        moduli.
+      \item \textbf{Analisi dei requisiti di osservabilità e selezione
+                  delle tecnologie}: l'analisi ha portato all'adozione dello stack
+            \gls{otel} + \emph{Grafana LGTM}, motivata dai criteri descritti nel
+            capitolo~\ref{cap:tecnologie-adottate};
+      \item \textbf{Progettazione dell'architettura di telemetria}:
+            l'architettura è stata progettata e centralizzata in
+            \texttt{BaseApplicationBuilder}, in modo che ogni nuovo modulo possa
+            aderirvi semplicemente registrando il proprio \texttt{ActivitySource} e
+            \texttt{Meter}, senza conoscere i dettagli interni del
+            \emph{pipeline};
+      \item \textbf{Definizione di una tassonomia coerente di metriche,
+                  \emph{trace} e attributi}: la tassonomia è stata stesa per i moduli
+            centrali del \emph{framework} (autenticazione, componenti
+            \emph{Angular} come griglie e \emph{form}, prestazioni hardware,
+            accesso al database, ecc.), con regole esplicite che evitano l'esplosione
+            della cardinalità lato Prometheus;
+      \item \textbf{Definizione delle strategie di campionamento}: sono
+            state realizzate a due livelli (\gls{samplerg} globale e
+            \emph{processor} per-\emph{source}), con \emph{ratio} configurabili per
+            ambiente tramite \emph{appsettings};
+      \item \textbf{Arricchimento automatico delle \emph{trace} ed
+                  \emph{exemplar}}: è stato implementato un \emph{processor} \gls{otel}
+            centralizzato che intercetta ogni \emph{span} radice e ne propaga
+            \texttt{enduser.id} ed \texttt{enduser.name}, e sono stati abilitati
+            gli \emph{exemplar} sulle metriche di tipo \emph{Histogram};
+      \item \textbf{Configurazione di Grafana LGTM e produzione delle
+                  dashboard}: lo stack è stato configurato con i relativi \emph{backend}
+            di \emph{storage} (Tempo, Loki, Prometheus) e le dashboard sono state
+            versionate nel \emph{repository} tramite \emph{provisioning}
+            dichiarativo, rendendo navigabile la catena diagnostica dal grafico
+            alla singola richiesta;
+      \item \textbf{Infrastruttura di \emph{testing} backend}: è stata
+            introdotta da zero una suite comprensiva di \emph{unit test} sui
+            \emph{controller}, \emph{integration test} di tipo \emph{smoke},
+            \emph{lifecycle} (CRUD/Grid) e \emph{summary}; la sola messa in funzione
+            della prima \emph{suite} ha portato alla luce alcuni difetti applicativi
+            latenti che si sarebbero manifestati esclusivamente presso un cliente
+            specifico, in produzione;
+      \item \textbf{Test \emph{frontend}}: sono stati prodotti
+            \emph{unit test} con \emph{Vitest} per la logica dei componenti
+            \emph{Angular} e test \emph{end-to-end} con \emph{Playwright} per i
+            flussi utente principali, integrati nel processo di \emph{build};
+      \item \textbf{Agenti AI e \emph{skill} procedurali}: è stata
+            prodotta una suite di \emph{Claude skill} e agenti AI che codificano in forma
+            riutilizzabile le convenzioni del \emph{framework}, garantendo la
+            replicabilità della propagazione di telemetria e test ai diversi
+            moduli.
 \end{itemize}
 Oltre a quanto previsto in fase di pianificazione, il tempo liberato grazie
 all'agente AI ha permesso l'approfondimento di funzionalità non
-precedentemente preventivate. L'arricchimento automatico delle \emph{trace}
-con l'identità dell'utente autenticato è stato ottenuto tramite un
-\emph{processor} \gls{otel} centralizzato in \texttt{BaseApplicationBuilder},
-che intercetta ogni \emph{span} radice e ne propaga l'\texttt{enduser.id} senza
-richiedere modifiche al codice dei singoli moduli. A questo si è aggiunta
-l'integrazione degli \emph{exemplar}, che collegano ogni campione di metrica al
-\texttt{TraceId} della richiesta che lo ha generato, completando la catena
-diagnostica metrica~$\rightarrow$~\emph{trace}~$\rightarrow$~utente~$\rightarrow$~\emph{log}.
-Grazie alle \emph{Claude skill} e agli agenti AI sviluppati, è stato possibile
-estendere l'istrumentazione a moduli inizialmente fuori scope,
-\texttt{Sia.Devextreme.Crud}, \texttt{Sia.Devextreme.Kanban} e ulteriori moduli,
-propagando in modo coerente il pattern \texttt{SiaXxxDiagnostics}.
-Le dashboard Grafana sono state arricchite con pannelli aggiuntivi per la
-diagnosi a grana fine (latenza per \emph{endpoint}, distribuzione degli errori
-per modulo, \emph{top users} per consumo di risorse), versionati nel repository
-tramite \emph{provisioning} dichiarativo. L'insieme delle \emph{skill}
-procedurali prodotte, che codificano le convenzioni del framework per
-telemetria, \emph{controller}, \emph{service}, \emph{repository}, \gls{crud}
-e \emph{grid} ha trasformato un esito incidentale dello stage in un asset
-metodologico permanente per il team.
-\\
+precedentemente preventivate:
+\begin{itemize}
+      \item  L'arricchimento automatico delle \emph{trace}
+            con l'identità dell'utente;
+      \item  L'integrazione degli \emph{exemplar}, che collegano ogni campione di metrica al
+            \texttt{TraceId} della richiesta che lo ha generato;
+      \item  Grazie alle \emph{skill} e agli agenti AI sviluppati, è stato possibile
+            estendere l'istrumentazione a moduli inizialmente non preventivati;
+      \item  Le dashboard Grafana sono state arricchite con pannelli aggiuntivi per la
+            diagnosi a grana fine (latenza per \emph{endpoint}, distribuzione degli errori
+            per modulo, \emph{top users} per consumo di risorse);
+\end{itemize}
 I requisiti funzionali, qualitativi e di vincolo descritti nel
 capitolo~\ref{cap:analisi-requisiti} sono stati soddisfatti nella loro
 totalità, compresi quelli desiderabili e quelli aggiuntivi proposti in corso
@@ -128,6 +114,91 @@ originate dal \emph{frontend} che ripetevano la stessa richiesta a ogni
 cambio di vista. L'identificazione di questi casi, prima invisibili nei canali
 di monitoraggio esistenti, ha consentito di migliorare le performance
 prima che producessero impatto sugli utenti finali.
+
+\subsection{Integrazione della telemetria in produzione}
+
+Per verificare che il sistema di osservabilità fosse in grado non solo di
+raccogliere segnali ma di guidare una diagnosi reale, è stata condotta
+un'analisi su sette giorni di un installazione reale del \gls{crmg} aziendale.\\
+Il sintomo più evidente emerso dall'aggregazione delle trace per \emph{route} HTTP
+è stata la presenza di tempi di risposta nell'ordine delle decine di secondi su un
+sottoinsieme ristretto ma frequentato di \emph{endpoint}. La Tabella~\ref{tab:top-endpoint-lenti}
+riporta i casi più significativi.
+\begin{table}[h]
+      \centering
+      \caption{Endpoint HTTP più lenti osservati in 7 giorni (durata $>2$\,s)}
+      \label{tab:top-endpoint-lenti}
+      \begin{tabular}{|l|r|r|r|}
+            \hline
+            \textbf{Endpoint}                     & \textbf{Occorrenze} & \textbf{Massimo} & \textbf{p95} \\
+            \hline
+            \texttt{GET api/Layout/layout}        & 535                 & 47.7\,s          & 40.6\,s      \\
+            \hline
+            \texttt{POST api/grid-core/page}      & 101                 & 77.4\,s          & 68.6\,s      \\
+            \hline
+            \texttt{POST api/calendar/activities} & 39                  & 150.3\,s         & 148.7\,s     \\
+            \hline
+            \texttt{GET api/WidgetData/fullkvp}   & 120                 & 68.3\,s          & 38.5\,s      \\
+            \hline
+      \end{tabular}
+\end{table}\\
+Il caso più frequente, \texttt{GET api/Layout/layout}, invocato 535 volte con
+tempi superiori a 2 secondi nell'arco di una settimana, è anche il più
+rappresentativo della categoria di problemi riscontrati: un endpoint
+apparentemente semplice (il recupero della configurazione di un \emph{layout}
+tramite chiave primaria) che si comporta come un'operazione pesante.
+
+\subsubsection{Analisi di alcuni problemi emersi e relative cause}
+
+La forza dell'architettura di osservabilità descritta nei capitoli precedenti,
+in particolare la possibilità di scendere dalla trace aggregata fino al singolo
+span SQL, ha permesso di isolare la causa di due dei problemi più impattanti.\\
+Esaminando la trace di una singola chiamata a \texttt{api/Layout/layout} durata
+47.6 secondi, l'unico span figlio di tipo SQL osservato è una query
+\texttt{SELECT * FROM [component].Layouts WHERE id = @Id}, della durata di 36.8
+secondi. Si tratta di una lettura per chiave primaria su una singola riga: in
+condizioni normali, un'operazione di questo tipo non dovrebbe richiedere più di
+qualche decina di millisecondi.\\
+La telemetria non elimina i problemi, ma
+restringe lo spazio delle ipotesi. Senza la trace, il sintomo osservabile
+sarebbe stato solo ``l'apertura della pagina è lenta''; con la trace, il
+problema è stato circoscritto a una query specifica su una tabella specifica,
+lasciando alla fase di analisi SQL, il compito di stabilire la causa.
+A seguito dell'analisi, è stato notato come la causa più plausibile fosse uno
+\emph{spike} di richieste generate dalla mancanza di salvataggio in cache delle traduzioni
+già recuperate. Ciò provocava un accodamento di richieste superflue ad ogni caricamento di
+risorse testuali con traduzione allegata.
+Questa inefficienza portava ad un esaurimento del \emph{pool} di connessioni.\\
+Dopo l'intervento dedicato al risolvere il seguente problema, si è notato un
+incremento nelle prestazioni di caricamento delle varie pagine.\\
+Il secondo caso riguarda l'endpoint \texttt{POST api/calendar/activities},
+osservato con una durata massima di 150 secondi. Come nella maggioranza delle
+chiamate lente ai vari endpoint anche qui la trace ha mostrato quasi tutta la durata della
+richiesta concentrata in un singolo span SQL, in questo caso però relativo all'esecuzione di una
+\emph{stored procedure} (139.6 secondi su 148.7 totali).\\
+La latenza così elevata è sicuramente influenzata dalla \emph{pool starvation} descritta
+precedentemente, ma la causa principale, in questo caso, è la composizione della
+\emph{stored procedure} che presenta molte join tra tabelle, causando un rallentamento
+anche a livello di calcolo computazionale.
+
+\subsubsection{Impatto atteso dagli interventi correttivi}
+
+Alcuni interventi correttivi sono già stati applicati e validati durante lo
+stage: tra questi, la risoluzione delle chiamate ripetitive per la traduzione
+di testo, che la telemetria aveva resa visibile come fonte di overhead non
+necessarioLe correzioni apportate al codice hanno eliminato il
+collo di bottiglia, risolvendo la lentezza nel caricamento delle pagine con
+elevato contenuto testuale. Per la maggior parte dei problemi individuati nel caso di studio,
+tuttavia, non è stato possibile riportare un confronto prima/dopo
+misurato: lo stage si è concluso prima della pianificata scalatura verticale
+del server utilizzato dall'azienda per l'installazione analizzata, intervento
+necessario per validare in modo affidabile l'effetto delle correzioni proposte.\\
+Va inoltre precisato che non è mai stato un obiettivo dello stage apportare
+direttamente modifiche al codice applicativo per migliorarne le prestazioni,
+per quanto l'occasione si sarebbe rivelata un'ottima fonte di riflessioni e
+conferme. Il valore di questa analisi sta piuttosto nell'aver dimostrato che
+l'infrastruttura di osservabilità progettata nei capitoli precedenti è in
+grado di guidare una diagnosi reale fino al livello della singola query SQL.
 
 \section{Conoscenze acquisite e analisi del lavoro svolto}
 
@@ -153,50 +224,50 @@ Di massima, è possibile descrivere le principali conoscenze maturate
 nell'ambito progettuale:
 
 \begin{itemize}
-    \item \textbf{standard \gls{otel} e modello dei segnali}: la comprensione
-        del modello a \emph{trace}, metriche, \emph{log} ed \emph{exemplar},
-        delle convenzioni semantiche e del
-        protocollo di trasporto \gls{otlp}, ha permesso di progettare una telemetria
-        coerente con un linguaggio comune adottato dall'intera comunità \gls{otel},
-        evitando soluzioni proprietarie e garantendo la portabilità dei segnali
-        verso qualsiasi backend \gls{otel}-compatibile;
-    \item \textbf{stack \emph{Grafana LGTM} e linguaggi di query}: lo studio di
-        \emph{Loki}, \emph{Tempo} e \emph{Prometheus}, con i rispettivi
-        linguaggi PromQL, TraceQL e LogQL, ha permesso di comprendere i
-        \emph{trade-off} di ciascun \emph{backend} (cardinalità in Prometheus,
-        \emph{retention} dei segnali, indicizzazione in Loki) e di costruire
-        dashboard navigabili che sfruttano la correlazione \emph{cross}-segnale,
-        elemento centrale di una vera osservabilità;
-    \item \textbf{libreria \emph{Serilog} e \emph{sink} OTLP}: l'integrazione
-        di \emph{Serilog} con esportazione \gls{otlp} e la propagazione automatica di
-        \texttt{TraceId} e \texttt{SpanId} hanno consentito di ottenere una
-        correlazione \emph{log}-\emph{trace} senza modifiche nel codice
-        applicativo, un risultato che dimostra come scelte architetturali
-        centralizzate possano avere un impatto trasversale sull'intero
-        \emph{framework};
-    \item \textbf{infrastruttura di \emph{testing}}: lo studio di \emph{xUnit},
-        \emph{NSubstitute}, \emph{FluentAssertions} per il \emph{backend} e di
-        \emph{Vitest} e \emph{Playwright} per il \emph{frontend}, unito alla
-        progettazione di \gls{fixtureg} riutilizzabili
-        (\texttt{SiaWebApplicationFactory}) e di scenari \emph{lifecycle}
-        \emph{data-driven} per \gls{crud} e Grid, ha permesso di acquisire
-        competenze concrete su un'attività, la scrittura di test su un
-        \emph{framework} esistente, spesso solo accennata nei corsi
-        universitari;
-    \item \textbf{applicazione di \emph{design pattern} a un contesto reale}:
-        l'uso del pattern \texttt{SiaXxxDiagnostics} per ogni modulo, della
-        \emph{factory} per la registrazione delle sorgenti nel \emph{pipeline}
-        e dell'\emph{adapter} per integrare \emph{Serilog} con \gls{otel}, ha
-        permesso di osservare in concreto come pattern studiati in modo
-        astratto durante il corso di Ingegneria del Software trovino una loro
-        naturale applicazione in un \emph{framework} condiviso;
-    \item \textbf{metodologie di lavoro AI-assistite}: la creazione di agenti
-        specializzati, il \emph{prompt} e \emph{skill engineering}, l'adozione
-        del \gls{mcp} per ridurre le ``allucinazioni'' lavorando su dati reali,
-        sono competenze del tutto nuove rispetto al percorso accademico ed
-        estremamente attuali in un mercato del lavoro che integra sempre più
-        intensamente strumenti di intelligenza artificiale nei processi di
-        sviluppo.
+      \item \textbf{standard \gls{otel} e modello dei segnali}: la comprensione
+            del modello a \emph{trace}, metriche, \emph{log} ed \emph{exemplar},
+            delle convenzioni semantiche e del
+            protocollo di trasporto \gls{otlp}, ha permesso di progettare una telemetria
+            coerente con un linguaggio comune adottato dall'intera comunità \gls{otel},
+            evitando soluzioni proprietarie e garantendo la portabilità dei segnali
+            verso qualsiasi backend \gls{otel}-compatibile;
+      \item \textbf{stack \emph{Grafana LGTM} e linguaggi di query}: lo studio di
+            \emph{Loki}, \emph{Tempo} e \emph{Prometheus}, con i rispettivi
+            linguaggi PromQL, TraceQL e LogQL, ha permesso di comprendere i
+            \emph{trade-off} di ciascun \emph{backend} (cardinalità in Prometheus,
+            \emph{retention} dei segnali, indicizzazione in Loki) e di costruire
+            dashboard navigabili che sfruttano la correlazione \emph{cross}-segnale,
+            elemento centrale di una vera osservabilità;
+      \item \textbf{libreria \emph{Serilog} e \emph{sink} OTLP}: l'integrazione
+            di \emph{Serilog} con esportazione \gls{otlp} e la propagazione automatica di
+            \texttt{TraceId} e \texttt{SpanId} hanno consentito di ottenere una
+            correlazione \emph{log}-\emph{trace} senza modifiche nel codice
+            applicativo, un risultato che dimostra come scelte architetturali
+            centralizzate possano avere un impatto trasversale sull'intero
+            \emph{framework};
+      \item \textbf{infrastruttura di \emph{testing}}: lo studio di \emph{xUnit},
+            \emph{NSubstitute}, \emph{FluentAssertions} per il \emph{backend} e di
+            \emph{Vitest} e \emph{Playwright} per il \emph{frontend}, unito alla
+            progettazione di \gls{fixtureg} riutilizzabili
+            (\texttt{SiaWebApplicationFactory}) e di scenari \emph{lifecycle}
+            \emph{data-driven} per \gls{crud} e Grid, ha permesso di acquisire
+            competenze concrete su un'attività, la scrittura di test su un
+            \emph{framework} esistente, spesso solo accennata nei corsi
+            universitari;
+      \item \textbf{applicazione di \emph{design pattern} a un contesto reale}:
+            l'uso del pattern \texttt{SiaXxxDiagnostics} per ogni modulo, della
+            \emph{factory} per la registrazione delle sorgenti nel \emph{pipeline}
+            e dell'\emph{adapter} per integrare \emph{Serilog} con \gls{otel}, ha
+            permesso di osservare in concreto come pattern studiati in modo
+            astratto durante il corso di Ingegneria del Software trovino una loro
+            naturale applicazione in un \emph{framework} condiviso;
+      \item \textbf{metodologie di lavoro AI-assistite}: la creazione di agenti
+            specializzati, il \emph{prompt} e \emph{skill engineering}, l'adozione
+            del \gls{mcp} per ridurre le ``allucinazioni'' lavorando su dati reali,
+            sono competenze del tutto nuove rispetto al percorso accademico ed
+            estremamente attuali in un mercato del lavoro che integra sempre più
+            intensamente strumenti di intelligenza artificiale nei processi di
+            sviluppo.
 \end{itemize}
 
 \section{Scenari di applicabilità e sviluppi futuri}
@@ -218,53 +289,53 @@ possibilità di archiviazione a lungo termine in \emph{storage} a basso costo. I
 tempi concreti di \emph{retention} potranno essere configurati in funzione delle
 esigenze di indagine e del costo di \emph{storage} accettabile per il singolo
 cliente.\\
-L'analisi dei dati telemetrici raccolti consentirà di individuare eventuali 
-nuovi colli di bottiglia e anomalie prestazionali emerse durante l'utilizzo 
-del sistema in ambienti reali. In presenza di rallentamenti o comportamenti 
-anomali, sarà quindi possibile \textbf{estendere progressivamente il livello di 
-instrumentazione}, introducendo ulteriori segnali di telemetria e aumentando 
+L'analisi dei dati telemetrici raccolti consentirà di individuare eventuali
+nuovi colli di bottiglia e anomalie prestazionali emerse durante l'utilizzo
+del sistema in ambienti reali. In presenza di rallentamenti o comportamenti
+anomali, sarà quindi possibile \textbf{estendere progressivamente il livello di
+      instrumentazione}, introducendo ulteriori segnali di telemetria e aumentando
 il grado di dettaglio del tracciamento nelle componenti maggiormente critiche.\\
-Questo approccio incrementale permetterà di approfondire specifiche porzioni della 
-logica applicativa responsabili delle degradazioni prestazionali, facilitando 
-l'identificazione delle cause alla radice e supportando interventi di ottimizzazione 
-più mirati. Inoltre, la disponibilità di metriche, \emph{trace} e log correlati 
-consentirà di analizzare il comportamento del sistema da prospettive differenti, 
-migliorando la capacità diagnostica e riducendo i tempi necessari all'individuazione 
+Questo approccio incrementale permetterà di approfondire specifiche porzioni della
+logica applicativa responsabili delle degradazioni prestazionali, facilitando
+l'identificazione delle cause alla radice e supportando interventi di ottimizzazione
+più mirati. Inoltre, la disponibilità di metriche, \emph{trace} e log correlati
+consentirà di analizzare il comportamento del sistema da prospettive differenti,
+migliorando la capacità diagnostica e riducendo i tempi necessari all'individuazione
 dei problemi.\\
-Un ulteriore sviluppo dell'infrastruttura di telemetria riguarda la definizione 
-di soglie operative (\emph{threshold}) sui principali indicatori di prestazione, 
+Un ulteriore sviluppo dell'infrastruttura di telemetria riguarda la definizione
+di soglie operative (\emph{threshold}) sui principali indicatori di prestazione,
 con l'obiettivo di \textbf{introdurre un sistema di \emph{alerting} automatico}.\\
-Attraverso strumenti come \emph{Grafana Alerting} e le metriche raccolte tramite 
-\emph{OpenTelemetry}, sarebbe possibile configurare notifiche automatiche verso i 
-team di sviluppo e manutenzione in presenza di anomalie, quali picchi di latenza, 
-aumento del tasso di errori o degradazione delle prestazioni di specifici moduli 
+Attraverso strumenti come \emph{Grafana Alerting} e le metriche raccolte tramite
+\emph{OpenTelemetry}, sarebbe possibile configurare notifiche automatiche verso i
+team di sviluppo e manutenzione in presenza di anomalie, quali picchi di latenza,
+aumento del tasso di errori o degradazione delle prestazioni di specifici moduli
 applicativi.\\
-Un sistema di questo tipo consentirebbe di adottare un approccio maggiormente 
-proattivo al monitoraggio, riducendo i tempi di individuazione dei problemi e 
-permettendo interventi tempestivi prima che i rallentamenti abbiano un impatto 
-significativo sugli utenti finali. Inoltre, la possibilità di definire soglie 
-differenti in base al modulo o al contesto di utilizzo renderebbe il monitoraggio 
+Un sistema di questo tipo consentirebbe di adottare un approccio maggiormente
+proattivo al monitoraggio, riducendo i tempi di individuazione dei problemi e
+permettendo interventi tempestivi prima che i rallentamenti abbiano un impatto
+significativo sugli utenti finali. Inoltre, la possibilità di definire soglie
+differenti in base al modulo o al contesto di utilizzo renderebbe il monitoraggio
 più flessibile e adattabile ai diversi scenari applicativi.\\
-Sul piano della metodologia di sviluppo AI-assistita adottata durante lo stage, 
-uno degli sviluppi futuri più promettenti riguarda l’evoluzione dell’agente dedicato 
+Sul piano della metodologia di sviluppo AI-assistita adottata durante lo stage,
+uno degli sviluppi futuri più promettenti riguarda l’evoluzione dell’agente dedicato
 alla telemetria.\\
-L’obiettivo è estenderne le capacità oltre la semplice raccolta o propagazione dei 
-segnali osservabili, introducendo funzionalità di \textbf{analisi automatica, interpretazione 
-dei dati e generazione di report} sintetici destinati ai team di sviluppo.\\
-In prospettiva, l’agente potrebbe essere istruito a correlare metriche, \emph{trace} 
+L’obiettivo è estenderne le capacità oltre la semplice raccolta o propagazione dei
+segnali osservabili, introducendo funzionalità di \textbf{analisi automatica, interpretazione
+      dei dati e generazione di report} sintetici destinati ai team di sviluppo.\\
+In prospettiva, l’agente potrebbe essere istruito a correlare metriche, \emph{trace}
 e \emph{log} provenienti dai diversi moduli del framework, individuando automaticamente
-anomalie, regressioni prestazionali o pattern ricorrenti di errore. A partire da tali 
-informazioni, sarebbe possibile produrre report riassuntivi leggibili anche senza 
+anomalie, regressioni prestazionali o pattern ricorrenti di errore. A partire da tali
+informazioni, sarebbe possibile produrre report riassuntivi leggibili anche senza
 una conoscenza approfondita degli strumenti di osservabilità.\\
-Un approccio di questo tipo consentirebbe ai developer di ottenere una panoramica 
-immediata dello stato del framework, riducendo la necessità di interrogare manualmente 
+Un approccio di questo tipo consentirebbe ai developer di ottenere una panoramica
+immediata dello stato del framework, riducendo la necessità di interrogare manualmente
 dashboard, query PromQL o sistemi di tracing.\\
-L’agente assumerebbe quindi un ruolo più vicino a quello di un assistente operativo 
-per l’osservabilità, capace non solo di raccogliere dati, ma anche di trasformarli in 
+L’agente assumerebbe quindi un ruolo più vicino a quello di un assistente operativo
+per l’osservabilità, capace non solo di raccogliere dati, ma anche di trasformarli in
 indicazioni utili e direttamente azionabili.\\
-Nel lungo periodo, tale evoluzione potrebbe portare alla realizzazione di sistemi 
-semi-autonomi di analisi, in grado di suggerire automaticamente nuove instrumentazioni, 
-individuare aree del codice che richiedono approfondimenti telemetrici o proporre 
+Nel lungo periodo, tale evoluzione potrebbe portare alla realizzazione di sistemi
+semi-autonomi di analisi, in grado di suggerire automaticamente nuove instrumentazioni,
+individuare aree del codice che richiedono approfondimenti telemetrici o proporre
 interventi di ottimizzazione sulla base dei pattern osservati in produzione.
 
 \section{Valutazione personale}

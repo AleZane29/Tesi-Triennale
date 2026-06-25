@@ -10,15 +10,15 @@ lo stato interno esaminando esclusivamente i dati prodotti in output. Nel contes
 applicazioni web distribuite, questa proprietà è resa possibile dalla produzione
 sistematica di tre categorie di segnali:
 \begin{itemize}
-  \item \textbf{Logs}: rappresentano eventi discreti generati dal sistema durante la sua esecuzione. Contengono informazioni dettagliate su operazioni svolte, errori, stati e messaggi diagnostici, risultando fondamentali per attività di debugging e analisi puntuale di anomalie.
+      \item \textbf{Logs}: rappresentano eventi discreti generati dal sistema durante la sua esecuzione. Contengono informazioni dettagliate su operazioni svolte, errori, stati e messaggi diagnostici, risultando fondamentali per attività di debugging e analisi puntuale di anomalie.
 
-  \item \textbf{Traces}: descrivono il flusso di esecuzione di una richiesta all’interno del sistema, tracciandone il percorso attraverso i vari componenti e servizi. Sono particolarmente utili in architetture distribuite, in quanto permettono di analizzare le dipendenze tra servizi e individuare eventuali colli di bottiglia o punti di errore.
+      \item \textbf{Traces}: descrivono il flusso di esecuzione di una richiesta all’interno del sistema, tracciandone il percorso attraverso i vari componenti e servizi. Sono particolarmente utili in architetture distribuite, in quanto permettono di analizzare le dipendenze tra servizi e individuare eventuali colli di bottiglia o punti di errore.
 
-  \item \textbf{Metriche}: rappresentano misurazioni numeriche aggregate nel tempo, utilizzate per monitorare lo stato e le prestazioni del sistema. Si distinguono in:
-        \begin{itemize}
-          \item \textit{Metriche di performance}: raccolte automaticamente tramite strumenti come OpenTelemetry, includono informazioni quali tempi di risposta, utilizzo delle risorse, throughput e latenza, utili per valutare le prestazioni del sistema.
-          \item \textit{Metriche di business}: definite a livello applicativo, riguardano aspetti funzionali del dominio, come numero di operazioni effettuate, utenti attivi o eventi specifici, e consentono di monitorare l’utilizzo e il valore del sistema dal punto di vista aziendale.
-        \end{itemize}
+      \item \textbf{Metriche}: rappresentano misurazioni numeriche aggregate nel tempo, utilizzate per monitorare lo stato e le prestazioni del sistema. Si distinguono in:
+            \begin{itemize}
+                  \item \textit{Metriche di performance}: raccolte automaticamente tramite strumenti come OpenTelemetry, includono informazioni quali tempi di risposta, utilizzo delle risorse, throughput e latenza, utili per valutare le prestazioni del sistema.
+                  \item \textit{Metriche di business}: definite a livello applicativo, riguardano aspetti funzionali del dominio, come numero di operazioni effettuate, utenti attivi o eventi specifici, e consentono di monitorare l’utilizzo e il valore del sistema dal punto di vista aziendale.
+            \end{itemize}
 
 \end{itemize}
 La forza di un sistema di osservabilità moderno non risiede nell'utilizzo isolato di
@@ -36,14 +36,14 @@ Foundation (CNCF).\\
 I principi fondamentali di \gls{otel} rilevanti per questo progetto sono:
 
 \begin{itemize}
-  \item \textbf{Separazione tra produzione ed esportazione.} Le \gls{api} applicative sono
-        indipendenti dal backend di storage scelto: lo stesso codice pu\`o inviare dati a
-        Grafana, Jaeger, Zipkin o qualsiasi altro sistema compatibile.
-  \item \textbf{Instrumentazione automatica.} Per i framework pi\`u diffusi (ASP.NET Core,
-        HttpClient, SqlClient), \gls{otel} fornisce librerie che non richiedono modifiche
-        al codice applicativo.
-  \item \textbf{Estensibilit\`a.} \`E possibile aggiungere attributi custom, definire
-        metriche applicative proprie e configurare \gls{samplerg} e processor personalizzati.
+      \item \textbf{Separazione tra produzione ed esportazione.} Le \gls{api} applicative sono
+            indipendenti dal backend di storage scelto: lo stesso codice pu\`o inviare dati a
+            Grafana, Jaeger, Zipkin o qualsiasi altro sistema compatibile.
+      \item \textbf{Instrumentazione automatica.} Per i framework pi\`u diffusi (ASP.NET Core,
+            HttpClient, SqlClient), \gls{otel} fornisce librerie che non richiedono modifiche
+            al codice applicativo.
+      \item \textbf{Estensibilit\`a.} \`E possibile aggiungere attributi custom, definire
+            metriche applicative proprie e configurare \gls{samplerg} e processor personalizzati.
 \end{itemize}
 
 \section{Architettura della telemetria}
@@ -57,8 +57,8 @@ La generazione dei dati avviene direttamente all’interno dell’applicazione b
 Le \textbf{trace} vengono prodotte utilizzando OpenTelemetry, che si appoggia alle \gls{api} native di .NET (\texttt{ActivitySource} e \texttt{Activity}) per rappresentare le operazioni eseguite dal sistema sotto forma di \textit{span}. Ogni richiesta viene quindi tracciata lungo tutto il suo ciclo di vita, includendo chiamate HTTP, operazioni sui database e logica applicativa.\\
 Le \textbf{metriche} vengono generate attraverso due approcci distinti:
 \begin{itemize}
-  \item metriche di \textit{performance}, raccolte automaticamente da OpenTelemetry (ad esempio durata delle richieste HTTP o utilizzo delle risorse);
-  \item metriche di \textit{business}, definite manualmente tramite le \gls{api} \texttt{Meter} di .NET, per monitorare aspetti specifici del dominio applicativo.
+      \item metriche di \textit{performance}, raccolte automaticamente da OpenTelemetry (ad esempio durata delle richieste HTTP o utilizzo delle risorse);
+      \item metriche di \textit{business}, definite manualmente tramite le \gls{api} \texttt{Meter} di .NET, per monitorare aspetti specifici del dominio applicativo.
 \end{itemize}
 I \textbf{log} vengono invece gestiti tramite la libreria Serilog, che consente la produzione di log strutturati e la loro esportazione verso l’infrastruttura di osservabilità. Grazie all’integrazione con OpenTelemetry, i log risultano automaticamente correlati alle trace tramite identificativi condivisi (\textit{TraceId} e \textit{SpanId}).
 
@@ -68,24 +68,24 @@ Per la gestione e la visualizzazione dei dati di telemetria è stata adottata un
 I dati di telemetria generati dall’applicazione backend, vengono inizialmente prodotti tramite le librerie OpenTelemetry, .NET Meters e Serilog, e poi vengono esportati in formato compatibile OpenTelemetry.
 Tutti questi dati vengono inviati a un componente intermedio, l’\textit{OpenTelemetry Collector}, tramite protocollo \gls{otlp} (OpenTelemetry Protocol). Il Collector svolge un ruolo centrale nell’architettura di osservabilità, fungendo da punto di raccolta e smistamento dei dati. Le sue principali responsabilità includono:
 \begin{itemize}
-  \item \textbf{Ricezione dei dati}: acquisizione di trace, metriche e log dall’applicazione tramite endpoint \gls{otlp};
-  \item \textbf{Elaborazione}: possibilità di applicare trasformazioni, filtri o arricchimenti ai dati raccolti;
-  \item \textbf{Esportazione}: inoltro dei dati verso i sistemi di destinazione tramite specifici \textit{exporter}.
+      \item \textbf{Ricezione dei dati}: acquisizione di trace, metriche e log dall’applicazione tramite endpoint \gls{otlp};
+      \item \textbf{Elaborazione}: possibilità di applicare trasformazioni, filtri o arricchimenti ai dati raccolti;
+      \item \textbf{Esportazione}: inoltro dei dati verso i sistemi di destinazione tramite specifici \textit{exporter}.
 \end{itemize}
 Nel progetto, il Collector è configurato per instradare i diversi tipi di dati verso componenti distinti dello stack Grafana:
 \begin{itemize}
-  \item le \textbf{trace} vengono esportate verso Tempo, permettendo l’analisi dei flussi di esecuzione e delle dipendenze tra servizi;
-  \item le \textbf{metriche} vengono inviate a Prometheus, rendendo possibile il monitoraggio delle prestazioni e la creazione di dashboard;
-  \item i \textbf{log} vengono esportati verso Loki, consentendo la consultazione centralizzata e la correlazione con trace e metriche.
+      \item le \textbf{trace} vengono esportate verso Tempo, permettendo l’analisi dei flussi di esecuzione e delle dipendenze tra servizi;
+      \item le \textbf{metriche} vengono inviate a Prometheus, rendendo possibile il monitoraggio delle prestazioni e la creazione di dashboard;
+      \item i \textbf{log} vengono esportati verso Loki, consentendo la consultazione centralizzata e la correlazione con trace e metriche.
 \end{itemize}
 Grafana rappresenta il punto di accesso unificato a queste informazioni, offrendo strumenti per la visualizzazione e l’analisi dei dati di telemetria. In particolare, permette di costruire dashboard personalizzate basate su metriche, esplorare i log e navigare le trace, abilitando una visione completa e correlata del comportamento del sistema.
 Questa architettura consente di separare la raccolta dei dati dalla loro visualizzazione, migliorando la scalabilità e la flessibilità del sistema di monitoraggio, oltre a facilitare eventuali estensioni future.
 
 \begin{figure}[h]
-  \centering
-  \includegraphics[width=1\linewidth]{../images/architectures/ArchitetturaOtelCollector.png}
-  \caption{Architettura OTel Collector}
-  \label{fig:arch-otel-collector}
+      \centering
+      \includegraphics[width=1\linewidth]{../images/architectures/ArchitetturaOtelCollector.png}
+      \caption{Architettura OTel Collector}
+      \label{fig:arch-otel-collector}
 \end{figure}
 
 \subsection{Protocolli e canali di comunicazione}
@@ -120,7 +120,7 @@ di risposta dell'utente.
 
 \subsubsection{Adozione di OpenTelemetry}
 
-La scelta di \gls{otel}, come richiesto dal requisito RVN-1, permette flessibilità nella scelta
+La scelta di \gls{otel}, come richiesto dal requisito RVD-1, permette flessibilità nella scelta
 del backend di visualizzazione.
 Le alternative considerate, soluzioni proprietarie come Azure Application Insights o Datadog APM,
 avrebbero introdotto un accoppiamento stretto con un singolo fornitore, limitando la
@@ -129,7 +129,7 @@ flessibilità nella scelta del backend e rendendo difficoltosa la migrazione fut
 \subsubsection{Architettura opt-in}
 
 L'intero sistema è progettato come \emph{opt-in}: la telemetria è attiva solo se\\
-\texttt{OpenTelemetry:Enabled = true} in \emph{appsettings}, rispettando così il requisito RFN-5.
+\texttt{OpenTelemetry:Enabled = true} in \emph{appsettings}, rispettando così il requisito RFO-5.
 Questo consente di abilitarla esclusivamente negli ambienti che la richiedono, evitando \emph{overhead} in sviluppo locale.
 
 \subsubsection{Centralizzazione della configurazione}
@@ -158,14 +158,14 @@ corrisponde, si applica il ratio globale \texttt{SamplingRatio}.
 \subsubsection{Arricchimento automatico del contesto utente}
 \label{sec:enduser-middleware}
 
-Per soddisfare il requisito RFN-10, il sistema arricchisce automaticamente ogni span con
+Per soddisfare il requisito RFD-9, il sistema arricchisce automaticamente ogni span con
 l'identità dell'utente autenticato senza richiedere modifiche ai singoli moduli applicativi. Il
 meccanismo è descritto nel dettaglio nella sezione~\ref{sec:modello-enduser}.
 
 \subsubsection{Correlazione metrica-trace tramite \emph{exemplars}}
 \label{sec:exemplars-design}
 
-Per soddisfare il requisito RFN-11, le metriche di tipo \emph{Histogram} espongono degli
+Per soddisfare il requisito RFO-10, le metriche di tipo \emph{Histogram} espongono degli
 \emph{exemplars}: campioni rappresentativi a cui è associato il \texttt{TraceId} della richiesta che li ha
 generati. Questo collegamento abilita la navigazione dal pannello di una metrica aggregata alla trace
 specifica che ha prodotto il campione anomalo, rendendo immediata la correlazione tra l'anomalia osservata
@@ -205,16 +205,16 @@ Sono impiegati quattro tipi di metriche, offerti
 dall'\gls{api} \texttt{System.Diagnostics.Metrics} di \emph{.NET}:
 
 \begin{description}
-  \item[Counter] Contatore monotono crescente per eventi cumulativi (es.\ login riusciti,
-        query eseguite). In Prometheus acquisisce il suffisso \texttt{\_total}.
-  \item[Histogram] Distribuzione statistica per latenze e percentili (p50, p95, p99).
-        In Prometheus genera tre serie: \texttt{\_bucket}, \texttt{\_sum}, \texttt{\_count}.
-  \item[UpDownCounter] Contatore non monotono, che può essere incrementato o decrementato,
-        utilizzato per rappresentare grandezze ``in corso'' (es.\ numero di operazioni attualmente
-        in esecuzione).
-  \item[ObservableGauge] Strumento campionato tramite \emph{callback} periodica, utilizzato per
-        valori istantanei non cumulativi (es. numero di connessioni
-        attive).
+      \item[Counter] Contatore monotono crescente per eventi cumulativi (es.\ login riusciti,
+            query eseguite). In Prometheus acquisisce il suffisso \texttt{\_total}.
+      \item[Histogram] Distribuzione statistica per latenze e percentili (p50, p95, p99).
+            In Prometheus genera tre serie: \texttt{\_bucket}, \texttt{\_sum}, \texttt{\_count}.
+      \item[UpDownCounter] Contatore non monotono, che può essere incrementato o decrementato,
+            utilizzato per rappresentare grandezze ``in corso'' (es.\ numero di operazioni attualmente
+            in esecuzione).
+      \item[ObservableGauge] Strumento campionato tramite \emph{callback} periodica, utilizzato per
+            valori istantanei non cumulativi (es. numero di connessioni
+            attive).
 \end{description}
 La progettazione delle metriche ha seguito due criteri guida. Il primo è la bassa cardinalità:
 i tag con alta variabilità (es. identificatori numerici di record) sono
@@ -236,10 +236,10 @@ Il modulo \texttt{Sia.Base}, responsabile delle operazioni \gls{crud} e dell'acc
 Ad esempio, una richiesta di inserimento di un ordine potrebbe essere identificata dagli attributi:
 
 \begin{itemize}
-  \item \texttt{sia.operation = insert};
-  \item \texttt{sia.entity = OrderEntity};
-  \item \texttt{sia.repository = OrdersRepository};
-  \item \texttt{sia.caller\_method = CreateOrder}.
+      \item \texttt{sia.operation = insert};
+      \item \texttt{sia.entity = OrderEntity};
+      \item \texttt{sia.repository = OrdersRepository};
+      \item \texttt{sia.caller\_method = CreateOrder}.
 \end{itemize}
 In caso di errore viene inoltre registrato l'attributo \texttt{exception.type}, che permette di distinguere rapidamente problematiche quali \texttt{SqlException} o \texttt{TimeoutException}.
 
@@ -261,20 +261,20 @@ A seconda dell'operazione eseguita, possono essere presenti ulteriori attributi 
 
 Ogni trace generata da una chiamata autenticata riporta automaticamente l'identità
 dell'utente tramite i tag \texttt{enduser.id} ed \texttt{enduser.name}, senza che i
-singoli moduli debbano iniettarli manualmente (RFN-10).\\
+singoli moduli debbano iniettarli manualmente (RFD-9).\\
 Il meccanismo si articola in due componenti trasparenti al codice applicativo:
 \begin{description}
-  \item[un middleware ASP.NET Core] (\texttt{EnrichActivityWithUserMiddleware}), registrato dopo \texttt{UseAuthentication()},
-        legge gli attributi \texttt{userId} e \texttt{userName} da \texttt{HttpContext.User} e le
-        pubblica nel \gls{baggageg} \gls{otel}.
-  \item[un \texttt{ActivityProcessor} custom] (\texttt{BaggageActivityProcessor}) intercetta l'hook \texttt{OnStart} di ogni nuova
-        \texttt{Activity} e copia le entry con prefisso \texttt{enduser.} come tag sullo span.
-        Poiché il \gls{baggageg} viene ereditato dalle child span, tutte le query SQL generate
-        nell'ambito della stessa richiesta portano gli stessi \texttt{enduser.*} della root.
+      \item[un middleware ASP.NET Core] (\texttt{EnrichActivityWithUserMiddleware}), registrato dopo \texttt{UseAuthentication()},
+            legge gli attributi \texttt{userId} e \texttt{userName} da \texttt{HttpContext.User} e le
+            pubblica nel \gls{baggageg} \gls{otel}.
+      \item[un \texttt{ActivityProcessor} custom] (\texttt{BaggageActivityProcessor}) intercetta l'hook \texttt{OnStart} di ogni nuova
+            \texttt{Activity} e copia le entry con prefisso \texttt{enduser.} come tag sullo span.
+            Poiché il \gls{baggageg} viene ereditato dalle child span, tutte le query SQL generate
+            nell'ambito della stessa richiesta portano gli stessi \texttt{enduser.*} della root.
 \end{description}
 Gli attributi \texttt{enduser.*} non vengono mai aggiunti come tag delle metriche:
 farlo farebbe crescere il numero di serie temporali di Prometheus
-linearmente con il numero di utenti, violando RQN-2. La correlazione \emph{metrica~$\to$~utente}
+linearmente con il numero di utenti, violando RQO-2. La correlazione \emph{metrica~$\to$~utente}
 si ottiene invece tramite gli exemplar: dalla metrica si naviga alla trace, che porta
 già \texttt{enduser.*}.
 
@@ -343,14 +343,14 @@ riportato nell'appendice~\ref{app:listing-adapter}
 (listati~\ref{lst:adapter-diagnostics-app} e~\ref{lst:recordmetricerror-call-app}).\\
 \\\textbf{Vantaggi.}
 \begin{itemize}
-  \item contratto unico a livello \emph{framework}, \emph{counter}
-        distinti per modulo (cardinalità controllata);
-  \item logica di \emph{unwrap} e applicazione dei \emph{tag} scritta una
-        sola volta;
-  \item zero ripetizione nel controller: ogni \texttt{catch} diventa una
-        singola riga;
-  \item piena retrocompatibilità con i chiamanti diretti dei \emph{field}
-        statici esistenti, che rimangono invariati.
+      \item contratto unico a livello \emph{framework}, \emph{counter}
+            distinti per modulo (cardinalità controllata);
+      \item logica di \emph{unwrap} e applicazione dei \emph{tag} scritta una
+            sola volta;
+      \item zero ripetizione nel controller: ogni \texttt{catch} diventa una
+            singola riga;
+      \item piena retrocompatibilità con i chiamanti diretti dei \emph{field}
+            statici esistenti, che rimangono invariati.
 \end{itemize}
 
 \subsection{Pattern Factory}
@@ -379,11 +379,11 @@ metriche e \emph{log}, garantendone la coerenza cross-segnale. Anche questa cost
 in un metodo \emph{factory} interno a \texttt{BaseApplicationBuilder}.\\
 \\\textbf{Vantaggi}
 \begin{itemize}
-  \item la configurazione da \emph{appsettings} viene tradotta in oggetti \gls{otel} in un solo
-        punto, semplificando i test e le variazioni per ambiente;
-  \item i moduli vedono solo istanze pronte all'uso, senza conoscere il pipeline;
-  \item è possibile sostituire la \emph{factory} con una variante \emph{mock} per i test
-        senza toccare il codice di business.
+      \item la configurazione da \emph{appsettings} viene tradotta in oggetti \gls{otel} in un solo
+            punto, semplificando i test e le variazioni per ambiente;
+      \item i moduli vedono solo istanze pronte all'uso, senza conoscere il pipeline;
+      \item è possibile sostituire la \emph{factory} con una variante \emph{mock} per i test
+            senza toccare il codice di business.
 \end{itemize}
 
 \section{Diagrammi delle classi del sistema di telemetria}
@@ -394,19 +394,19 @@ struttura complessiva del sistema di telemetria è formalizzata in tre
 diagrammi delle classi in stile \gls{uml} semplificato:
 
 \begin{itemize}
-  \item il \emph{pipeline} \gls{otel} centralizzato in
-        \texttt{BaseApplicationBuilder}, con i tre \emph{provider}
-        (\texttt{TracerProvider}, \texttt{MeterProvider},
-        \texttt{LoggerProvider}) che condividono lo stesso
-        \texttt{ResourceBuilder} ed esportano via
-        \texttt{OtlpExporter} (figura~\ref{fig:diag-pipeline});
-  \item la struttura generica del pattern
-        \texttt{Sia\{Modulo\}Diagnostics} con il\\
-        \texttt{ControllerDiagnosticsAdapter} annidato
-        (figura~\ref{fig:diag-diagnostics-pattern});
-  \item il flusso di arricchimento automatico delle \texttt{Activity}
-        con l'identità utente, dal \emph{middleware} ASP.NET Core al
-        \texttt{BaggageActivityProcessor} (figura~\ref{fig:diag-enduser}).
+      \item il \emph{pipeline} \gls{otel} centralizzato in
+            \texttt{BaseApplicationBuilder}, con i tre \emph{provider}
+            (\texttt{TracerProvider}, \texttt{MeterProvider},
+            \texttt{LoggerProvider}) che condividono lo stesso
+            \texttt{ResourceBuilder} ed esportano via
+            \texttt{OtlpExporter} (figura~\ref{fig:diag-pipeline});
+      \item la struttura generica del pattern
+            \texttt{Sia\{Modulo\}Diagnostics} con il\\
+            \texttt{ControllerDiagnosticsAdapter} annidato
+            (figura~\ref{fig:diag-diagnostics-pattern});
+      \item il flusso di arricchimento automatico delle \texttt{Activity}
+            con l'identità utente, dal \emph{middleware} ASP.NET Core al
+            \texttt{BaggageActivityProcessor} (figura~\ref{fig:diag-enduser}).
 \end{itemize}
 Per non interrompere il flusso narrativo del capitolo, i tre diagrammi e le
 relative descrizioni di dettaglio sono raccolti nell'appendice~\ref{app:diagrammi-classi}.
@@ -423,10 +423,10 @@ da individuare in modo sistematico.\\
 L’assenza di una suite automatizzata comportava inoltre:
 
 \begin{itemize}
-  \item la mancanza di una rete di sicurezza durante attività di \emph{refactoring};
-  \item tempi elevati per la validazione delle modifiche;
-  \item difficoltà nell’individuazione precoce di difetti;
-  \item assenza di una \emph{baseline} condivisa sul comportamento atteso del sistema.
+      \item la mancanza di una rete di sicurezza durante attività di \emph{refactoring};
+      \item tempi elevati per la validazione delle modifiche;
+      \item difficoltà nell’individuazione precoce di difetti;
+      \item assenza di una \emph{baseline} condivisa sul comportamento atteso del sistema.
 \end{itemize}
 L’obiettivo dello stage è stato quindi introdurre una metodologia di testing
 riproducibile e integrabile nei processi di sviluppo, capace di verificare sia
@@ -442,7 +442,8 @@ complementari: Unit test frontend, test \emph{end-to-end} frontend, unit test ba
 e integration test backend.
 L’introduzione di più livelli di test ha permesso di ottenere una copertura più
 ampia del sistema, combinando verifiche veloci e isolate con controlli completi
-sul comportamento integrato dell’applicazione.
+sul comportamento integrato dell’applicazione, arrivando allo sviluppo di circa
+600 test tra frontend e backend.
 
 \subsubsection{Unit test backend}
 
@@ -460,6 +461,10 @@ dei repository e la logica associata ai moduli instrumentati con OpenTelemetry.\
 L’utilizzo di dipendenze simulate (\emph{mock}) ha permesso di eseguire i test
 in modo deterministico e veloce, senza richiedere l’avvio dell’intera
 infrastruttura applicativa.
+I moduli backend che sono stati strumentati con questo tipo di test sono 2
+per un totale di 51 test. Anche se in seguito, tramite l'uso di regole assegnate agli
+agenti AI developer, sono stati creati nuovi test per ogni modifica effettuata al codice
+applicativo.
 
 \subsubsection{Integration test backend}
 
@@ -491,6 +496,9 @@ dei dati presenti nel sistema. Questo approccio permette di individuare problemi
 che difficilmente emergerebbero tramite semplici \emph{mock}, come incongruenze
 nei dati, errori di mapping, vincoli non rispettati o differenze tra schema
 atteso e stato effettivo del database.
+In questo caso il numero di test sviluppati è molto maggiore, ci aggiriamo intorno ai 200,
+maggior parte facenti parte di \emph{smoke test} che testano gli endpoint di griglie e CRUD (con una copertura del 100\%)
+presenti nel DB.
 
 \subsubsection{Unit test frontend}
 
@@ -503,11 +511,11 @@ componenti applicativi in modo rapido e deterministico, riducendo il rischio di
 regressioni durante l’evoluzione del software.\\
 In generale, gli \emph{unit test} verificano aspetti quali:
 \begin{itemize}
-  \item la correttezza della logica applicativa;
-  \item la gestione dello stato interno dei componenti;
-  \item la trasformazione e validazione dei dati;
-  \item la gestione degli errori e dei casi limite;
-  \item il corretto comportamento di metodi puri e funzioni di utilità.
+      \item la correttezza della logica applicativa;
+      \item la gestione dello stato interno dei componenti;
+      \item la trasformazione e validazione dei dati;
+      \item la gestione degli errori e dei casi limite;
+      \item il corretto comportamento di metodi puri e funzioni di utilità.
 \end{itemize}
 Nel progetto sviluppato durante lo stage, i test hanno riguardato principalmente
 la logica frontend implementata in TypeScript, includendo servizi applicativi,
@@ -519,6 +527,8 @@ dell’interfaccia.\\
 Questi test non richiedono né un browser reale né servizi esterni attivi, risultando
 quindi molto veloci nell’esecuzione e facilmente integrabili nei processi automatici
 di validazione del software.
+I moduli che risultavano essere più importanti da testare erano 4 (Grid, Calendar, Shared, Kanban)
+per un totale di circa 300 test.
 
 \subsubsection{Test end-to-end con Playwright}
 
@@ -547,6 +557,9 @@ Il costo da pagare è la velocità di esecuzione:
 ogni test richiede secondi, non millisecondi e la dipendenza dallo stato del
 sistema. Per questo i test E2E si concentrano sui flussi utente strategici,
 lasciando la copertura della logica di dettaglio agli \emph{unit test}.
+Per questa caratteristica, i test E2E creati, sono stati semplicemente 29, suddivisi in:
+5 per l'autenticazione, 7 per il calendario, 3 per componenti crud, 9 per le griglie e
+5 per la visualizzazione di tipo kanban.
 
 \subsection{Vantaggi ottenuti}
 

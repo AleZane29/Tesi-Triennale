@@ -1,18 +1,27 @@
-# Capitoli da sistemare
-
-- Aggiornare tecnologie adottate
-
 # To do
 
-- Integrare parte di scelta e studio delle tecnologie con i criteri di scelta e
-  i pro e contro di ogni tecnologia
-- Togliere RFID dal glossario e metterlo a piè di pagina con una breve
-  spiegazione
-- Introdurre skill claude code (e spiegarle una a una)
-- Sistemare descrizione capitoli (sia intro di ciascuno che introduzione a
-  inizio tesi)
-- Controllare che i riferimenti ai requisiti siano giusti (sezione scelte
-  architetturali)
-- Evidenziare i termini in linguaggio tecnico con il corsivo
-- Finito il glossario, trovare tutti i termini nel documento con Ctrl+F e
-  sostituirli con \gls{termine}
+- Rimuovere generalizzazioni UC e ridurre descrizione sotto-UC
+
+- Ridurre MCP
+
+- Capitolo (metterei all'inizio) nel quale si giustifica la scelta di usare
+  direttamente Claude, perché abbiamo ottenuto un buon risultato e si è
+  preferito approfondire di più le funzionalità implementabili
+
+- Aggiungere valori per: num di test, % di copertura, ore preventivate vs
+  effettive -> telemetria: sotto capitolo nelle conclusioni, numero test e
+  copertura non di codice ma per endpoint/griglie, ecc. E2E (Playwright) 29 test
+  Unit (Vitest) ~300 test e2e: 5 auth, 7 calendar, 3 crud, 9 grid, 5 kanban = 29
+
+- Errori grammaticali:
+  - sez: 1.4: "delle prospettive presenti per descrive la struttura" =>
+    descrivere.
+  - UC5.3: "conteso" => contesto
+  - didascalia fig. B.3 ed elenco figure: "arrichimento" => arricchimento.
+  - sez.5.4.5: "userId e userName […] le pubblica nel Baggage" => li pubblica.
+  - sez.7.8: "La riferenza canonica" => Il riferimento canonico;
+  - sez.5.7.2.2: "ciclo di vita di un entita'" => un'entita'.
+  - UC6: "Selezione delle tramite variabili template" => frase monca.
+  - occorrenze di "i unit test" => "gli unit test";
+  - l'incipit del cap. 5: "architettura adottata di telemetria e test" da
+    riformulare.

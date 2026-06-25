@@ -8,15 +8,15 @@
 Il codice di telemetria è distribuito su due livelli del framework:
 
 \begin{itemize}
-    \item un livello \textbf{condiviso} (\texttt{Application.Shared.Telemetry} e
-        \texttt{BaseApplicationBuilder}), che configura il pipeline \gls{otel},
-        registra \gls{samplerg}, \emph{processor} e \emph{exporter}, e definisce le
-        convenzioni comuni (attributi di \emph{resource}, \emph{middleware}
-        di arricchimento utente);
-    \item un livello \textbf{per-modulo} (\texttt{Sia.\{Modulo\}/Diagnostics/}), che contiene
-        la classe statica \texttt{Sia\{Modulo\}Diagnostics} con \texttt{ActivitySource},
-        \texttt{Meter}, \texttt{Counter}, \texttt{Histogram}, e la dashboard Grafana
-        \texttt{\{nome\}.dashboard.json} versionata insieme al codice.
+      \item un livello \textbf{condiviso} (\texttt{Application.Shared.Telemetry} e
+            \texttt{BaseApplicationBuilder}), che configura il pipeline \gls{otel},
+            registra \gls{samplerg}, \emph{processor} e \emph{exporter}, e definisce le
+            convenzioni comuni (attributi di \emph{resource}, \emph{middleware}
+            di arricchimento utente);
+      \item un livello \textbf{per-modulo} (\texttt{Sia.\{Modulo\}/Diagnostics/}), che contiene
+            la classe statica \texttt{Sia\{Modulo\}Diagnostics} con \texttt{ActivitySource},
+            \texttt{Meter}, \texttt{Counter}, \texttt{Histogram}, e la dashboard Grafana
+            \texttt{\{nome\}.dashboard.json} versionata insieme al codice.
 \end{itemize}
 Questa suddivisione garantisce che un nuovo modulo, per integrare la telemetria, debba solo
 creare la propria classe \texttt{Diagnostics} e registrare il proprio \texttt{Meter} e
@@ -29,15 +29,15 @@ Il pipeline è configurato in \texttt{BaseApplicationBuilder.ConfigureBuilder} t
 l'\gls{api} \texttt{AddOpenTelemetry()} dell'estensione ufficiale. I pacchetti NuGet
 utilizzati sono:
 \begin{itemize}
-    \item \texttt{OpenTelemetry} e \texttt{OpenTelemetry.Extensions.Hosting} per
-        l'integrazione con il \emph{generic host} di .NET;
-    \item \texttt{AspNetCore} e
-        \texttt{Http} di \texttt{OpenTelemetry.Instrumentation} per le \emph{trace} automatiche delle
-        richieste HTTP in ingresso e in uscita;
-    \item \texttt{OpenTelemetry.Instrumentation.SqlClient} per le \emph{trace} automatiche
-        delle query su SQL Server;
-    \item \texttt{OpenTelemetry.Exporter.OpenTelemetryProtocol} per l'esportazione \gls{otlp} verso
-        il \emph{Collector}.
+      \item \texttt{OpenTelemetry} e \texttt{OpenTelemetry.Extensions.Hosting} per
+            l'integrazione con il \emph{generic host} di .NET;
+      \item \texttt{AspNetCore} e
+            \texttt{Http} di \texttt{OpenTelemetry.Instrumentation} per le \emph{trace} automatiche delle
+            richieste HTTP in ingresso e in uscita;
+      \item \texttt{OpenTelemetry.Instrumentation.SqlClient} per le \emph{trace} automatiche
+            delle query su SQL Server;
+      \item \texttt{OpenTelemetry.Exporter.OpenTelemetryProtocol} per l'esportazione \gls{otlp} verso
+            il \emph{Collector}.
 \end{itemize}
 La configurazione dichiara nell'ordine: il \texttt{ResourceBuilder} con gli attributi
 comuni (\texttt{service.name}, \texttt{sia.product\_type}, \texttt{sia.customer\_name}), il
@@ -55,13 +55,13 @@ Ciascun modulo instrumentato espone una classe statica
 La classe definisce come membri statici \texttt{readonly}:
 
 \begin{itemize}
-    \item l'\texttt{ActivitySource} del modulo, con nome \texttt{Sia.\{Modulo\}} e versione;
-    \item il \texttt{Meter} del modulo, con lo stesso nome e versione;
-    \item i \texttt{Counter}/\texttt{Histogram}/\texttt{UpDownCounter} custom, con
-        \emph{naming} secondo la convenzione \texttt{sia.\{modulo\}.\{operazione\}.\{segnale\}};
-    \item il \texttt{Counter} \texttt{ControllerErrors}
-        (\texttt{sia.\{modulo\}.controller.errors}) e il singleton
-        \texttt{AsControllerDiagnostics} dell'Adapter verso \texttt{IControllerDiagnostics}, per i moduli con controller.
+      \item l'\texttt{ActivitySource} del modulo, con nome \texttt{Sia.\{Modulo\}} e versione;
+      \item il \texttt{Meter} del modulo, con lo stesso nome e versione;
+      \item i \texttt{Counter}/\texttt{Histogram}/\texttt{UpDownCounter} custom, con
+            \emph{naming} secondo la convenzione \texttt{sia.\{modulo\}.\{operazione\}.\{segnale\}};
+      \item il \texttt{Counter} \texttt{ControllerErrors}
+            (\texttt{sia.\{modulo\}.controller.errors}) e il singleton
+            \texttt{AsControllerDiagnostics} dell'Adapter verso \texttt{IControllerDiagnostics}, per i moduli con controller.
 \end{itemize}
 Nel codice applicativo, l'istrumentazione manuale di un'operazione avviene con:
 \\
@@ -77,11 +77,11 @@ corrispondente.
 L'implementazione del pattern descritto nella sezione~\ref{sec:design-patterns} è la stessa
 in ogni modulo con controller. Il framework fornisce:
 \begin{itemize}
-    \item l'interfaccia \texttt{Sia.Base.Diagnostics.IControllerDiagnostics}, con il contratto
-        \texttt{Counter<long> ControllerErrors \{ get; \}}
-    \item \texttt{BaseApiController.RecordMetricError(IControllerDiagnostics,\\ Exception, string operation)}, 
-        metodo che effettua l'\emph{unwrap} di \\ \texttt{SiaLoggerException.OriginalException} 
-        e applica i \emph{tag} \texttt{exception.type} e \texttt{sia.operation}.
+      \item l'interfaccia \texttt{Sia.Base.Diagnostics.IControllerDiagnostics}, con il contratto
+            \texttt{Counter<long> ControllerErrors \{ get; \}}
+      \item \texttt{BaseApiController.RecordMetricError(IControllerDiagnostics,\\ Exception, string operation)},
+            metodo che effettua l'\emph{unwrap} di \\ \texttt{SiaLoggerException.OriginalException}
+            e applica i \emph{tag} \texttt{exception.type} e \texttt{sia.operation}.
 \end{itemize}
 Nel modulo (esempio riferito a \texttt{Sia.Devextreme.Crud}) la classe \texttt{Diagnostics}
 si presenta, nei suoi elementi essenziali, come segue:~\ref{app:listing-adapter}
@@ -100,7 +100,7 @@ il diagramma delle classi dell'arricchimento utente.
 
 \section{Configurazione degli exemplars}
 
-L'istruzione \texttt{SetExemplarFilter(ExemplarFilterType.TraceBased)} presente nel provider 
+L'istruzione \texttt{SetExemplarFilter(ExemplarFilterType.TraceBased)} presente nel provider
 \texttt{Meter} del pipeline, istruisce
 \gls{otel} ad allegare un \emph{exemplar} a un campione di metrica solo quando esiste una
 trace \emph{sampled} nel contesto corrente. L'\emph{exemplar} riporta il \texttt{TraceId}
@@ -109,11 +109,11 @@ metrica alla trace.
 
 \section{Log Serilog con sink OTLP}
 
-Il \emph{sink} OTLP (\texttt{Serilog.Sinks.OpenTelemetry}) 
+Il \emph{sink} OTLP (\texttt{Serilog.Sinks.OpenTelemetry})
 è registrato in sostituzione dei \emph{sink} precedenti,
 mantenendo il formato strutturato dei \emph{log}. Serilog legge il contesto di
 \texttt{Activity.Current} e arricchisce automaticamente ogni evento con \texttt{TraceId} e
-\texttt{SpanId}, soddisfacendo il requisito RFN-4 di correlazione \emph{log}-\emph{trace}.
+\texttt{SpanId}, soddisfacendo il requisito RFO-4 di correlazione \emph{log}-\emph{trace}.
 Il livello minimo di \emph{log} è configurabile per ambiente tramite \emph{appsettings}.
 
 \section{Dashboard Grafana e versionamento}
@@ -123,41 +123,41 @@ Ogni modulo instrumentato espone una dashboard Grafana nella cartella\\
 repository insieme al codice che instrumenta, in modo da garantire il sincronismo tra le
 modifiche di istrumentazione e i pannelli di visualizzazione. Ogni dashboard definisce:
 \begin{itemize}
-    \item le \emph{template variable} \texttt{service\_name}, \texttt{enduser\_id},
-        \texttt{enduser\_name} e \texttt{bucket};
-    \item pannelli di latenza con percentili \emph{p50}, \emph{p95}, \emph{p99} calcolati via
-        \texttt{histogram\_quantile} (\autoref{fig:dash-base});
-    \item un pannello \emph{stat} ``Operazioni ultimo \texttt{\$\{bucket\}}'' basato
-        sull'\texttt{increase} del \emph{counter} principale (\autoref{fig:dash-bucket});
-    \item pannelli di errori con \emph{break-down} per \texttt{exception.type} (\autoref{fig:dash-logs-trace});
-    \item un pannello \emph{logs} su Loki filtrato per \texttt{service.name} (\autoref{fig:dash-logs-trace}).
+      \item le \emph{template variable} \texttt{service\_name}, \texttt{enduser\_id},
+            \texttt{enduser\_name} e \texttt{bucket};
+      \item pannelli di latenza con percentili \emph{p50}, \emph{p95}, \emph{p99} calcolati via
+            \texttt{histogram\_quantile} (\autoref{fig:dash-base});
+      \item un pannello \emph{stat} ``Operazioni ultimo \texttt{\$\{bucket\}}'' basato
+            sull'\texttt{increase} del \emph{counter} principale (\autoref{fig:dash-bucket});
+      \item pannelli di errori con \emph{break-down} per \texttt{exception.type} (\autoref{fig:dash-logs-trace});
+      \item un pannello \emph{logs} su Loki filtrato per \texttt{service.name} (\autoref{fig:dash-logs-trace}).
 \end{itemize}
 La riferenza canonica è la dashboard \texttt{sia-base.dashboard.json} del modulo
 \texttt{Sia.Base}, replicata con le dovute personalizzazioni in ogni modulo successivo.
 
 \begin{figure}[h!]
-    \centering
-    \makebox[\textwidth][c]{%
-        \includegraphics[width=1.23\textwidth]{../images/screenshots/DashboardBase.png}
-    }
-    \caption{Overview e durata richieste della dashboard di \emph{Sia.Base}}
-    \label{fig:dash-base}
+      \centering
+      \makebox[\textwidth][c]{%
+            \includegraphics[width=1.23\textwidth]{../images/screenshots/DashboardBase.png}
+      }
+      \caption{Overview e durata richieste della dashboard di \emph{Sia.Base}}
+      \label{fig:dash-base}
 \end{figure}
 \begin{figure}[h!]
-    \centering
-    \makebox[\textwidth][c]{%
-        \includegraphics[width=1.23\textwidth]{../images/screenshots/DashboardBucket.png}
-    }
-        \caption{Sezione richieste per \texttt{\$\{bucket\}} della dashboard \emph{Sia.Base}}
-    \label{fig:dash-bucket}
+      \centering
+      \makebox[\textwidth][c]{%
+            \includegraphics[width=1.23\textwidth]{../images/screenshots/DashboardBucket.png}
+      }
+      \caption{Sezione richieste per \texttt{\$\{bucket\}} della dashboard \emph{Sia.Base}}
+      \label{fig:dash-bucket}
 \end{figure}
 \begin{figure}[h!]
-    \centering
-    \makebox[\textwidth][c]{%
-        \includegraphics[width=1.23\textwidth]{../images/screenshots/DashboardLogsTrace.png}
-    }
-    \caption{Sezione trace e log della dashboard di \emph{Sia.Grid}}
-    \label{fig:dash-logs-trace}
+      \centering
+      \makebox[\textwidth][c]{%
+            \includegraphics[width=1.23\textwidth]{../images/screenshots/DashboardLogsTrace.png}
+      }
+      \caption{Sezione trace e log della dashboard di \emph{Sia.Grid}}
+      \label{fig:dash-logs-trace}
 \end{figure}
 
 \section{Telemetria delle performance hardware}
@@ -169,13 +169,13 @@ ed è responsabile della raccolta periodica di indicatori sullo stato del server
 l'applicazione, con successiva notifica ad un \emph{manager} centrale delle installazioni.
 Prima dell'intervento di telemetria, il modulo esponeva già i dati tramite:
 \begin{itemize}
-    \item cinque implementazioni di \texttt{IHealthCheck} (\texttt{CpuUsageHealthCheck},\\
-        \texttt{CpuTemperatureHealthCheck}, \texttt{RamHealthCheck}, \texttt{DiskHealthCheck},
-        \texttt{SqlHealthCheck}), invocate dall'endpoint \texttt{/health} di ASP.NET Core;
-    \item un \texttt{BackgroundService} (\texttt{HealthCheckServerHostedService}) che, ad
-        intervallo configurabile (\texttt{HealthNotifyDelayMinutes}), aggrega i risultati e
-        invia il report al \emph{manager} tramite un \texttt{HttpClient} dedicato
-        (\texttt{HealthCheckServerToServerApi}).
+      \item cinque implementazioni di \texttt{IHealthCheck} (\texttt{CpuUsageHealthCheck},\\
+            \texttt{CpuTemperatureHealthCheck}, \texttt{RamHealthCheck}, \texttt{DiskHealthCheck},
+            \texttt{SqlHealthCheck}), invocate dall'endpoint \texttt{/health} di ASP.NET Core;
+      \item un \texttt{BackgroundService} (\texttt{HealthCheckServerHostedService}) che, ad
+            intervallo configurabile (\texttt{HealthNotifyDelayMinutes}), aggrega i risultati e
+            invia il report al \emph{manager} tramite un \texttt{HttpClient} dedicato
+            (\texttt{HealthCheckServerToServerApi}).
 \end{itemize}
 
 \subsection{Scelte progettuali}
@@ -189,8 +189,8 @@ La seconda è la natura istantanea dei dati raccolti. CPU\%, temperatura, GB di
 RAM liberi e spazio su disco non sono grandezze cumulative: l'uso di \texttt{Counter} o
 \texttt{Histogram} sarebbe improprio. Per rappresentare questo tipo di dato è stato utilizzato l'\texttt{ObservableGauge},
 che a differenza di altri strumenti metrici, rappresenta uno stato istantaneo e non un aggregato.
-La sua caratteristica fondamentale 
-è l'inversione del controllo: non è l'applicazione a inviare attivamente il dato, ma è il sistema 
+La sua caratteristica fondamentale
+è l'inversione del controllo: non è l'applicazione a inviare attivamente il dato, ma è il sistema
 di telemetria a recuperarlo periodicamente tramite una funzione di \emph{callback (polling)} al momento della raccolta.
 E poiché le letture hardware avvengono solo quando l'endpoint \texttt{/health} viene
 interrogato, le gauge leggono un valore in cache, aggiornato dagli
@@ -201,13 +201,13 @@ interrogato, le gauge leggono un valore in cache, aggiornato dagli
 
 \subsubsection{Trace}
 
-Il modulo produce tre span organizzate gerarchicamente: 
+Il modulo produce tre span organizzate gerarchicamente:
 \begin{itemize}
-    \item una span padre (\texttt{...cycle}) per ogni iterazione del ciclo di notifica che racchiude tutto il percorso per notificare un 
-        nuovo dato raccolto dal servizio di \emph{HealthCheck}; 
-    \item una span figlia per ciascun controllo hardware eseguito (\texttt{...check}) che espone quale componente hardware è stato
-        verificato e il suo stato attuale; 
-    \item infine, la span (\texttt{...send}) misura la durata dell'invio del report al \emph{manager}
+      \item una span padre (\texttt{...cycle}) per ogni iterazione del ciclo di notifica che racchiude tutto il percorso per notificare un
+            nuovo dato raccolto dal servizio di \emph{HealthCheck};
+      \item una span figlia per ciascun controllo hardware eseguito (\texttt{...check}) che espone quale componente hardware è stato
+            verificato e il suo stato attuale;
+      \item infine, la span (\texttt{...send}) misura la durata dell'invio del report al \emph{manager}
 \end{itemize}
 Le trace HTTP generate automaticamente da \texttt{HttpClient}
 restano figlie di \texttt{...send}: nella stessa trace è quindi possibile
@@ -219,26 +219,26 @@ il \emph{manager}, senza dover correlare manualmente segnali separati.
 Accanto alle metriche cumulative standard (cycle, check, send), il modulo espone sei
 \texttt{ObservableGauge} per i valori hardware istantanei.
 \begin{table}[h]
-\centering
-\caption{ObservableGauge del modulo \texttt{Sia.HealthChecks.Servers}}
-\label{tab:gauge-healthchecks}
-\begin{tabular}{|l|c|p{7cm}|}
-\hline
-\textbf{Metrica} & \textbf{Unità} & \textbf{Descrizione} \\
-\hline
-\texttt{...cpu.usage}        & \%    & Percentuale di utilizzo della CPU al momento dell'ultima lettura \\
-\hline
-\texttt{...cpu.temperature}  & °C    & Temperatura del processore rilevata dai sensori hardware \\
-\hline
-\texttt{...ram.available}    & GByte & Memoria RAM libera disponibile per i processi \\
-\hline
-\texttt{...ram.total}        & GByte & Memoria RAM fisica totale installata nel server \\
-\hline
-\texttt{...disk.free}        & GByte & Spazio libero sul disco, distinto per \texttt{sia.drive} \\
-\hline
-\texttt{...disk.total}       & GByte & Capacità totale del disco, distinta per \texttt{sia.drive} \\
-\hline
-\end{tabular}
+      \centering
+      \caption{ObservableGauge del modulo \texttt{Sia.HealthChecks.Servers}}
+      \label{tab:gauge-healthchecks}
+      \begin{tabular}{|l|c|p{7cm}|}
+            \hline
+            \textbf{Metrica}            & \textbf{Unità} & \textbf{Descrizione}                                             \\
+            \hline
+            \texttt{...cpu.usage}       & \%             & Percentuale di utilizzo della CPU al momento dell'ultima lettura \\
+            \hline
+            \texttt{...cpu.temperature} & °C             & Temperatura del processore rilevata dai sensori hardware         \\
+            \hline
+            \texttt{...ram.available}   & GByte          & Memoria RAM libera disponibile per i processi                    \\
+            \hline
+            \texttt{...ram.total}       & GByte          & Memoria RAM fisica totale installata nel server                  \\
+            \hline
+            \texttt{...disk.free}       & GByte          & Spazio libero sul disco, distinto per \texttt{sia.drive}         \\
+            \hline
+            \texttt{...disk.total}      & GByte          & Capacità totale del disco, distinta per \texttt{sia.drive}       \\
+            \hline
+      \end{tabular}
 \end{table}\\
 I tag hanno domini piccoli e chiusi (\texttt{sia.check} $\in \{cpu,\allowbreak\ cpu\_temperature,\allowbreak\ ram,\allowbreak\ disk,\allowbreak\ sql\}$,
 \texttt{sia.status} $\in \{Healthy, Unhealthy\}$), mantenendo la cardinalità sotto
@@ -249,17 +249,17 @@ controllo indipendentemente dal numero di installazioni monitorate.
 La dashboard segue lo schema standard del progetto, con l'aggiunta di una riga
 \emph{Risorse} dedicata alle gauge hardware: andamento di CPU\% e temperatura nel tempo,
 RAM disponibile confrontata a soglia, spazio disco libero per drive e una \emph{state
-timeline} delle connessioni SQL che visualizza a colpo d'occhio gli intervalli in cui una
+      timeline} delle connessioni SQL che visualizza a colpo d'occhio gli intervalli in cui una
 connessione è risultata \emph{down}. I pannelli trace e log consentono, a partire da un
 picco anomalo su qualsiasi metrica hardware, di navigare alla trace del ciclo di notifica
 corrispondente e ai log emessi in quell'iterazione, chiudendo il percorso diagnostico
 metrica $\rightarrow$ trace $\rightarrow$ log.
 
 \begin{figure}[h]
-    \centering
-    \makebox[\textwidth][c]{%
-        \includegraphics[width=1.25\textwidth]{../images/screenshots/DashboardHardware.png}
-    }
-    \caption{Sezione risorse della dashboard di telemetria hardware}
-    \label{fig:dash-hardware-telemetry}
+      \centering
+      \makebox[\textwidth][c]{%
+            \includegraphics[width=1.25\textwidth]{../images/screenshots/DashboardHardware.png}
+      }
+      \caption{Sezione risorse della dashboard di telemetria hardware}
+      \label{fig:dash-hardware-telemetry}
 \end{figure}
