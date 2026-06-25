@@ -15,7 +15,7 @@ Trasversalmente ai due sottosistemi, è stato adottato un agente di intelligenza
 I due sottosistemi sono indipendenti sul piano tecnologico ma complementari sul piano metodologico: la telemetria fornisce il \emph{feedback} che guida il miglioramento iterativo dei test, mentre i test supportano la validazione continua dell'instrumentazione.
 
 \section{Casi d'uso}
-La presente sezione illustra i casi d’uso analizzati, corredati dai relativi diagrammi. 
+La presente sezione illustra i casi d’uso analizzati, corredati dai relativi diagrammi.
 I diagrammi dei casi d’uso (in inglese \emph{Use Case Diagram}) costituiscono una tipologia di diagrammi \gls{uml} finalizzati alla rappresentazione delle funzionalità e dei servizi offerti da un sistema, dal punto di vista degli attori che interagiscono con esso.
 
 \subsection{Attori}
@@ -31,846 +31,448 @@ In merito al sistema sviluppato si possono individuare come attori:
 
 \begin{itemize}
     \item UC1 --- Generazione assistita di \emph{unit test} backend tramite agente AI.
-    \begin{itemize}
-        \item UC1.1 --- Identificazione del componente da coprire.
-        \item UC1.2 --- Invocazione dell'agente AI tramite \emph{skill} dedicata.
-        \item UC1.3 --- Analisi del codice e generazione dei test.
-        \item UC1.4 --- Revisione e integrazione nella suite.
-    \end{itemize}
+          \begin{itemize}
+              \item UC1.1 --- Identificazione del componente da coprire.
+              \item UC1.2 --- Invocazione dell'agente AI tramite \emph{skill} dedicata.
+              \item UC1.3 --- Analisi del codice e generazione dei test.
+              \item UC1.4 --- Revisione e integrazione nella suite.
+          \end{itemize}
     \item UC2 --- Generazione assistita di \emph{integration test} su database.
-    \begin{itemize}
-        \item UC2.1 --- Selezione dell'oggetto da validare.
-        \item UC2.2 --- Interrogazione del database e delle prospettive via \gls{mcp}.
-        \item UC2.3 --- Generazione dell'\emph{integration test}.
-        \item UC2.4 --- Revisione e integrazione nella suite.
-    \end{itemize}
+          \begin{itemize}
+              \item UC2.1 --- Selezione dell'oggetto da validare.
+              \item UC2.2 --- Interrogazione del database e delle prospettive via \gls{mcp}.
+              \item UC2.3 --- Generazione dell'\emph{integration test}.
+              \item UC2.4 --- Revisione e integrazione nella suite.
+          \end{itemize}
     \item UC3 --- Generazione assistita di \emph{unit test} e test \emph{end-to-end} \emph{frontend}.
-    \begin{itemize}
-        \item UC3.1 --- Identificazione del componente o del flusso utente da coprire.
-        \item UC3.2 --- Generazione di \emph{unit test} per la logica del componente.
-        \item UC3.3 --- Generazione del test \emph{end-to-end}.
-        \item UC3.4 --- Revisione e integrazione nella suite.
-    \end{itemize}
+          \begin{itemize}
+              \item UC3.1 --- Identificazione del componente o del flusso utente da coprire.
+              \item UC3.2 --- Generazione di \emph{unit test} per la logica del componente.
+              \item UC3.3 --- Generazione del test \emph{end-to-end}.
+              \item UC3.4 --- Revisione e integrazione nella suite.
+          \end{itemize}
     \item UC4 --- Esecuzione della suite di test e produzione del report di copertura.
-    \begin{itemize}
-        \item UC4.1 --- Avvio della suite di test.
-        \item UC4.2 --- Esecuzione dei test integrata nel processo di \emph{build}.
-        \item UC4.3 --- Generazione del report di copertura del codice.
-        \item UC4.4 --- Gestione dei test falliti (estensione).
-    \end{itemize}
+          \begin{itemize}
+              \item UC4.1 --- Avvio della suite di test.
+              \item UC4.2 --- Esecuzione dei test integrata nel processo di \emph{build}.
+              \item UC4.3 --- Generazione del report di copertura del codice.
+              \item UC4.4 --- Gestione dei test falliti (estensione).
+          \end{itemize}
     \item UC5 --- Propagazione della telemetria a un nuovo modulo del \emph{framework} tramite \emph{skill} dedicate.
-    \begin{itemize}
-        \item UC5.1 --- Identificazione del modulo da instrumentare.
-        \item UC5.2 --- Invocazione della \emph{skill} di propagazione della telemetria.
-        \item UC5.3 --- Introduzione della classe di diagnostica e registrazione della sorgente nel \emph{pipeline} \gls{otel}.
-        \item UC5.4 --- Definizione di metriche con cardinalità controllata.
-        \item UC5.5 --- Validazione dei segnali sullo stack \emph{Grafana LGTM}.
-    \end{itemize}
+          \begin{itemize}
+              \item UC5.1 --- Identificazione del modulo da instrumentare.
+              \item UC5.2 --- Invocazione della \emph{skill} di propagazione della telemetria.
+              \item UC5.3 --- Introduzione della classe di diagnostica e registrazione della sorgente nel \emph{pipeline} \gls{otel}.
+              \item UC5.4 --- Definizione di metriche con cardinalità controllata.
+              \item UC5.5 --- Validazione dei segnali sullo stack \emph{Grafana LGTM}.
+          \end{itemize}
     \item UC6 --- Visualizzazione delle metriche, \emph{trace} e \emph{log} di un modulo tramite dashboard \emph{Grafana LGTM}.
-    \begin{itemize}
-        \item UC6.1 --- Apertura della dashboard del modulo.
-        \item UC6.2 --- Selezione delle tramite variabili \emph{template}.
-        \item UC6.3 --- Consultazione correlata di metriche, \emph{trace} e \emph{log}.
-    \end{itemize}
+          \begin{itemize}
+              \item UC6.1 --- Apertura della dashboard del modulo.
+              \item UC6.2 --- Selezione delle tramite variabili \emph{template}.
+              \item UC6.3 --- Consultazione correlata di metriche, \emph{trace} e \emph{log}.
+          \end{itemize}
     \item UC7 --- Diagnosi di una richiesta lenta a partire da un pannello percentili, tramite \emph{exemplar} verso la \emph{trace} e navigazione ai \emph{log} correlati.
-    \begin{itemize}
-        \item UC7.1 --- Individuazione del campione anomalo sul pannello percentili.
-        \item UC7.2 --- Navigazione all'\emph{exemplar} associato al campione.
-        \item UC7.3 --- Apertura della \emph{trace} corrispondente in \emph{Tempo}.
-        \item UC7.4 --- Navigazione ai \emph{log} correlati tramite \texttt{TraceId}.
-    \end{itemize}
+          \begin{itemize}
+              \item UC7.1 --- Individuazione del campione anomalo sul pannello percentili.
+              \item UC7.2 --- Navigazione all'\emph{exemplar} associato al campione.
+              \item UC7.3 --- Apertura della \emph{trace} corrispondente in \emph{Tempo}.
+              \item UC7.4 --- Navigazione ai \emph{log} correlati tramite \texttt{TraceId}.
+          \end{itemize}
     \item UC8 --- Identificazione dell'utente coinvolto in una \emph{trace} tramite l'arricchimento automatico degli \emph{span}.
-    \begin{itemize}
-        \item UC8.1 --- Apertura della \emph{trace} di interesse.
-        \item UC8.2 --- Lettura degli attributi \texttt{enduser.id} e \texttt{enduser.name} dello \emph{span} radice.
-        \item UC8.3 --- Filtro di ulteriori \emph{trace} e \emph{log} per lo stesso utente.
-    \end{itemize}
+          \begin{itemize}
+              \item UC8.1 --- Apertura della \emph{trace} di interesse.
+              \item UC8.2 --- Lettura degli attributi \texttt{enduser.id} e \texttt{enduser.name} dello \emph{span} radice.
+              \item UC8.3 --- Filtro di ulteriori \emph{trace} e \emph{log} per lo stesso utente.
+          \end{itemize}
     \item UC9 --- Creazione o modifica di una dashboard \emph{Grafana} tramite agente AI e \gls{mcp}.
-    \begin{itemize}
-        \item UC9.1 --- Specifica delle esigenze di \emph{monitoring} all'agente AI.
-        \item UC9.2 --- Validazione delle query PromQL/TraceQL/LogQL via \gls{mcp}.
-        \item UC9.3 --- Pubblicazione o aggiornamento della dashboard sull'istanza \emph{Grafana}.
-        \item UC9.4 --- Gestione di una query non valida (estensione).
-    \end{itemize}
+          \begin{itemize}
+              \item UC9.1 --- Specifica delle esigenze di \emph{monitoring} all'agente AI.
+              \item UC9.2 --- Validazione delle query PromQL/TraceQL/LogQL via \gls{mcp}.
+              \item UC9.3 --- Pubblicazione o aggiornamento della dashboard sull'istanza \emph{Grafana}.
+              \item UC9.4 --- Gestione di una query non valida (estensione).
+          \end{itemize}
 \end{itemize}
 \newpage
 \begin{usecase}{1}{Generazione assistita di unit test backend}
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.9\columnwidth]{usecase/UC1}
-    \caption{UC1: Generazione assistita di unit test backend}
-\end{figure}
+    \begin{figure}[!h]
+        \centering
+        \includegraphics[width=0.9\columnwidth]{usecase/UC1}
+        \caption{UC1: Generazione assistita di unit test backend}
+    \end{figure}
 
-\usecaseactors{Sviluppatore, Agente AI}
-\usecasepre{L'ambiente di sviluppo del \emph{framework} \emph{Sia.Core} è aperto, l'agente AI è configurato con la \emph{skill} dedicata agli \emph{unit test} \emph{backend} e nel progetto è presente il \emph{test runner} \emph{.NET}}
-\usecasedesc{Lo sviluppatore vuole introdurre \emph{unit test} su un servizio o un \emph{repository} del \emph{framework backend} privo di copertura adeguata, avvalendosi dell'agente AI}
-\usecasepost{Nuovi \emph{unit test} sono presenti nel progetto, eseguibili nella \emph{build}, e contribuiscono all'aumento della copertura del codice}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore identifica il componente da coprire (UC1.1);
-    \item Lo sviluppatore invoca l'agente AI tramite \emph{prompt} (UC1.2);
-    \item L'agente analizza il codice del componente e genera gli \emph{unit test} (UC1.3);
-    \item Lo sviluppatore revisiona i test e li integra nella suite (UC1.4).
-\end{enumerate}
-}
-\usecasegeneralizations{
-\begin{enumerate}
-    \item Identificazione del componente (UC1.1);
-    \item Invocazione dell'agente AI (UC1.2);
-    \item Analisi del codice e generazione dei test (UC1.3);
-    \item Revisione e integrazione (UC1.4).
-\end{enumerate}
-}
-\label{uc:unit-test-backend}
+    \usecaseactors{Sviluppatore, Agente AI}
+    \usecasepre{L'ambiente di sviluppo del \emph{framework} \emph{Sia.Core} è aperto, l'agente AI è configurato con la \emph{skill} dedicata agli \emph{unit test} \emph{backend} e nel progetto è presente il \emph{test runner} \emph{.NET}}
+    \usecasedesc{Lo sviluppatore vuole introdurre \emph{unit test} su un servizio o un \emph{repository} del \emph{framework backend} privo di copertura adeguata, avvalendosi dell'agente AI}
+    \usecasepost{Nuovi \emph{unit test} sono presenti nel progetto, eseguibili nella \emph{build}, e contribuiscono all'aumento della copertura del codice}
+    \usecasescenario{
+        \begin{enumerate}
+            \item Lo sviluppatore identifica il componente da coprire (UC1.1);
+            \item Lo sviluppatore invoca l'agente AI tramite \emph{prompt} (UC1.2);
+            \item L'agente analizza il codice del componente e genera gli \emph{unit test} (UC1.3);
+            \item Lo sviluppatore revisiona i test e li integra nella suite (UC1.4).
+        \end{enumerate}
+    }
+    \label{uc:unit-test-backend}
 \end{usecase}
 
 \begin{usecase}{1.1}{Identificazione del componente da coprire}
-\usecaseactors{Sviluppatore}
-\usecasepre{Lo sviluppatore conosce l'organizzazione del \emph{framework} e ha accesso al \emph{repository} sorgente}
-\usecasedesc{Lo sviluppatore individua un servizio o un \emph{repository} privo di copertura adeguata, anche basandosi sul report di copertura prodotto da una precedente esecuzione della suite}
-\usecasepost{Il componente da coprire è chiaramente identificato e il suo percorso nel \emph{repository} è noto}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore consulta il report di copertura o il codice sorgente;
-    \item Lo sviluppatore individua il componente target dell'attività di \emph{testing}.
-\end{enumerate}
-}
-\label{uc:unit-test-backend-target}
+    \usecasedesc{Lo sviluppatore individua un servizio o un \emph{repository} privo di copertura adeguata, anche basandosi sul report di copertura prodotto da una precedente esecuzione della suite}
+    \label{uc:unit-test-backend-target}
 \end{usecase}
 
 \begin{usecase}{1.2}{Invocazione dell'agente AI tramite prompt}
-\usecaseactors{Sviluppatore, Agente AI}
-\usecasepre{Il componente target è stato identificato (UC1.1) e la \emph{skill} per la generazione di \emph{unit test} \emph{backend} è disponibile nell'ambiente}
-\usecasedesc{Lo sviluppatore richiama l'agente AI passando il riferimento al componente, l'agente riconosce il contesto del \emph{prompt} e recupera la \emph{skill} di generazione \emph{unit test}}
-\usecasepost{L'agente AI ha ricevuto il contesto necessario per produrre i test}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore scrive il \emph{prompt} nel quale descrive la volontà di scrivere dei nuovi test, indicando il componente target;
-    \item L'agente invoca la \emph{skill} dedicata.
-\end{enumerate}
-}
-\label{uc:unit-test-backend-invoke}
+    \usecasedesc{Lo sviluppatore richiama l'agente AI passando il riferimento al componente, l'agente riconosce il contesto del \emph{prompt} e recupera la \emph{skill} di generazione \emph{unit test}}
+    \label{uc:unit-test-backend-invoke}
 \end{usecase}
 
 \begin{usecase}{1.3}{Analisi del codice e generazione dei test}
-\usecaseactors{Agente AI}
-\usecasepre{L'agente AI è stato invocato con riferimento al componente target (UC1.2)}
-\usecasedesc{L'agente analizza il codice del componente, ne deduce i comportamenti attesi e i casi limite, e produce \emph{unit test} che esercitano la logica di business}
-\usecasepost{Sono disponibili in bozza i file di test per il componente analizzato}
-\usecasescenario{
-\begin{enumerate}
-    \item L'agente legge il codice sorgente del componente e delle sue dipendenze dirette;
-    \item L'agente genera i \emph{mock} delle dipendenze necessari ai test;
-    \item L'agente produce i \emph{unit test} con le asserzioni sui comportamenti attesi.
-\end{enumerate}
-}
-\label{uc:unit-test-backend-generate}
+    \usecasedesc{L'agente analizza il codice del componente, ne deduce i comportamenti attesi e i casi limite, e produce \emph{unit test} che esercitano la logica di business}
+    \label{uc:unit-test-backend-generate}
 \end{usecase}
 
 \begin{usecase}{1.4}{Revisione e integrazione nella suite}
-\usecaseactors{Sviluppatore}
-\usecasepre{I test sono stati generati in bozza dall'agente AI (UC1.3)}
-\usecasedesc{Lo sviluppatore valuta la correttezza e la pertinenza dei test, li adatta se necessario e li integra nella suite del progetto}
-\usecasepost{I test sono parte integrante della suite e vengono eseguiti nella \emph{build}}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore esegue i test in locale e ne verifica l'esito;
-    \item Lo sviluppatore corregge eventuali asserzioni inappropriate o incomplete;
-    \item Lo sviluppatore committa i nuovi test nel \emph{repository}.
-\end{enumerate}
-}
-\label{uc:unit-test-backend-review}
+    \usecasedesc{Lo sviluppatore valuta la correttezza e la pertinenza dei test, li adatta se necessario e li integra nella suite del progetto}
+    \label{uc:unit-test-backend-review}
 \end{usecase}
 
 \begin{usecase}{2}{Generazione assistita di integration test su DB}
-\begin{figure}[!h]
-    \centering
-    \includegraphics[width=0.9\columnwidth]{usecase/UC2}
-    \caption{UC2: Generazione assistita di integration test su DB}
-\end{figure}
+    \begin{figure}[!h]
+        \centering
+        \includegraphics[width=0.9\columnwidth]{usecase/UC2}
+        \caption{UC2: Generazione assistita di integration test su DB}
+    \end{figure}
 
-\usecaseactors{Sviluppatore, Agente AI}
-\usecasepre{Il \gls{mcp} è configurato verso il database del \emph{framework} e l'agente AI dispone delle \emph{skill} dedicate agli \emph{integration test}}
-\usecasedesc{Lo sviluppatore vuole verificare l'attendibilità dei dati nel database, il corretto comportamento di una procedura SQL o la coerenza di una prospettiva di configurazione di un componente, sfruttando l'agente AI e l'accesso diretto via \gls{mcp}}
-\usecasepost{La suite di \emph{integration test} verifica in modo automatizzato la consistenza dell'oggetto selezionato}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore seleziona l'oggetto da validare (UC2.1);
-    \item L'agente AI ispeziona via \gls{mcp} schema, dati e procedure coinvolte (UC2.2);
-    \item L'agente genera l'\emph{integration test} (UC2.3);
-    \item Lo sviluppatore revisiona e integra i test nella suite (UC2.4).
-\end{enumerate}
-}
-\usecasegeneralizations{
-\begin{enumerate}
-    \item Selezione dell'oggetto da validare (UC2.1);
-    \item Interrogazione via \gls{mcp} (UC2.2);
-    \item Generazione del test (UC2.3);
-    \item Revisione e integrazione (UC2.4).
-\end{enumerate}
-}
-\label{uc:integration-test-backend}
+    \usecaseactors{Sviluppatore, Agente AI}
+    \usecasepre{Il \gls{mcp} è configurato verso il database del \emph{framework} e l'agente AI dispone delle \emph{skill} dedicate agli \emph{integration test}}
+    \usecasedesc{Lo sviluppatore vuole verificare l'attendibilità dei dati nel database, il corretto comportamento di una procedura SQL o la coerenza di una prospettiva di configurazione di un componente, sfruttando l'agente AI e l'accesso diretto via \gls{mcp}}
+    \usecasepost{La suite di \emph{integration test} verifica in modo automatizzato la consistenza dell'oggetto selezionato}
+    \usecasescenario{
+        \begin{enumerate}
+            \item Lo sviluppatore seleziona l'oggetto da validare (UC2.1);
+            \item L'agente AI ispeziona via \gls{mcp} schema, dati e procedure coinvolte (UC2.2);
+            \item L'agente genera l'\emph{integration test} (UC2.3);
+            \item Lo sviluppatore revisiona e integra i test nella suite (UC2.4).
+        \end{enumerate}
+    }
+    \label{uc:integration-test-backend}
 \end{usecase}
 
 \begin{usecase}{2.1}{Selezione dell'oggetto da validare}
-\usecaseactors{Sviluppatore}
-\usecasepre{Lo sviluppatore ha bisogno di validare un dato del database, una procedura SQL o una prospettiva di configurazione}
-\usecasedesc{Lo sviluppatore identifica l'oggetto target (tabella, vista, \emph{stored procedure}, prospettiva) e il criterio di validità che deve essere verificato}
-\usecasepost{L'oggetto target è chiaramente identificato e il criterio di validità è formalizzato}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore individua l'oggetto da validare;
-    \item Lo sviluppatore formalizza il criterio di validità.
-\end{enumerate}
-}
-\label{uc:integration-test-target}
+    \usecasedesc{Lo sviluppatore identifica l'oggetto target (tabella, vista, \emph{stored procedure}, prospettiva) e il criterio di validità che deve essere verificato}
+    \label{uc:integration-test-target}
 \end{usecase}
 
 \begin{usecase}{2.2}{Interrogazione del database e delle prospettive via MCP}
-\usecaseactors{Agente AI}
-\usecasepre{L'oggetto da validare è stato selezionato (UC2.1) e il \gls{mcp} è disponibile}
-\usecasedesc{L'agente AI interroga il database e il filesystem delle prospettive per ricostruire schema, dati e dipendenze dell'oggetto target}
-\usecasepost{L'agente dispone delle informazioni strutturali e di dominio necessarie a generare il test}
-\usecasescenario{
-\begin{enumerate}
-    \item L'agente interroga lo schema dell'oggetto via \gls{mcp};
-    \item L'agente recupera dati di esempio o la definizione della prospettiva.
-\end{enumerate}
-}
-\label{uc:integration-test-mcp}
+    \usecasedesc{L'agente AI interroga il database e il filesystem delle prospettive per ricostruire schema, dati e dipendenze dell'oggetto target}
+    \label{uc:integration-test-mcp}
 \end{usecase}
 
 \begin{usecase}{2.3}{Generazione dell'integration test}
-\usecaseactors{Agente AI}
-\usecasepre{L'agente ha raccolto le informazioni sull'oggetto target (UC2.2)}
-\usecasedesc{L'agente produce un \emph{integration test} che esegue le operazioni necessarie e ne verifica la conformità al criterio di validità formalizzato}
-\usecasepost{Il file di test è disponibile in bozza}
-\usecasescenario{
-\begin{enumerate}
-    \item L'agente costruisce le \gls{fixtureg} di test necessarie;
-    \item L'agente produce le asserzioni sul criterio di validità.
-\end{enumerate}
-}
-\label{uc:integration-test-generate}
+    \usecasedesc{L'agente produce un \emph{integration test} che esegue le operazioni necessarie e ne verifica la conformità al criterio di validità formalizzato}
+    \label{uc:integration-test-generate}
 \end{usecase}
 
 \begin{usecase}{2.4}{Revisione e integrazione nella suite}
-\usecaseactors{Sviluppatore}
-\usecasepre{Il test è stato generato in bozza (UC2.3)}
-\usecasedesc{Lo sviluppatore valuta il test, lo adatta al contesto specifico e lo integra nella suite}
-\usecasepost{Il test è parte integrante della suite di \emph{integration test}}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore esegue il test in locale e ne verifica l'esito;
-    \item Lo sviluppatore committa il test nel \emph{repository}.
-\end{enumerate}
-}
-\label{uc:integration-test-review}
+    \usecasedesc{Lo sviluppatore valuta il test, lo adatta al contesto specifico e lo integra nella suite}
+    \label{uc:integration-test-review}
 \end{usecase}
-
+\newpage
 \begin{usecase}{3}{Generazione assistita di unit test e E2E frontend}
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.8\columnwidth]{usecase/UC3}
-    \caption{UC3: Generazione assistita di unit test e E2E frontend}
-\end{figure}
+    \begin{figure}[!h]
+        \centering
+        \includegraphics[width=0.8\columnwidth]{usecase/UC3}
+        \caption{UC3: Generazione assistita di unit test e E2E frontend}
+    \end{figure}
 
-\usecaseactors{Sviluppatore, Agente AI}
-\usecasepre{L'ambiente di sviluppo \emph{Angular} del \emph{framework} è aperto, l'agente AI dispone delle \emph{skill} dedicate al \emph{testing frontend} e gli strumenti di \emph{unit test} e di test \emph{end-to-end} sono installati}
-\usecasedesc{Lo sviluppatore vuole introdurre \emph{unit test} sulla logica di un componente \emph{Angular} e/o test \emph{end-to-end} su un flusso utente, avvalendosi dell'agente AI}
-\usecasepost{Sono disponibili \emph{unit test} e test \emph{end-to-end} nella suite del \emph{frontend}}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore identifica il componente o il flusso utente (UC3.1);
-    \item L'agente genera gli \emph{unit test} per la logica del componente (UC3.2);
-    \item L'agente genera il test \emph{end-to-end} corrispondente (UC3.3);
-    \item Lo sviluppatore revisiona e integra i test nella suite (UC3.4).
-\end{enumerate}
-}
-\usecasegeneralizations{
-\begin{enumerate}
-    \item Identificazione del componente / flusso (UC3.1);
-    \item Generazione \emph{unit test} (UC3.2);
-    \item Generazione test \emph{end-to-end} (UC3.3);
-    \item Revisione e integrazione (UC3.4).
-\end{enumerate}
-}
-\label{uc:test-frontend}
+    \usecaseactors{Sviluppatore, Agente AI}
+    \usecasepre{L'ambiente di sviluppo \emph{Angular} del \emph{framework} è aperto, l'agente AI dispone delle \emph{skill} dedicate al \emph{testing frontend} e gli strumenti di \emph{unit test} e di test \emph{end-to-end} sono installati}
+    \usecasedesc{Lo sviluppatore vuole introdurre \emph{unit test} sulla logica di un componente \emph{Angular} e/o test \emph{end-to-end} su un flusso utente, avvalendosi dell'agente AI}
+    \usecasepost{Sono disponibili \emph{unit test} e test \emph{end-to-end} nella suite del \emph{frontend}}
+    \usecasescenario{
+        \begin{enumerate}
+            \item Lo sviluppatore identifica il componente o il flusso utente (UC3.1);
+            \item L'agente genera gli \emph{unit test} per la logica del componente (UC3.2);
+            \item L'agente genera il test \emph{end-to-end} corrispondente (UC3.3);
+            \item Lo sviluppatore revisiona e integra i test nella suite (UC3.4).
+        \end{enumerate}
+    }
+    \label{uc:test-frontend}
 \end{usecase}
 
 \begin{usecase}{3.1}{Identificazione del componente o del flusso utente}
-\usecaseactors{Sviluppatore}
-\usecasepre{Lo sviluppatore ha accesso al codice del progetto \emph{Angular}}
-\usecasedesc{Lo sviluppatore individua un componente da coprire con \emph{unit test} e/o un flusso utente da coprire con un test \emph{end-to-end}}
-\usecasepost{Il target del \emph{testing} è identificato}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore consulta il codice o le specifiche del flusso;
-    \item Lo sviluppatore definisce gli scenari da coprire.
-\end{enumerate}
-}
-\label{uc:test-frontend-target}
+    \usecasedesc{Lo sviluppatore individua un componente da coprire con \emph{unit test} e/o un flusso utente da coprire con un test \emph{end-to-end}}
+    \label{uc:test-frontend-target}
 \end{usecase}
 
 \begin{usecase}{3.2}{Generazione di unit test per la logica del componente}
-\usecaseactors{Agente AI}
-\usecasepre{Il componente target è stato identificato (UC3.1)}
-\usecasedesc{L'agente analizza la logica del componente \emph{Angular}, dei servizi iniettati e dei \emph{template binding}, e genera \emph{unit test} con i \emph{mock} delle dipendenze}
-\usecasepost{Sono disponibili in bozza i file di \emph{unit test} per il componente}
-\usecasescenario{
-\begin{enumerate}
-    \item L'agente legge il codice del componente e dei servizi correlati;
-    \item L'agente produce i \emph{unit test} con \emph{mock} delle dipendenze.
-\end{enumerate}
-}
-\label{uc:test-frontend-unit}
+    \usecasedesc{L'agente analizza la logica del componente \emph{Angular}, dei servizi iniettati e dei \emph{template binding}, e genera \emph{unit test} con i \emph{mock} delle dipendenze}
+    \label{uc:test-frontend-unit}
 \end{usecase}
 
 \begin{usecase}{3.3}{Generazione del test end-to-end}
-\usecaseactors{Agente AI}
-\usecasepre{Il flusso utente è stato identificato (UC3.1)}
-\usecasedesc{L'agente genera un test \emph{end-to-end} che simula l'interazione dell'utente sull'applicazione, verificando le transizioni di stato e gli elementi attesi nelle varie schermate}
-\usecasepost{È disponibile in bozza il file di test \emph{end-to-end}}
-\usecasescenario{
-\begin{enumerate}
-    \item L'agente identifica i selettori e gli stati attesi nelle pagine coinvolte;
-    \item L'agente produce lo \emph{script} di test \emph{end-to-end} con i passi di interazione e le asserzioni.
-\end{enumerate}
-}
-\label{uc:test-frontend-e2e}
+    \usecasedesc{L'agente genera un test \emph{end-to-end} che simula l'interazione dell'utente sull'applicazione, verificando le transizioni di stato e gli elementi attesi nelle varie schermate}
+    \label{uc:test-frontend-e2e}
 \end{usecase}
 
 \begin{usecase}{3.4}{Revisione e integrazione nella suite}
-\usecaseactors{Sviluppatore}
-\usecasepre{I test sono stati generati in bozza (UC3.2, UC3.3)}
-\usecasedesc{Lo sviluppatore esegue i test in locale, ne valuta l'esito e li integra nella suite \emph{frontend}}
-\usecasepost{I test sono parte della suite \emph{frontend} e sono eseguiti nella \emph{build}}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore esegue \emph{unit test} ed \emph{end-to-end} in locale;
-    \item Lo sviluppatore corregge eventuali asserzioni o selettori instabili;
-    \item Lo sviluppatore committa i test nel \emph{repository}.
-\end{enumerate}
-}
-\label{uc:test-frontend-review}
+    \usecasedesc{Lo sviluppatore esegue i test in locale, ne valuta l'esito e li integra nella suite \emph{frontend}}
+    \label{uc:test-frontend-review}
 \end{usecase}
 
-\newpage
 \begin{usecase}{4}{Esecuzione della suite di test e produzione del report di copertura}
-\begin{figure}[!h]
-    \centering
-    \includegraphics[width=0.9\columnwidth]{usecase/UC4}
-    \caption{UC4: Esecuzione della suite di test e produzione del report di copertura}
-\end{figure}
+    \begin{figure}[!h]
+        \centering
+        \includegraphics[width=0.9\columnwidth]{usecase/UC4}
+        \caption{UC4: Esecuzione della suite di test e produzione del report di copertura}
+    \end{figure}
 
-\usecaseactors{Sviluppatore, Sia.Core}
-\usecasepre{La suite di test (\emph{unit}, \emph{integration} ed \emph{end-to-end}) è integrata nel processo di \emph{build}}
-\usecasedesc{Lo sviluppatore lancia l'esecuzione completa della suite per ottenere un esito complessivo e un report di copertura aggiornato del codice}
-\usecasepost{Lo sviluppatore dispone di un esito complessivo della suite e di un report di copertura}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore avvia la suite di test (UC4.1);
-    \item Il sistema esegue tutti i test integrati nella \emph{build} (UC4.2);
-    \item Il sistema produce il report di copertura del codice (UC4.3).
-\end{enumerate}
-}
-\usecaseextensions{
-\begin{enumerate}
-    \item In presenza di test falliti, lo sviluppatore avvia la procedura di gestione (UC4.4).
-\end{enumerate}
-}
-\usecasegeneralizations{
-\begin{enumerate}
-    \item Avvio della suite (UC4.1);
-    \item Esecuzione dei test (UC4.2);
-    \item Generazione del report di copertura (UC4.3);
-    \item Gestione dei test falliti (UC4.4).
-\end{enumerate}
-}
-\label{uc:esecuzione-test}
+    \usecaseactors{Sviluppatore, Sia.Core}
+    \usecasepre{La suite di test (\emph{unit}, \emph{integration} ed \emph{end-to-end}) è integrata nel processo di \emph{build}}
+    \usecasedesc{Lo sviluppatore lancia l'esecuzione completa della suite per ottenere un esito complessivo e un report di copertura aggiornato del codice}
+    \usecasepost{Lo sviluppatore dispone di un esito complessivo della suite e di un report di copertura}
+    \usecasescenario{
+        \begin{enumerate}
+            \item Lo sviluppatore avvia la suite di test (UC4.1);
+            \item Il sistema esegue tutti i test integrati nella \emph{build} (UC4.2);
+            \item Il sistema produce il report di copertura del codice (UC4.3).
+        \end{enumerate}
+    }
+    \usecaseextensions{
+        \begin{enumerate}
+            \item In presenza di test falliti, lo sviluppatore avvia la procedura di gestione (UC4.4).
+        \end{enumerate}
+    }
+    \label{uc:esecuzione-test}
 \end{usecase}
 
 \begin{usecase}{4.1}{Avvio della suite di test}
-\usecaseactors{Sviluppatore}
-\usecasepre{La suite è installata e configurata sul sistema dello sviluppatore}
-\usecasedesc{Lo sviluppatore lancia il comando o l'azione di avvio della suite}
-\usecasepost{La suite è in esecuzione}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore esegue il comando di avvio della suite di test.
-\end{enumerate}
-}
-\label{uc:esecuzione-test-start}
+    \usecasedesc{Lo sviluppatore lancia il comando o l'azione di avvio della suite}
+    \label{uc:esecuzione-test-start}
 \end{usecase}
 
 \begin{usecase}{4.2}{Esecuzione dei test integrata nella build}
-\usecaseactors{Sia.Core}
-\usecasepre{La suite è stata avviata (UC4.1)}
-\usecasedesc{Il sistema esegue in sequenza \emph{unit test}, \emph{integration test} ed \emph{end-to-end test} riportando l'esito di ciascuno}
-\usecasepost{Tutti i test sono stati eseguiti e ciascuno ha un esito noto}
-\usecasescenario{
-\begin{enumerate}
-    \item Il sistema esegue gli \emph{unit test};
-    \item Il sistema esegue gli \emph{integration test};
-    \item Il sistema esegue i test \emph{end-to-end}.
-\end{enumerate}
-}
-\label{uc:esecuzione-test-run}
+    \usecasedesc{Il sistema esegue in sequenza \emph{unit test}, \emph{integration test} ed \emph{end-to-end test} riportando l'esito di ciascuno}
+    \label{uc:esecuzione-test-run}
 \end{usecase}
 
 \begin{usecase}{4.3}{Generazione del report di copertura del codice}
-\usecaseactors{Sia.Core}
-\usecasepre{L'esecuzione della suite è terminata (UC4.2)}
-\usecasedesc{Il sistema raccoglie i dati di copertura dei test e produce un report consultabile dallo sviluppatore}
-\usecasepost{È disponibile un report di copertura del codice aggiornato}
-\usecasescenario{
-\begin{enumerate}
-    \item Il sistema aggrega i dati di copertura;
-    \item Il sistema genera il report nel formato configurato.
-\end{enumerate}
-}
-\label{uc:esecuzione-test-coverage}
+    \usecasedesc{Il sistema raccoglie i dati di copertura dei test e produce un report consultabile dallo sviluppatore}
+    \label{uc:esecuzione-test-coverage}
 \end{usecase}
 
 \begin{usecase}{4.4}{Gestione dei test falliti}
-\usecaseactors{Sviluppatore}
-\usecasepre{Almeno un test della suite è fallito}
-\usecasedesc{Lo sviluppatore consulta l'esito del test fallito, individua la causa nel codice sorgente e procede alla correzione del codice o del test}
-\usecasepost{Il test torna a essere verde dopo l'intervento dello sviluppatore}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore consulta l'esito e il \emph{log} del test fallito;
-    \item Lo sviluppatore identifica la causa nel codice sorgente o nel test stesso;
-    \item Lo sviluppatore corregge il difetto e rilancia il test.
-\end{enumerate}
-}
-\label{uc:esecuzione-test-failure}
+    \usecasedesc{Lo sviluppatore consulta l'esito del test fallito, individua la causa nel codice sorgente e procede alla correzione del codice o del test}
+    \label{uc:esecuzione-test-failure}
 \end{usecase}
 
 \begin{usecase}{5}{Propagazione della telemetria a un nuovo modulo}
-\begin{figure}[!h]
-    \centering
-    \includegraphics[width=0.9\columnwidth]{usecase/UC5}
-    \caption{UC5: Propagazione della telemetria a un nuovo modulo}
-\end{figure}
+    \begin{figure}[!h]
+        \centering
+        \includegraphics[width=0.9\columnwidth]{usecase/UC5}
+        \caption{UC5: Propagazione della telemetria a un nuovo modulo}
+    \end{figure}
 
-\usecaseactors{Sviluppatore, Agente AI}
-\usecasepre{Esiste un modulo del \emph{framework} non ancora coperto da telemetria, sono disponibili le \emph{skill} per la propagazione di \emph{trace}, metriche e \emph{log}, e lo stack \emph{Grafana LGTM} è raggiungibile}
-\usecasedesc{Lo sviluppatore vuole estendere la copertura della telemetria a un nuovo modulo del \emph{framework}, avvalendosi delle \emph{skill} dedicate dell'agente AI per garantire l'aderenza alle convenzioni}
-\usecasepost{Il modulo emette segnali di telemetria conformi alle convenzioni del \emph{framework} e visibili nello stack \emph{Grafana LGTM}}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore identifica il modulo da instrumentare (UC5.1);
-    \item Lo sviluppatore invoca la \emph{skill} di propagazione della telemetria (UC5.2);
-    \item L'agente introduce il pattern \texttt{SiaXxxDiagnostics} e registra la sorgente nel \emph{pipeline} \gls{otel} (UC5.3);
-    \item L'agente definisce metriche studiate per il modulo da coprire (UC5.4);
-    \item Lo sviluppatore valida i segnali sullo stack \emph{Grafana LGTM} (UC5.5).
-\end{enumerate}
-}
-\usecasegeneralizations{
-\begin{enumerate}
-    \item Identificazione del modulo (UC5.1);
-    \item Invocazione della \emph{skill} (UC5.2);
-    \item Introduzione di \texttt{SiaXxxDiagnostics} (UC5.3);
-    \item Definizione di metriche (UC5.4);
-    \item Validazione dei segnali (UC5.5).
-\end{enumerate}
-}
-\label{uc:propagazione-telemetria}
+    \usecaseactors{Sviluppatore, Agente AI}
+    \usecasepre{Esiste un modulo del \emph{framework} non ancora coperto da telemetria, sono disponibili le \emph{skill} per la propagazione di \emph{trace}, metriche e \emph{log}, e lo stack \emph{Grafana LGTM} è raggiungibile}
+    \usecasedesc{Lo sviluppatore vuole estendere la copertura della telemetria a un nuovo modulo del \emph{framework}, avvalendosi delle \emph{skill} dedicate dell'agente AI per garantire l'aderenza alle convenzioni}
+    \usecasepost{Il modulo emette segnali di telemetria conformi alle convenzioni del \emph{framework} e visibili nello stack \emph{Grafana LGTM}}
+    \usecasescenario{
+        \begin{enumerate}
+            \item Lo sviluppatore identifica il modulo da instrumentare (UC5.1);
+            \item Lo sviluppatore invoca la \emph{skill} di propagazione della telemetria (UC5.2);
+            \item L'agente introduce il pattern \texttt{SiaXxxDiagnostics} e registra la sorgente nel \emph{pipeline} \gls{otel} (UC5.3);
+            \item L'agente definisce metriche studiate per il modulo da coprire (UC5.4);
+            \item Lo sviluppatore valida i segnali sullo stack \emph{Grafana LGTM} (UC5.5).
+        \end{enumerate}
+    }
+    \label{uc:propagazione-telemetria}
 \end{usecase}
 
 \begin{usecase}{5.1}{Identificazione del modulo da instrumentare}
-\usecaseactors{Sviluppatore}
-\usecasepre{Lo sviluppatore conosce la mappa dei moduli del \emph{framework}}
-\usecasedesc{Lo sviluppatore individua un modulo non ancora coperto e ne valuta gli aspetti rilevanti per la telemetria (operazioni critiche, dipendenze esterne, prestazioni)}
-\usecasepost{Il modulo target e i suoi aspetti rilevanti sono identificati}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore consulta la mappa dei moduli e lo stato attuale di copertura della telemetria;
-    \item Lo sviluppatore definisce gli aspetti del modulo da osservare.
-\end{enumerate}
-}
-\label{uc:propagazione-target}
+    \usecasedesc{Lo sviluppatore individua un modulo non ancora coperto e ne valuta gli aspetti rilevanti per la telemetria (operazioni critiche, dipendenze esterne, prestazioni)}
+    \label{uc:propagazione-target}
 \end{usecase}
 
 \begin{usecase}{5.2}{Invocazione della skill di propagazione della telemetria}
-\usecaseactors{Sviluppatore, Agente AI}
-\usecasepre{Il modulo target è stato identificato (UC5.1) e la \emph{skill} dedicata è disponibile}
-\usecasedesc{Lo sviluppatore richiama l'agente AI passando il riferimento al componente, l'agente riconosce il contesto del \emph{prompt} e recupera la \emph{skill} di propagazione della telemetria}
-\usecasepost{L'agente ha ricevuto il contesto necessario per procedere all'instrumentazione}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore scrive il \emph{prompt} nel quale descrive la volontà di coprire un nuovo modulo con la telemetria;
-    \item L'agente invoca la \emph{skill} dedicata.
-\end{enumerate}
-}
-\label{uc:propagazione-invoke}
+    \usecasedesc{Lo sviluppatore richiama l'agente AI passando il riferimento al componente, l'agente riconosce il contesto del \emph{prompt} e recupera la \emph{skill} di propagazione della telemetria}
+    \label{uc:propagazione-invoke}
 \end{usecase}
 
 \begin{usecase}{5.3}{Introduzione della classe di diagnostica e registrazione in OTel}
-\usecaseactors{Agente AI}
-\usecasepre{L'agente dispone del conteso per la propagazione sul modulo target (UC5.2)}
-\usecasedesc{L'agente introduce nel modulo il pattern \texttt{SiaXxxDiagnostics}, definisce \texttt{ActivitySource} e \texttt{Meter} e registra la nuova sorgente nel \emph{pipeline} \gls{otel} del \emph{framework}}
-\usecasepost{Il modulo dispone della propria infrastruttura di telemetria registrata nel \emph{pipeline}}
-\usecasescenario{
-\begin{enumerate}
-    \item L'agente crea la classe \texttt{SiaXxxDiagnostics};
-    \item L'agente registra la sorgente nel \emph{pipeline} \gls{otel};
-    \item L'agente strumenta i punti critici del modulo con \emph{span}.
-\end{enumerate}
-}
-\label{uc:propagazione-diagnostics}
+    \usecasedesc{L'agente introduce nel modulo il pattern \texttt{SiaXxxDiagnostics}, definisce \texttt{ActivitySource} e \texttt{Meter} e registra la nuova sorgente nel \emph{pipeline} \gls{otel} del \emph{framework}}
+    \label{uc:propagazione-diagnostics}
 \end{usecase}
 
+\newpage
 \begin{usecase}{5.4}{Definizione di metriche studiate per il modulo da coprire}
-\usecaseactors{Agente AI}
-\usecasepre{Il modulo dispone della propria \texttt{SiaXxxDiagnostics} (UC5.3)}
-\usecasedesc{L'agente definisce le metriche del modulo applicando le convenzioni del \emph{framework} sui tag, in modo da evitare l'esplosione della cardinalità lato Prometheus}
-\usecasepost{Il modulo emette metriche conformi alle convenzioni di cardinalità}
-\usecasescenario{
-\begin{enumerate}
-    \item L'agente identifica le grandezze da misurare;
-    \item L'agente sceglie tipo di metrica e attributi nel rispetto delle regole di cardinalità;
-    \item L'agente registra le metriche sul \texttt{Meter} del modulo.
-\end{enumerate}
-}
-\label{uc:propagazione-metrics}
+    \usecasedesc{L'agente definisce le metriche del modulo applicando le convenzioni del \emph{framework} sui tag, in modo da evitare l'esplosione della cardinalità lato Prometheus}
+    \label{uc:propagazione-metrics}
 \end{usecase}
 
 \begin{usecase}{5.5}{Validazione dei segnali sullo stack Grafana LGTM}
-\usecaseactors{Sviluppatore}
-\usecasepre{Il modulo è stato instrumentato (UC5.3, UC5.4) e lo stack \emph{Grafana LGTM} è raggiungibile}
-\usecasedesc{Lo sviluppatore esegue il modulo in sviluppo e verifica che \emph{trace}, metriche e \emph{log} compaiano correttamente in \emph{Tempo}, \emph{Prometheus} e \emph{Loki}}
-\usecasepost{La nuova telemetria è validata}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore esercita il modulo;
-    \item Lo sviluppatore verifica i segnali in \emph{Grafana};
-    \item Lo sviluppatore valida la correlazione \emph{trace}/metriche/\emph{log}.
-\end{enumerate}
-}
-\label{uc:propagazione-validate}
+    \usecasedesc{Lo sviluppatore esegue il modulo in sviluppo e verifica che \emph{trace}, metriche e \emph{log} compaiano correttamente in \emph{Tempo}, \emph{Prometheus} e \emph{Loki}}
+    \label{uc:propagazione-validate}
 \end{usecase}
-\newpage
+
 \begin{usecase}{6}{Visualizzazione di metriche, trace e log di un modulo}
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.9\columnwidth]{usecase/UC6}
-    \caption{UC6: Visualizzazione di metriche, trace e log di un modulo}
-\end{figure}
+    \begin{figure}[!h]
+        \centering
+        \includegraphics[width=0.9\columnwidth]{usecase/UC6}
+        \caption{UC6: Visualizzazione di metriche, trace e log di un modulo}
+    \end{figure}
 
-\usecaseactors{Sviluppatore}
-\usecasepre{Lo stack \emph{Grafana LGTM} è raggiungibile, il modulo di interesse è instrumentato e produce segnali, e la dashboard del modulo è disponibile}
-\usecasedesc{Lo sviluppatore consulta in modo correlato metriche, \emph{trace} e \emph{log} di un modulo per ottenerne una visione unificata in un periodo di tempo}
-\usecasepost{Lo sviluppatore dispone di una visione unificata del comportamento del modulo nel periodo selezionato}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore apre la dashboard del modulo (UC6.1);
-    \item Lo sviluppatore seleziona servizio, installazione e cliente tramite le variabili \emph{template} (UC6.2);
-    \item Lo sviluppatore consulta in modo correlato metriche, \emph{trace} e \emph{log} (UC6.3).
-\end{enumerate}
-}
-\usecasegeneralizations{
-\begin{enumerate}
-    \item Apertura della dashboard (UC6.1);
-    \item Selezione dei filtri (UC6.2);
-    \item Consultazione correlata dei segnali (UC6.3).
-\end{enumerate}
-}
-\label{uc:dashboard-modulo}
+    \usecaseactors{Sviluppatore}
+    \usecasepre{Lo stack \emph{Grafana LGTM} è raggiungibile, il modulo di interesse è instrumentato e produce segnali, e la dashboard del modulo è disponibile}
+    \usecasedesc{Lo sviluppatore consulta in modo correlato metriche, \emph{trace} e \emph{log} di un modulo per ottenerne una visione unificata in un periodo di tempo}
+    \usecasepost{Lo sviluppatore dispone di una visione unificata del comportamento del modulo nel periodo selezionato}
+    \usecasescenario{
+        \begin{enumerate}
+            \item Lo sviluppatore apre la dashboard del modulo (UC6.1);
+            \item Lo sviluppatore seleziona servizio, installazione e cliente tramite le variabili \emph{template} (UC6.2);
+            \item Lo sviluppatore consulta in modo correlato metriche, \emph{trace} e \emph{log} (UC6.3).
+        \end{enumerate}
+    }
+    \label{uc:dashboard-modulo}
 \end{usecase}
-
 \begin{usecase}{6.1}{Apertura della dashboard del modulo}
-\usecaseactors{Sviluppatore}
-\usecasepre{Lo sviluppatore è autenticato in \emph{Grafana} e conosce il modulo di interesse}
-\usecasedesc{Lo sviluppatore apre la dashboard associata al modulo dalla cartella di organizzazione del \emph{framework}}
-\usecasepost{La dashboard del modulo è aperta}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore naviga nella cartella delle dashboard del \emph{framework};
-    \item Lo sviluppatore apre la dashboard del modulo.
-\end{enumerate}
-}
-\label{uc:dashboard-modulo-open}
+    \usecasedesc{Lo sviluppatore apre la dashboard associata al modulo dalla cartella di organizzazione del \emph{framework}}
+    \label{uc:dashboard-modulo-open}
 \end{usecase}
 
 \begin{usecase}{6.2}{Selezione delle variabili template}
-\usecaseactors{Sviluppatore}
-\usecasepre{La dashboard è aperta (UC6.1)}
-\usecasedesc{Lo sviluppatore seleziona dai \emph{dropdown} delle variabili \emph{template} servizio, installazione e cliente per circoscrivere la visualizzazione}
-\usecasepost{I pannelli mostrano dati filtrati sul contesto selezionato}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore apre i selettori delle variabili \emph{template};
-    \item Lo sviluppatore sceglie servizio, installazione e cliente di interesse.
-\end{enumerate}
-}
-\label{uc:dashboard-modulo-filter}
+    \usecasedesc{Lo sviluppatore seleziona dai \emph{dropdown} delle variabili \emph{template} servizio, installazione e cliente per circoscrivere la visualizzazione}
+    \label{uc:dashboard-modulo-filter}
 \end{usecase}
 
 \begin{usecase}{6.3}{Consultazione correlata di metriche, trace e log}
-\usecaseactors{Sviluppatore}
-\usecasepre{La dashboard è filtrata sul contesto desiderato (UC6.2)}
-\usecasedesc{Lo sviluppatore osserva i pannelli di metriche, \emph{trace} e \emph{log} relativi al modulo nel periodo selezionato, sfruttando i collegamenti reciproci messi a disposizione dalla dashboard}
-\usecasepost{Lo sviluppatore ha una visione unificata del comportamento del modulo}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore consulta le metriche aggregate;
-    \item Lo sviluppatore naviga alle \emph{trace} di interesse;
-    \item Lo sviluppatore consulta i \emph{log} associati.
-\end{enumerate}
-}
-\label{uc:dashboard-modulo-correlate}
+    \usecasedesc{Lo sviluppatore osserva i pannelli di metriche, \emph{trace} e \emph{log} relativi al modulo nel periodo selezionato, sfruttando i collegamenti reciproci messi a disposizione dalla dashboard}
+    \label{uc:dashboard-modulo-correlate}
 \end{usecase}
-\newpage
 
 \begin{usecase}{7}{Diagnosi di una richiesta lenta tramite exemplar}
-\begin{figure}[!h]
-    \centering
-    \includegraphics[width=0.9\columnwidth]{usecase/UC7}
-    \caption{UC7: Diagnosi di una richiesta lenta tramite exemplar}
-\end{figure}
+    \begin{figure}[!h]
+        \centering
+        \includegraphics[width=0.9\columnwidth]{usecase/UC7}
+        \caption{UC7: Diagnosi di una richiesta lenta tramite exemplar}
+    \end{figure}
 
-\usecaseactors{Sviluppatore}
-\usecasepre{Una dashboard \emph{Grafana} mostra un pannello percentili (es.\ p95/p99) di una metrica di tipo \emph{Histogram} con \emph{exemplar} abilitati e i \emph{log} sono indicizzati in \emph{Loki} con \texttt{TraceId}}
-\usecasedesc{Lo sviluppatore vuole ricostruire la catena diagnostica completa di una richiesta lenta a partire da un campione anomalo sul pannello percentili}
-\usecasepost{Lo sviluppatore ha ricostruito la catena diagnostica della singola richiesta lenta, dall'aggregato al \emph{log} di dettaglio}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore individua il campione anomalo sul pannello percentili (UC7.1);
-    \item Lo sviluppatore naviga all'\emph{exemplar} associato (UC7.2);
-    \item Lo sviluppatore apre la \emph{trace} corrispondente in \emph{Tempo} (UC7.3);
-    \item Lo sviluppatore naviga ai \emph{log} correlati tramite \texttt{TraceId} (UC7.4).
-\end{enumerate}
-}
-\usecasegeneralizations{
-\begin{enumerate}
-    \item Individuazione del campione anomalo (UC7.1);
-    \item Navigazione all'\emph{exemplar} (UC7.2);
-    \item Apertura della \emph{trace} (UC7.3);
-    \item Navigazione ai \emph{log} (UC7.4).
-\end{enumerate}
-}
-\label{uc:diagnosi-exemplar}
+    \usecaseactors{Sviluppatore}
+    \usecasepre{Una dashboard \emph{Grafana} mostra un pannello percentili (es.\ p95/p99) di una metrica di tipo \emph{Histogram} con \emph{exemplar} abilitati e i \emph{log} sono indicizzati in \emph{Loki} con \texttt{TraceId}}
+    \usecasedesc{Lo sviluppatore vuole ricostruire la catena diagnostica completa di una richiesta lenta a partire da un campione anomalo sul pannello percentili}
+    \usecasepost{Lo sviluppatore ha ricostruito la catena diagnostica della singola richiesta lenta, dall'aggregato al \emph{log} di dettaglio}
+    \usecasescenario{
+        \begin{enumerate}
+            \item Lo sviluppatore individua il campione anomalo sul pannello percentili (UC7.1);
+            \item Lo sviluppatore naviga all'\emph{exemplar} associato (UC7.2);
+            \item Lo sviluppatore apre la \emph{trace} corrispondente in \emph{Tempo} (UC7.3);
+            \item Lo sviluppatore naviga ai \emph{log} correlati tramite \texttt{TraceId} (UC7.4).
+        \end{enumerate}
+    }
+    \label{uc:diagnosi-exemplar}
 \end{usecase}
 
 \begin{usecase}{7.1}{Individuazione del campione anomalo}
-\usecaseactors{Sviluppatore}
-\usecasepre{Il pannello percentili mostra picchi sospetti}
-\usecasedesc{Lo sviluppatore identifica il punto temporale e il valore del campione anomalo sul pannello}
-\usecasepost{Il campione anomalo è selezionato sul pannello}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore osserva il pannello percentili;
-    \item Lo sviluppatore seleziona il punto anomalo.
-\end{enumerate}
-}
-\label{uc:diagnosi-exemplar-anomaly}
+    \usecasedesc{Lo sviluppatore identifica il punto temporale e il valore del campione anomalo sul pannello}
+    \label{uc:diagnosi-exemplar-anomaly}
 \end{usecase}
 
 \begin{usecase}{7.2}{Navigazione all'exemplar associato}
-\usecaseactors{Sviluppatore}
-\usecasepre{Il campione è selezionato (UC7.1) e gli \emph{exemplar} sono presenti}
-\usecasedesc{Lo sviluppatore clicca sull'\emph{exemplar} associato al campione, rappresentato come marker sul pannello}
-\usecasepost{Il \texttt{TraceId} dell'\emph{exemplar} è disponibile}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore individua il marker dell'\emph{exemplar};
-    \item Lo sviluppatore lo clicca per ottenere il \texttt{TraceId}.
-\end{enumerate}
-}
-\label{uc:diagnosi-exemplar-link}
+    \usecasedesc{Lo sviluppatore clicca sull'\emph{exemplar} associato al campione, rappresentato come marker sul pannello}
+    \label{uc:diagnosi-exemplar-link}
 \end{usecase}
 
 \begin{usecase}{7.3}{Apertura della trace in Tempo}
-\usecaseactors{Sviluppatore}
-\usecasepre{Il \texttt{TraceId} è disponibile (UC7.2)}
-\usecasedesc{Lo sviluppatore apre la \emph{trace} in \emph{Tempo}, esamina lo \emph{span} radice e i suoi figli, individuando il punto in cui si concentra la latenza}
-\usecasepost{Lo sviluppatore ha identificato lo \emph{span} responsabile della lentezza}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore apre la \emph{trace} in \emph{Tempo};
-    \item Lo sviluppatore analizza gli \emph{span} presenti nella \emph{trace};
-    \item Lo sviluppatore identifica lo \emph{span} dominante.
-\end{enumerate}
-}
-\label{uc:diagnosi-exemplar-trace}
+    \usecasedesc{Lo sviluppatore apre la \emph{trace} in \emph{Tempo}, esamina lo \emph{span} radice e i suoi figli, individuando il punto in cui si concentra la latenza}
+    \label{uc:diagnosi-exemplar-trace}
 \end{usecase}
 
 \begin{usecase}{7.4}{Navigazione ai log correlati tramite TraceId}
-\usecaseactors{Sviluppatore}
-\usecasepre{Lo \emph{span} responsabile è stato identificato (UC7.3)}
-\usecasedesc{Lo sviluppatore segue il link verso \emph{Loki}, filtrato per \texttt{TraceId}, e consulta i \emph{log} emessi nel contesto della richiesta}
-\usecasepost{Lo sviluppatore ha consultato i \emph{log} di dettaglio della richiesta lenta}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore segue il link \emph{Trace}-to-\emph{Logs};
-    \item Lo sviluppatore consulta i \emph{log} filtrati per \texttt{TraceId}.
-\end{enumerate}
-}
-\label{uc:diagnosi-exemplar-logs}
+    \usecasedesc{Lo sviluppatore segue il link verso \emph{Loki}, filtrato per \texttt{TraceId}, e consulta i \emph{log} emessi nel contesto della richiesta}
+    \label{uc:diagnosi-exemplar-logs}
 \end{usecase}
 
+\newpage
 \begin{usecase}{8}{Identificazione dell'utente coinvolto in una trace}
-\begin{figure}[!h]
-    \centering
-    \includegraphics[width=0.9\columnwidth]{usecase/UC8}
-    \caption{UC8: Identificazione dell'utente coinvolto in una trace}
-\end{figure}
+    \begin{figure}[!h]
+        \centering
+        \includegraphics[width=0.9\columnwidth]{usecase/UC8}
+        \caption{UC8: Identificazione dell'utente coinvolto in una trace}
+    \end{figure}
 
-\usecaseactors{Sviluppatore}
-\usecasepre{La telemetria del \emph{framework} arricchisce automaticamente ogni \emph{span} con gli attributi \texttt{enduser.id} e \texttt{enduser.name}, e \emph{log} e \emph{trace} sono indicizzati su tali attributi}
-\usecasedesc{Lo sviluppatore vuole risalire all'utente che ha originato una richiesta tracciata e analizzare il suo intero contesto}
-\usecasepost{Lo sviluppatore conosce l'identità dell'utente coinvolto e può proseguire l'indagine su tutto il suo contesto}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore apre la \emph{trace} di interesse (UC8.1);
-    \item Lo sviluppatore legge gli attributi \texttt{enduser.id} e \texttt{enduser.name} dello \emph{span} radice (UC8.2);
-    \item Lo sviluppatore filtra ulteriori \emph{trace} e \emph{log} per lo stesso utente (UC8.3).
-\end{enumerate}
-}
-\usecasegeneralizations{
-\begin{enumerate}
-    \item Apertura della \emph{trace} (UC8.1);
-    \item Lettura degli attributi \emph{enduser} (UC8.2);
-    \item Filtro su altre \emph{trace} e \emph{log} (UC8.3).
-\end{enumerate}
-}
-\label{uc:enduser-trace}
+    \usecaseactors{Sviluppatore}
+    \usecasepre{La telemetria del \emph{framework} arricchisce automaticamente ogni \emph{span} con gli attributi \texttt{enduser.id} e \texttt{enduser.name}, e \emph{log} e \emph{trace} sono indicizzati su tali attributi}
+    \usecasedesc{Lo sviluppatore vuole risalire all'utente che ha originato una richiesta tracciata e analizzare il suo intero contesto}
+    \usecasepost{Lo sviluppatore conosce l'identità dell'utente coinvolto e può proseguire l'indagine su tutto il suo contesto}
+    \usecasescenario{
+        \begin{enumerate}
+            \item Lo sviluppatore apre la \emph{trace} di interesse (UC8.1);
+            \item Lo sviluppatore legge gli attributi \texttt{enduser.id} e \texttt{enduser.name} dello \emph{span} radice (UC8.2);
+            \item Lo sviluppatore filtra ulteriori \emph{trace} e \emph{log} per lo stesso utente (UC8.3).
+        \end{enumerate}
+    }
+    \label{uc:enduser-trace}
 \end{usecase}
 
 \begin{usecase}{8.1}{Apertura della trace di interesse}
-\usecaseactors{Sviluppatore}
-\usecasepre{Lo sviluppatore dispone di un \texttt{TraceId} o di un punto d'ingresso (es.\ \emph{exemplar}, \emph{log})}
-\usecasedesc{Lo sviluppatore apre la \emph{trace} in \emph{Tempo}}
-\usecasepost{La \emph{trace} è aperta}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore apre la \emph{trace} a partire dal \texttt{TraceId} disponibile.
-\end{enumerate}
-}
-\label{uc:enduser-trace-open}
+    \usecasedesc{Lo sviluppatore apre la \emph{trace} in \emph{Tempo}}
+    \label{uc:enduser-trace-open}
 \end{usecase}
 
 \begin{usecase}{8.2}{Lettura degli attributi enduser dello span radice}
-\usecaseactors{Sviluppatore}
-\usecasepre{La \emph{trace} è aperta (UC8.1)}
-\usecasedesc{Lo sviluppatore esamina gli attributi dello \emph{span} radice e legge \texttt{enduser.id} e \texttt{enduser.name}}
-\usecasepost{L'identità dell'utente è nota}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore seleziona lo \emph{span} radice;
-    \item Lo sviluppatore consulta gli attributi \emph{enduser}.
-\end{enumerate}
-}
-\label{uc:enduser-trace-read}
+    \usecasedesc{Lo sviluppatore esamina gli attributi dello \emph{span} radice e legge \texttt{enduser.id} e \texttt{enduser.name}}
+    \label{uc:enduser-trace-read}
 \end{usecase}
 
 \begin{usecase}{8.3}{Filtro di ulteriori trace e log per lo stesso utente}
-\usecaseactors{Sviluppatore}
-\usecasepre{L'identità dell'utente è nota (UC8.2)}
-\usecasedesc{Lo sviluppatore esegue ricerche in \emph{Tempo} e \emph{Loki} filtrando per \texttt{enduser.id}, ottenendo l'intero contesto delle attività dell'utente}
-\usecasepost{Lo sviluppatore dispone della cronologia delle interazioni dell'utente}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore lancia una query \emph{TraceQL} filtrata per \texttt{enduser.id};
-    \item Lo sviluppatore lancia una query \emph{LogQL} filtrata per \texttt{enduser.id}.
-\end{enumerate}
-}
-\label{uc:enduser-trace-filter}
+    \usecasedesc{Lo sviluppatore esegue ricerche in \emph{Tempo} e \emph{Loki} filtrando per \texttt{enduser.id}, ottenendo l'intero contesto delle attività dell'utente}
+    \label{uc:enduser-trace-filter}
 \end{usecase}
-\newpage
-\begin{usecase}{9}{Creazione o modifica di una dashboard tramite agente AI e MCP}
-\begin{figure}[!h]
-    \centering
-    \includegraphics[width=0.9\columnwidth]{usecase/UC9}
-    \caption{UC9: Creazione o modifica di una dashboard tramite agente AI e MCP}
-\end{figure}
 
-\usecaseactors{Sviluppatore, Agente AI}
-\usecasepre{Lo stack \emph{Grafana LGTM} è raggiungibile e l'agente AI dispone delle credenziali \gls{mcp} verso \emph{Grafana} e verso le sorgenti dati}
-\usecasedesc{Lo sviluppatore vuole creare o modificare una dashboard delegando all'agente AI sia la formulazione delle query sia la pubblicazione finale}
-\usecasepost{La dashboard è disponibile in \emph{Grafana} con i pannelli e le query richiesti, validati sui dati reali}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore specifica all'agente le esigenze di \emph{monitoring} (UC9.1);
-    \item L'agente formula e valida le query via \gls{mcp} (UC9.2);
-    \item L'agente pubblica o aggiorna la dashboard sull'istanza \emph{Grafana} (UC9.3).
-\end{enumerate}
-}
-\usecaseextensions{
-\begin{enumerate}
-    \item In presenza di una query non valida, l'agente avvia la procedura di gestione (UC9.4).
-\end{enumerate}
-}
-\usecasegeneralizations{
-\begin{enumerate}
-    \item Specifica delle esigenze (UC9.1);
-    \item Validazione delle query (UC9.2);
-    \item Pubblicazione della dashboard (UC9.3);
-    \item Gestione di una query non valida (UC9.4).
-\end{enumerate}
-}
-\label{uc:dashboard-mcp}
+\begin{usecase}{9}{Creazione o modifica di una dashboard tramite agente AI e MCP}
+    \begin{figure}[!h]
+        \centering
+        \includegraphics[width=0.9\columnwidth]{usecase/UC9}
+        \caption{UC9: Creazione o modifica di una dashboard tramite agente AI e MCP}
+    \end{figure}
+
+    \usecaseactors{Sviluppatore, Agente AI}
+    \usecasepre{Lo stack \emph{Grafana LGTM} è raggiungibile e l'agente AI dispone delle credenziali \gls{mcp} verso \emph{Grafana} e verso le sorgenti dati}
+    \usecasedesc{Lo sviluppatore vuole creare o modificare una dashboard delegando all'agente AI sia la formulazione delle query sia la pubblicazione finale}
+    \usecasepost{La dashboard è disponibile in \emph{Grafana} con i pannelli e le query richiesti, validati sui dati reali}
+    \usecasescenario{
+        \begin{enumerate}
+            \item Lo sviluppatore specifica all'agente le esigenze di \emph{monitoring} (UC9.1);
+            \item L'agente formula e valida le query via \gls{mcp} (UC9.2);
+            \item L'agente pubblica o aggiorna la dashboard sull'istanza \emph{Grafana} (UC9.3).
+        \end{enumerate}
+    }
+    \usecaseextensions{
+        \begin{enumerate}
+            \item In presenza di una query non valida, l'agente avvia la procedura di gestione (UC9.4).
+        \end{enumerate}
+    }
+    \label{uc:dashboard-mcp}
 \end{usecase}
 
 \begin{usecase}{9.1}{Specifica delle esigenze di monitoring}
-\usecaseactors{Sviluppatore, Agente AI}
-\usecasepre{Lo sviluppatore ha identificato il modulo o il caso d'uso da monitorare}
-\usecasedesc{Lo sviluppatore descrive in linguaggio naturale i pannelli desiderati, le grandezze da osservare e i filtri di interesse}
-\usecasepost{L'agente ha una specifica strutturata della dashboard da produrre}
-\usecasescenario{
-\begin{enumerate}
-    \item Lo sviluppatore descrive le esigenze all'agente;
-    \item L'agente riformula la specifica in termini di pannelli e query.
-\end{enumerate}
-}
-\label{uc:dashboard-mcp-spec}
+    \usecasedesc{Lo sviluppatore descrive in linguaggio naturale i pannelli desiderati, le grandezze da osservare e i filtri di interesse}
+    \label{uc:dashboard-mcp-spec}
 \end{usecase}
 
 \begin{usecase}{9.2}{Validazione delle query PromQL/TraceQL/LogQL via MCP}
-\usecaseactors{Agente AI}
-\usecasepre{La specifica della dashboard è disponibile (UC9.1)}
-\usecasedesc{L'agente costruisce le query PromQL/TraceQL/LogQL necessarie e le esegue via \gls{mcp} contro le sorgenti dati per verificarne la sintassi e la pertinenza dei risultati}
-\usecasepost{Le query sono validate sui dati reali}
-\usecasescenario{
-\begin{enumerate}
-    \item L'agente costruisce le query;
-    \item L'agente esegue le query via \gls{mcp};
-    \item L'agente verifica la pertinenza dei risultati.
-\end{enumerate}
-}
-\label{uc:dashboard-mcp-query}
+    \usecasedesc{L'agente costruisce le query PromQL/TraceQL/LogQL necessarie e le esegue via \gls{mcp} contro le sorgenti dati per verificarne la sintassi e la pertinenza dei risultati}
+    \label{uc:dashboard-mcp-query}
 \end{usecase}
 
 \begin{usecase}{9.3}{Pubblicazione o aggiornamento della dashboard}
-\usecaseactors{Agente AI}
-\usecasepre{Le query sono state validate (UC9.2)}
-\usecasedesc{L'agente, tramite \gls{mcp}, crea o aggiorna la dashboard direttamente sull'istanza \emph{Grafana}, applicando convenzioni di naming e di organizzazione in cartelle}
-\usecasepost{La dashboard è disponibile in \emph{Grafana}}
-\usecasescenario{
-\begin{enumerate}
-    \item L'agente serializza la dashboard nel formato \emph{Grafana};
-    \item L'agente pubblica o aggiorna la dashboard via \gls{mcp};
-    \item L'agente comunica allo sviluppatore l'url della dashboard pubblicata.
-\end{enumerate}
-}
-\label{uc:dashboard-mcp-publish}
+    \usecasedesc{L'agente, tramite \gls{mcp}, crea o aggiorna la dashboard direttamente sull'istanza \emph{Grafana}, applicando convenzioni di naming e di organizzazione in cartelle}
+    \label{uc:dashboard-mcp-publish}
 \end{usecase}
 
 \begin{usecase}{9.4}{Gestione di una query non valida}
-\usecaseactors{Agente AI, Sviluppatore}
-\usecasepre{Una query formulata dall'agente fallisce o restituisce risultati non pertinenti (UC9.2)}
-\usecasedesc{L'agente analizza l'errore o l'anomalia, riformula la query e ritenta; in caso di esito negativo dopo più tentativi, riporta il problema allo sviluppatore richiedendo chiarimenti sulla specifica}
-\usecasepost{La query risulta valida o lo sviluppatore ha fornito chiarimenti per ridefinire la specifica}
-\usecasescenario{
-\begin{enumerate}
-    \item L'agente analizza l'errore o l'output non pertinente;
-    \item L'agente riformula la query e ritenta;
-    \item Se l'errore persiste, l'agente richiede chiarimenti allo sviluppatore.
-\end{enumerate}
-}
-\label{uc:dashboard-mcp-error}
+    \usecasedesc{L'agente analizza l'errore o l'anomalia, riformula la query e ritenta; in caso di esito negativo dopo più tentativi, riporta il problema allo sviluppatore richiedendo chiarimenti sulla specifica}
+    \label{uc:dashboard-mcp-error}
 \end{usecase}
 
 \section{Requisiti}
@@ -880,44 +482,44 @@ In merito al sistema sviluppato si possono individuare come attori:
 
 \begin{enumerate}[label=RF\arabic*.]
     \item Il sistema deve tracciare il percorso completo di ogni richiesta HTTP in
-        ingresso, incluse le operazioni di accesso al database.
+          ingresso, incluse le operazioni di accesso al database.
     \item Le operazioni \gls{crud} verso il database devono essere riconoscibili tramite
-        attributi che espongono il metodo e la \emph{repository} da cui è stata
-        scatenata la richiesta.
+          attributi che espongono il metodo e la \emph{repository} da cui è stata
+          scatenata la richiesta.
     \item Il sistema deve esporre metriche operative per i moduli centrali del
-        \emph{framework} (autenticazione, componenti \emph{Angular} come griglie e
-        \emph{form}, prestazioni hardware, accesso al database).
+          \emph{framework} (autenticazione, componenti \emph{Angular} come griglie e
+          \emph{form}, prestazioni hardware, accesso al database).
     \item I \emph{log} devono essere correlabili alle \emph{trace} tramite
-        \texttt{TraceId} e \texttt{SpanId}.
+          \texttt{TraceId} e \texttt{SpanId}.
     \item Il sistema deve essere attivabile e disattivabile tramite configurazione,
-        senza richiedere modifiche al codice.
+          senza richiedere modifiche al codice.
     \item Deve essere possibile configurare indipendentemente il campionamento per
-        ciascuna sorgente di \emph{trace}.
+          ciascuna sorgente di \emph{trace}.
     \item Deve essere possibile visualizzare \emph{trace} e metriche raggruppate in
-        dashboard \emph{Grafana} costruite sullo stack \emph{LGTM}.
+          dashboard \emph{Grafana} costruite sullo stack \emph{LGTM}.
     \item Le dashboard di \emph{Grafana} devono raccogliere i dati da più servizi e
-        installazioni di clienti diversi, e permettere di filtrare per gli stessi.
+          installazioni di clienti diversi, e permettere di filtrare per gli stessi.
     \item Il sistema deve arricchire automaticamente ogni \emph{span} con l'identità
-        dell'utente autenticato (\texttt{enduser.id}, \texttt{enduser.name}) senza
-        richiedere modifiche ai singoli moduli applicativi.
+          dell'utente autenticato (\texttt{enduser.id}, \texttt{enduser.name}) senza
+          richiedere modifiche ai singoli moduli applicativi.
     \item Le metriche di tipo \emph{Histogram} devono esporre \emph{exemplar}, ovvero
-        puntatori al \texttt{TraceId} del campione, per abilitare la navigazione dalla
-        metrica aggregata alla \emph{trace} corrispondente.
+          puntatori al \texttt{TraceId} del campione, per abilitare la navigazione dalla
+          metrica aggregata alla \emph{trace} corrispondente.
     \item Devono essere prodotti \emph{unit test} per la logica di business dei moduli
-        core del \emph{framework backend}, eseguibili in modo automatizzato.
+          core del \emph{framework backend}, eseguibili in modo automatizzato.
     \item Devono essere prodotti \emph{integration test} per la verifica
-        dell'attendibilità dei dati presenti nel database, delle procedure SQL e delle
-        prospettive di configurazione dei componenti.
+          dell'attendibilità dei dati presenti nel database, delle procedure SQL e delle
+          prospettive di configurazione dei componenti.
     \item Devono essere prodotti \emph{unit test} lato \emph{frontend} per la verifica
-        della logica applicativa dei componenti \emph{Angular}.
+          della logica applicativa dei componenti \emph{Angular}.
     \item Devono essere prodotti test \emph{end-to-end} lato \emph{frontend} per
-        verificare il corretto comportamento e la corretta visualizzazione
-        dell'applicazione dal punto di vista dell'utente finale.
+          verificare il corretto comportamento e la corretta visualizzazione
+          dell'applicazione dal punto di vista dell'utente finale.
     \item La suite di test deve essere integrabile nel processo di \emph{build} e
-        fornire un report di copertura del codice.
+          fornire un report di copertura del codice.
     \item Devono essere realizzati agenti AI specializzati e \emph{skill} procedurali
-        per propagare in modo uniforme telemetria e test ai diversi moduli del
-        \emph{framework}.
+          per propagare in modo uniforme telemetria e test ai diversi moduli del
+          \emph{framework}.
 \end{enumerate}
 
 \subsection{Requisiti non funzionali}
@@ -939,9 +541,9 @@ adottato un codice identificativo nella forma R(F/Q/V)(O/D), dove:
 \begin{itemize}
     \item la prima lettera (sempre R) indica che si tratta di un requisito;
     \item la seconda lettera ne indica la natura: F (funzionale), Q
-        (qualitativo) o V (di vincolo);
+          (qualitativo) o V (di vincolo);
     \item la terza lettera ne indica la priorità: O (obbligatorio) o D
-        (desiderabile).
+          (desiderabile).
 \end{itemize}
 
 Per non appesantire il corpo del capitolo, le tabelle
