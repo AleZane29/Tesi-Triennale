@@ -1,7 +1,7 @@
 \chapter{Progettazione}
 \label{cap:progettazione}
 
-\intro{In questo capitolo si esporranno le caratteristiche tecniche della soluzione prodotta, descrivendo la progettazione e l'architettura adottata di telemetria e test}\\
+\intro{In questo capitolo si esporranno le caratteristiche tecniche della soluzione prodotta, descrivendo l'architettura e le scelte progettuali adottate per la telemetria e per i test}\\
 
 \section{Osservabilità nei sistemi distribuiti}
 
@@ -39,7 +39,7 @@ I principi fondamentali di \gls{otel} rilevanti per questo progetto sono:
       \item \textbf{Separazione tra produzione ed esportazione.} Le \gls{api} applicative sono
             indipendenti dal backend di storage scelto: lo stesso codice pu\`o inviare dati a
             Grafana, Jaeger, Zipkin o qualsiasi altro sistema compatibile.
-      \item \textbf{Instrumentazione automatica.} Per i framework pi\`u diffusi (ASP.NET Core,
+      \item \textbf{Strumentazione automatica.} Per i framework pi\`u diffusi (ASP.NET Core,
             HttpClient, SqlClient), \gls{otel} fornisce librerie che non richiedono modifiche
             al codice applicativo.
       \item \textbf{Estensibilit\`a.} \`E possibile aggiungere attributi custom, definire
@@ -137,7 +137,7 @@ Questo consente di abilitarla esclusivamente negli ambienti che la richiedono, e
 Tutta la configurazione \gls{otel} è centralizzata in \texttt{BaseApplicationBuilder},
 componente condiviso da tutti i prodotti \emph{Sia.Web}. I singoli moduli si limitano a
 registrare il proprio \texttt{ActivitySource} e \texttt{Meter} nel provider gi\`a
-costruito, senza conoscere i dettagli del pipeline.
+costruito, senza conoscere i dettagli della pipeline.
 
 \subsubsection{Campionamento}
 
@@ -178,7 +178,7 @@ sezione~\ref{sec:modello-exemplars}.
 La soluzione si appoggia a due \emph{design pattern} classici per risolvere problemi ricorrenti:
 il pattern \emph{Adapter}, utilizzato per riconciliare i \texttt{Counter} per-modulo con un
 contratto comune (\texttt{IControllerDiagnostics}), e il pattern \emph{Factory}, utilizzato per
-costruire gli oggetti del pipeline \gls{otel} a partire dalla configurazione \emph{appsettings}.
+costruire gli oggetti della pipeline \gls{otel} a partire dalla configurazione \emph{appsettings}.
 I dettagli sono illustrati nella sezione~\ref{sec:design-patterns}.
 
 \section{Modello dei segnali e utilizzo degli attributi}
@@ -193,10 +193,10 @@ richiesta tracciata. Questo abilita la navigazione bidirezionale tra log e trace
 Una \emph{trace} \`e l'insieme completo di un'operazione end-to-end, identificata da un
 unico \texttt{trace\_id}. \`E composta da una gerarchia di \emph{span}, ciascuno con un
 proprio \texttt{span\_id} e, ad eccezione della root, un \texttt{parent\_span\_id}.\\
-Nel sistema, le trace sono prodotte da tre tipologie di sorgenti: instrumentazione
+Nel sistema, le trace sono prodotte da tre tipologie di sorgenti: strumentazione
 automatica HTTP (richieste in ingresso via AspNetCore, chiamate in uscita via HttpClient);
-instrumentazione automatica database (query SQL Server via SqlClient, query PostgreSQL via
-Npgsql); instrumentazione manuale dei moduli di Sia.Core tramite le classi
+strumentazione automatica database (query SQL Server via SqlClient, query PostgreSQL via
+Npgsql); strumentazione manuale dei moduli di Sia.Core tramite le classi
 \texttt{Sia[NomeModulo]Diagnostics}.
 
 \subsection{Modello delle metriche}
@@ -265,7 +265,7 @@ singoli moduli debbano iniettarli manualmente (RFD-9).\\
 Il meccanismo si articola in due componenti trasparenti al codice applicativo:
 \begin{description}
       \item[un middleware ASP.NET Core] (\texttt{EnrichActivityWithUserMiddleware}), registrato dopo \texttt{UseAuthentication()},
-            legge gli attributi \texttt{userId} e \texttt{userName} da \texttt{HttpContext.User} e le
+            legge gli attributi \texttt{userId} e \texttt{userName} da \texttt{HttpContext.User} e li
             pubblica nel \gls{baggageg} \gls{otel}.
       \item[un \texttt{ActivityProcessor} custom] (\texttt{BaggageActivityProcessor}) intercetta l'hook \texttt{OnStart} di ogni nuova
             \texttt{Activity} e copia le entry con prefisso \texttt{enduser.} come tag sullo span.
@@ -301,7 +301,7 @@ disponibile, azzerando l'overhead sulle richieste non campionate.
 
 Oltre ai pattern architetturali generali citati nella sezione~\ref{sec:design-patterns-intro},
 la soluzione utilizza due \emph{design pattern} della letteratura classica
-\footcite{Book:GoF:DesignPatterns} per risolvere problemi ricorrenti dell'instrumentazione.
+\footcite{Book:GoF:DesignPatterns} per risolvere problemi ricorrenti della strumentazione.
 
 \subsection{Pattern Adapter per il counter di errore dei controller}
 \label{subsec:pattern-adapter-controller-errors}
@@ -355,7 +355,7 @@ riportato nell'appendice~\ref{app:listing-adapter}
 
 \subsection{Pattern Factory}
 
-Il pattern \emph{Factory} è applicato in più punti del pipeline \gls{otel} per mantenere in un
+Il pattern \emph{Factory} è applicato in più punti della pipeline \gls{otel} per mantenere in un
 unico luogo la traduzione da configurazione \emph{appsettings} a oggetti del runtime
 OpenTelemetry.\\
 \\\textbf{Costruzione del \emph{sampler}}\\
@@ -363,7 +363,7 @@ La creazione di \texttt{SiaParentBasedSampler}
 avviene in un metodo \emph{factory} che, letti il valore globale \texttt{SamplingRatio} e i
 \emph{ratio} per-\emph{source} da \emph{appsettings}, restituisce l'istanza del \gls{samplerg}
 configurata correttamente. L'invocazione avviene una sola volta in
-\texttt{BaseApplicationBuilder}; il resto del pipeline consuma un oggetto già pronto.\\
+\texttt{BaseApplicationBuilder}; il resto della pipeline consuma un oggetto già pronto.\\
 \\\textbf{Registrazione di \texttt{Meter} e \texttt{ActivitySource}}\\
 Le classi
 \texttt{Sia\{Modulo\}Diagnostics} agiscono come \emph{static factory} centralizzata per gli
@@ -381,7 +381,7 @@ in un metodo \emph{factory} interno a \texttt{BaseApplicationBuilder}.\\
 \begin{itemize}
       \item la configurazione da \emph{appsettings} viene tradotta in oggetti \gls{otel} in un solo
             punto, semplificando i test e le variazioni per ambiente;
-      \item i moduli vedono solo istanze pronte all'uso, senza conoscere il pipeline;
+      \item i moduli vedono solo istanze pronte all'uso, senza conoscere la pipeline;
       \item è possibile sostituire la \emph{factory} con una variante \emph{mock} per i test
             senza toccare il codice di business.
 \end{itemize}
@@ -457,7 +457,7 @@ Nel progetto sviluppato durante lo stage, tali test sono stati utilizzati per
 validare il comportamento dei servizi applicativi del framework e delle API
 utilizzate dal frontend. In particolare, sono state verificate la corretta
 gestione delle richieste, la propagazione delle eccezioni, il comportamento
-dei repository e la logica associata ai moduli instrumentati con OpenTelemetry.\\
+dei repository e la logica associata ai moduli strumentati con OpenTelemetry.\\
 L’utilizzo di dipendenze simulate (\emph{mock}) ha permesso di eseguire i test
 in modo deterministico e veloce, senza richiedere l’avvio dell’intera
 infrastruttura applicativa.
@@ -477,7 +477,7 @@ riprodurre scenari più vicini al comportamento effettivo del sistema in produzi
 Nel progetto sono state adottate tre tipologie principali di test di integrazione.
 La prima riguarda i test \gls{crud},
 chiamati \textbf{lifecycle test}, come suggerito dal nome, verificano l'intero ciclo di vita
-di un entità sul database, controllando che tutte e quattro le operazioni vadano a termine correttamente.\\
+di un'entità sul database, controllando che tutte e quattro le operazioni vadano a termine correttamente.\\
 La seconda categoria, \textbf{smoke test}, ha lo scopo di esercitare ogni singola configurazione
 per componente presente in produzione,
 intercettando \emph{stored procedure} malformate, \emph{connection name} non

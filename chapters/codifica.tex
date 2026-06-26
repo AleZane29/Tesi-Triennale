@@ -9,7 +9,7 @@ Il codice di telemetria è distribuito su due livelli del framework:
 
 \begin{itemize}
       \item un livello \textbf{condiviso} (\texttt{Application.Shared.Telemetry} e
-            \texttt{BaseApplicationBuilder}), che configura il pipeline \gls{otel},
+            \texttt{BaseApplicationBuilder}), che configura la pipeline \gls{otel},
             registra \gls{samplerg}, \emph{processor} e \emph{exporter}, e definisce le
             convenzioni comuni (attributi di \emph{resource}, \emph{middleware}
             di arricchimento utente);
@@ -20,12 +20,12 @@ Il codice di telemetria è distribuito su due livelli del framework:
 \end{itemize}
 Questa suddivisione garantisce che un nuovo modulo, per integrare la telemetria, debba solo
 creare la propria classe \texttt{Diagnostics} e registrare il proprio \texttt{Meter} e
-\texttt{ActivitySource} nel pipeline già costruito, senza conoscere i dettagli del
+\texttt{ActivitySource} nella pipeline già costruito, senza conoscere i dettagli del
 \gls{samplerg} o degli \emph{exporter}.
 
 \section{Pipeline OpenTelemetry}
 
-Il pipeline è configurato in \texttt{BaseApplicationBuilder.ConfigureBuilder} tramite
+La pipeline è configurato in \texttt{BaseApplicationBuilder.ConfigureBuilder} tramite
 l'\gls{api} \texttt{AddOpenTelemetry()} dell'estensione ufficiale. I pacchetti NuGet
 utilizzati sono:
 \begin{itemize}
@@ -50,7 +50,7 @@ alla pipeline OpenTelemetry.
 
 \section{Classi di diagnostica per modulo}
 
-Ciascun modulo instrumentato espone una classe statica
+Ciascun modulo strumentato espone una classe statica
 \texttt{Sia\{Modulo\}Diagnostics}.
 La classe definisce come membri statici \texttt{readonly}:
 
@@ -101,7 +101,7 @@ il diagramma delle classi dell'arricchimento utente.
 \section{Configurazione degli exemplars}
 
 L'istruzione \texttt{SetExemplarFilter(ExemplarFilterType.TraceBased)} presente nel provider
-\texttt{Meter} del pipeline, istruisce
+\texttt{Meter} della pipeline, istruisce
 \gls{otel} ad allegare un \emph{exemplar} a un campione di metrica solo quando esiste una
 trace \emph{sampled} nel contesto corrente. L'\emph{exemplar} riporta il \texttt{TraceId}
 (e il \texttt{SpanId}) del campione, permettendo in Grafana la navigazione diretta dalla
@@ -118,9 +118,9 @@ Il livello minimo di \emph{log} è configurabile per ambiente tramite \emph{apps
 
 \section{Dashboard Grafana e versionamento}
 
-Ogni modulo instrumentato espone una dashboard Grafana nella cartella\\
+Ogni modulo strumentato espone una dashboard Grafana nella cartella\\
 \texttt{Sia.\{Modulo\}/Diagnostics/\{nome\}.dashboard.json}. Il file JSON è versionato nel
-repository insieme al codice che instrumenta, in modo da garantire il sincronismo tra le
+repository insieme al codice di strumentazione, in modo da garantire il sincronismo tra le
 modifiche di istrumentazione e i pannelli di visualizzazione. Ogni dashboard definisce:
 \begin{itemize}
       \item le \emph{template variable} \texttt{service\_name}, \texttt{enduser\_id},
@@ -132,7 +132,7 @@ modifiche di istrumentazione e i pannelli di visualizzazione. Ogni dashboard def
       \item pannelli di errori con \emph{break-down} per \texttt{exception.type} (\autoref{fig:dash-logs-trace});
       \item un pannello \emph{logs} su Loki filtrato per \texttt{service.name} (\autoref{fig:dash-logs-trace}).
 \end{itemize}
-La riferenza canonica è la dashboard \texttt{sia-base.dashboard.json} del modulo
+Il riferimento canonico è la dashboard \texttt{sia-base.dashboard.json} del modulo
 \texttt{Sia.Base}, replicata con le dovute personalizzazioni in ogni modulo successivo.
 
 \begin{figure}[h!]
@@ -180,7 +180,7 @@ Prima dell'intervento di telemetria, il modulo esponeva già i dati tramite:
 
 \subsection{Scelte progettuali}
 
-Il modulo presenta due caratteristiche che lo distinguono dagli altri moduli instrumentati.\\
+Il modulo presenta due caratteristiche che lo distinguono dagli altri moduli strumentati.\\
 La prima è l'assenza di un controller: gli \texttt{IHealthCheck} sono invocati
 dall'infrastruttura ASP.NET Core, non da endpoint applicativi. Di conseguenza
 il servizio di \emph{HealthChecks} non implementa \texttt{IControllerDiagnostics}

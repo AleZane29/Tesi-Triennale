@@ -8,7 +8,7 @@
 La pianificazione dello stage prevedeva una durata di 300 ore distribuite su 8 settimane,
 a fronte di un ambito ampio: apprendimento di tecnologie nuove (OpenTelemetry \gls{sdk} .NET,
 stack \emph{Grafana} LGTM, PromQL/TraceQL/LogQL, Serilog \gls{otlp}, \emph{Playwright}), realizzazione
-di prototipi, instrumentazione di più moduli del framework \emph{Sia.Web} e produzione della
+di prototipi, strumentazione di più moduli del framework \emph{Sia.Web} e produzione della
 relativa documentazione. Per colmare il gap di conoscenza in merito alle tecnologie e lo studio
 della soluzione \emph{Sia.Web}, si è fatto ricorso all’utilizzo di agenti di intelligenza artificiale.
 Questo approccio ha permesso di velocizzare le attività ripetitive e di replicare pattern già validati su nuovi moduli.
@@ -40,25 +40,25 @@ scartare alternative, invece di decidere a priori sulla base della sola document
 \subsection{Propagazione della telemetria agli altri moduli}
 
 L'ambito in cui l'uso dell'agente si è rivelato più produttivo è stato la propagazione
-dell'instrumentazione ai moduli del framework (\emph{Sia.Base}, \emph{Sia.Auth},
+della strumentazione ai moduli del framework (\emph{Sia.Base}, \emph{Sia.Auth},
 \emph{Sia.Grid}, \emph{Sia.Crud}, \ldots). Per evitare che la replicazione del pattern di
-instrumentazione su moduli diversi introducesse incoerenze (naming, cardinalità, attributi
+strumentazione su moduli diversi introducesse incoerenze (naming, cardinalità, attributi
 di \emph{resource}), sono state definite \emph{Claude skill} dedicate:
 
 \begin{itemize}
-  \item \texttt{sia-telemetry-setup}: configurazione del pipeline OTel, \gls{samplerg},
-        \emph{exporter}, \emph{appsettings};
-  \item \texttt{sia-telemetry-traces}: \emph{span}, \emph{tag}, \emph{helper} \texttt{TrackQuery};
-  \item \texttt{sia-telemetry-metrics}: metriche, \emph{naming}, cardinalità, pattern
-        \texttt{RecordMetricError};
-  \item \texttt{sia-telemetry-logs}: Serilog \gls{otlp}, correlazione \emph{log}-\emph{trace};
-  \item \texttt{sia-telemetry-grafana}: \emph{dashboard} Grafana, query PromQL/TraceQL/LogQL,
-        strumenti \gls{mcp}.
+      \item \texttt{sia-telemetry-setup}: configurazione della pipeline OTel, \gls{samplerg},
+            \emph{exporter}, \emph{appsettings};
+      \item \texttt{sia-telemetry-traces}: \emph{span}, \emph{tag}, \emph{helper} \texttt{TrackQuery};
+      \item \texttt{sia-telemetry-metrics}: metriche, \emph{naming}, cardinalità, pattern
+            \texttt{RecordMetricError};
+      \item \texttt{sia-telemetry-logs}: Serilog \gls{otlp}, correlazione \emph{log}-\emph{trace};
+      \item \texttt{sia-telemetry-grafana}: \emph{dashboard} Grafana, query PromQL/TraceQL/LogQL,
+            strumenti \gls{mcp}.
 \end{itemize}
 Ogni \emph{skill} è un contratto procedurale, non un semplice \emph{prompt}, che descrive
 convenzioni, \emph{anti-pattern} e \emph{template} di codice per uno specifico aspetto. L'agente
 carica la \emph{skill} appropriata quando riceve un task pertinente, garantendo che
-moduli instrumentati in momenti diversi rispettino le stesse convenzioni.
+moduli strumentati in momenti diversi rispettino le stesse convenzioni.
 
 \subsection{Propagazione dei test automatici}
 
@@ -89,16 +89,16 @@ Per evitare i rischi tipici della generazione automatica di codice (allucinazion
 al primo caso visto), è stato adottato un \emph{workflow} strutturato in tre fasi.
 
 \begin{enumerate}
-  \item \textbf{Plan.} Per ogni task non banale, l'agente produce un file
-        \texttt{plan.md} che descrive
-        obiettivo, componenti coinvolti, modifiche pianificate file per file, assunzioni e
-        domande aperte. Nessun codice viene prodotto in questa fase.
-  \item \textbf{Confirm.} Lo sviluppatore revisiona il \texttt{plan.md}, può editarlo
-        direttamente, integrarlo o rifiutarlo. L'agente si ferma \emph{esplicitamente} in
-        attesa di approvazione.
-  \item \textbf{Implement.} Solo dopo approvazione l'agente scrive un \texttt{task.md}, una
-        \emph{checklist} operativa, nella quale vengono tracciati in ordine, i singoli interventi
-        eseguiti dall'agente.
+      \item \textbf{Plan.} Per ogni task non banale, l'agente produce un file
+            \texttt{plan.md} che descrive
+            obiettivo, componenti coinvolti, modifiche pianificate file per file, assunzioni e
+            domande aperte. Nessun codice viene prodotto in questa fase.
+      \item \textbf{Confirm.} Lo sviluppatore revisiona il \texttt{plan.md}, può editarlo
+            direttamente, integrarlo o rifiutarlo. L'agente si ferma \emph{esplicitamente} in
+            attesa di approvazione.
+      \item \textbf{Implement.} Solo dopo approvazione l'agente scrive un \texttt{task.md}, una
+            \emph{checklist} operativa, nella quale vengono tracciati in ordine, i singoli interventi
+            eseguiti dall'agente.
 \end{enumerate}
 Il \emph{workflow} produce un artefatto tracciabile per ogni intervento: \texttt{plan.md} e
 \texttt{task.md} restano nel repository e fungono da registro decisionale.
@@ -106,37 +106,44 @@ Il \emph{workflow} produce un artefatto tracciabile per ogni intervento: \texttt
 \section{Confronto pianificazione vs esecuzione}
 
 L'uso dell'agente ha prodotto un beneficio misurabile soprattutto nelle fasi a forte
-componente ripetitiva (studio, \gls{poc}, propagazione del pattern di instrumentazione), e un
+componente ripetitiva (studio, \gls{poc}, propagazione del pattern di strumentazione), e un
 beneficio meno marcato in quelle a forte componente decisionale (scelte architetturali,
 analisi di cardinalità). Nel complesso, il tempo risparmiato nelle fasi assistite è stato
 riinvestito nelle attività non automatizzabili: revisione semantica del codice prodotto,
 validazione delle \emph{dashboard} contro Prometheus, affinamento iterativo delle
-\emph{skill}.
+\emph{skill}.\\
+Per dare un riferimento quantitativo a questo bilancio, lo studio delle tecnologie e lo
+sviluppo dei \gls{poc} erano stati preventivati attorno alle 80 ore: con l'uso degli agenti,
+il tempo effettivo si è ridotto a circa 30 ore. Una riduzione ancora più marcata si è
+osservata nella propagazione dei test, ambito per il quale la pianificazione iniziale non
+prevedeva nemmeno la copertura di tutti i moduli poi effettivamente strumentati: una
+stima approssimativa indica che, senza il supporto degli \gls{llm}, il lavoro avrebbe
+richiesto circa un mese, condensato invece in una settimana e mezza.
 
 \section{Limiti e mitigazioni}
 
 L'uso di un agente \gls{llm} comporta rischi noti che sono stati mitigati in modo sistematico.
 
 \begin{description}
-  \item[Allucinazioni su metriche/label.] L'agente tende a inventare nomi di metriche o
-        \emph{label} plausibili ma inesistenti. \textbf{Mitigazione}: regola obbligatoria di
-        validazione tramite \gls{mcp} Grafana, verificando l'esistenza di metriche e label in Grafana
-        prima di chiudere ogni modifica delle dashboard.
-  \item[Overfitting del prompt.] Le \emph{skill} iniziali, scritte a partire dal primo
-        modulo instrumentato (\texttt{Sia.Base}), contenevano riferimenti troppo specifici
-        (nomi di metriche, \emph{tag}, stored procedure). \textbf{Mitigazione}: riscrittura
-        delle \emph{skill} in termini generali, con placeholder \texttt{\{modulo\}} e
-        riferimenti ai moduli canonici solo come esempi.
-  \item[Perdita di contesto su sessioni lunghe.] La \emph{context window} dell'\gls{llm} è
-        finita; su task lunghi, l'agente perde traccia di decisioni prese in precedenza.
-        \textbf{Mitigazione}: memorizzazione persistente tramite \texttt{MEMORY.md} per
-        progetto e per agente, \texttt{plan.md} e \texttt{task.md} come registro decisionale
-        per ogni task.
-  \item[Divergenza dei pattern tra moduli.] Sviluppatori diversi, o sessioni diverse, possono
-        produrre variazioni del pattern di instrumentazione. \textbf{Mitigazione}:
-        centralizzazione dei pattern obbligatori nell'agente \texttt{sia-telemetry-developer}
-        (es.\ counter errori controller via \texttt{IControllerDiagnostics} con Adapter, uso
-        obbligatorio della \emph{template variable} \texttt{bucket} nelle dashboard).
+      \item[Allucinazioni su metriche/label.] L'agente tende a inventare nomi di metriche o
+            \emph{label} plausibili ma inesistenti. \textbf{Mitigazione}: regola obbligatoria di
+            validazione tramite \gls{mcp} Grafana, verificando l'esistenza di metriche e label in Grafana
+            prima di chiudere ogni modifica delle dashboard.
+      \item[Overfitting del prompt.] Le \emph{skill} iniziali, scritte a partire dal primo
+            modulo strumentato (\texttt{Sia.Base}), contenevano riferimenti troppo specifici
+            (nomi di metriche, \emph{tag}, stored procedure). \textbf{Mitigazione}: riscrittura
+            delle \emph{skill} in termini generali, con placeholder \texttt{\{modulo\}} e
+            riferimenti ai moduli canonici solo come esempi.
+      \item[Perdita di contesto su sessioni lunghe.] La \emph{context window} dell'\gls{llm} è
+            finita; su task lunghi, l'agente perde traccia di decisioni prese in precedenza.
+            \textbf{Mitigazione}: memorizzazione persistente tramite \texttt{MEMORY.md} per
+            progetto e per agente, \texttt{plan.md} e \texttt{task.md} come registro decisionale
+            per ogni task.
+      \item[Divergenza dei pattern tra moduli.] Sviluppatori diversi, o sessioni diverse, possono
+            produrre variazioni del pattern di strumentazione. \textbf{Mitigazione}:
+            centralizzazione dei pattern obbligatori nell'agente \texttt{sia-telemetry-developer}
+            (es.\ counter errori controller via \texttt{IControllerDiagnostics} con Adapter, uso
+            obbligatorio della \emph{template variable} \texttt{bucket} nelle dashboard).
 \end{description}
 Per superare gran parte di queste limitazioni e arricchire i processi di ragionamento degli agenti AI
 con contenuti e contesto aggiuntivi, è stato adottato il protocollo \gls{mcp}.
@@ -171,111 +178,39 @@ Foundation, risolve il problema della standardizzazione definendo un'interfaccia
 qualsiasi strumento possono implementare una volta sola per comunicare con l'intero
 ecosistema.
 
-% =============================================================================
-\subsection{Architettura}
-\label{sec:mcp-architettura}
-% =============================================================================
+\subsection{Dettagli del protocollo}
+\label{sec:mcp-dettagli}
 
-\gls{mcp} è un protocollo client-server basato su \emph{JSON-RPC 2.0} con connessioni stateful. I
-ruoli coinvolti sono tre.
-
-\begin{description}
-  \item[Host:] L'applicazione che ospita l'\gls{llm} e avvia le connessioni \gls{mcp}. Può essere
-        un'interfaccia conversazionale come Claude Desktop, un IDE con assistente integrato,
-        o un servizio backend autonomo. L'host è responsabile del consenso dell'utente e
-        del controllo di accesso: decide quali server \gls{mcp} connettere e con quali permessi.
-  \item[Client:] Il componente interno all'host che gestisce il ciclo di vita della
-        connessione verso uno specifico server \gls{mcp}: negozia le capacità, invia richieste,
-        riceve risposte.
-  \item[Server \gls{mcp}:] Il servizio che espone dati e funzionalità all'\gls{llm}. Può girare
-        in locale (processo figlio, comunicazione via \emph{stdio}) o in remoto (connessione
-        via HTTP con Server-Sent Events). Un server \gls{mcp} può rappresentare un'\gls{api} esterna,
-        un database, un file system, uno strumento di automazione, o qualsiasi sistema
-        che si voglia rendere accessibile all'agente.
-\end{description}
-La connessione tra client e server è stateful: prima di qualsiasi scambio applicativo
-avviene una fase di \emph{handshake} in cui le due parti negoziano le rispettive
-capacità. Questo meccanismo garantisce la retrocompatibilità: un client più nuovo può
-parlare con un server più vecchio senza rompere nulla, e viceversa.
-
-% =============================================================================
-\subsection{Le primitive del protocollo}
-\label{sec:mcp-primitive}
-% =============================================================================
-
-\gls{mcp} definisce tre categorie di primitive che un server può esporre, e tre che un client
-può offrire al server.
-
-\subsubsection{Primitive lato server}
-
-\begin{description}
-  \item[Resources] Dati e contesto che il modello o l'utente possono consultare:
-        file, pagine web, righe di database, output di API. Le risorse sono identificate da
-        URI e possono essere statiche o dinamiche (aggiornate a ogni lettura).
-  \item[Tools] Funzioni che il modello può invocare per compiere azioni nel mondo:
-        creare un file, inviare un'email, eseguire una query SQL, chiamare un endpoint REST.
-        I tool rappresentano esecuzione arbitraria di codice e richiedono consenso esplicito
-        dell'utente prima di essere invocati.
-  \item[Prompts] Template di messaggi e workflow predefiniti che il server mette a
-        disposizione dell'utente o dell'applicazione host, per guidare interazioni ricorrenti
-        senza doverle riscrivere ogni volta.
-\end{description}
-
-\subsubsection{Primitive lato client}
-
-\begin{description}
-  \item[Sampling] Consente al server di avviare interazioni ricorsive con l'\gls{llm},
-        delegando al client (e quindi all'utente) il controllo su quali prompt vengono
-        effettivamente inviati al modello e cosa il server può vedere delle risposte.
-  \item[Roots] Permette al server di interrogare il client sulle radici del filesystem
-        o degli URI entro cui è autorizzato a operare, definendo i confini del suo spazio
-        di lavoro.
-  \item[Elicitation] Consente al server di richiedere informazioni aggiuntive
-        all'utente in modo strutturato, durante l'esecuzione di un workflow.
-\end{description}
-
-% =============================================================================
-\subsection{Dall'integrazione al microservizio agentico}
-\label{sec:mcp-agentico}
-% =============================================================================
-
-La portata dell'innovazione si può cogliere quando si analizza il protocollo come, non soltanto un modo
-più comodo per collegare gli \gls{llm} a qualche strumento locale, bensì a \gls{mcp} come
-l'\textbf{infrastruttura per i microservizi agentici}.\\
-Nel modello tradizionale, un microservizio espone una REST \gls{api} che altri servizi chiamano
-in modo deterministico: il chiamante sa esattamente quale endpoint invocare, con quali
-parametri, e interpreta la risposta secondo uno schema fisso. In un'architettura agentica,
-il chiamante è un \gls{llm} che ragiona sul problema, decide autonomamente quali tool invocare e
-in quale ordine, e compone i risultati in modo flessibile. \gls{mcp} è il contratto che rende
-possibile questa composizione senza che ogni strumento debba essere scritto appositamente
-per ogni modello.\\
-Un server \gls{mcp} che espone dati in tempo reale, da una piattaforma di visualizzazione dati come \emph{Grafana},
-da un database operativo, da un framework per lo sviluppo di test (es. \emph{Playwright}), diventa un blocco riutilizzabile
-dell'ecosistema agentico: qualsiasi agente compatibile con \gls{mcp} può scoprirlo, negoziare
-le sue capacità e usarlo.
-
-% =============================================================================
-\subsection{Sicurezza}
-\label{sec:mcp-sicurezza}
-% =============================================================================
-
-L'ampiezza dei permessi che un server \gls{mcp} può richiedere, accesso al filesystem,
-esecuzione di query, chiamate a \gls{api} esterne, rende la sicurezza un tema centrale che
-la specifica affronta esplicitamente attraverso quattro principi.\\
-Il primo è il \textbf{consenso esplicito dell'utente}: nessun tool può essere invocato
-senza che l'utente abbia approvato l'azione, e le descrizioni dei tool non devono essere
-considerate attendibili se provengono da server non verificati (vettore noto di
-\emph{prompt injection} tramite descrizioni malevole). Il secondo è la \textbf{privacy dei
-  dati}: l'host non deve trasmettere dati utente verso server \gls{mcp} senza consenso esplicito.
-Il terzo è il \textbf{controllo sul sampling}: l'utente deve poter vedere e approvare i
-prompt che il server vuole inviare al modello. Il quarto è la \textbf{separazione dei
-  contesti}: il protocollo limita intenzionalmente la visibilità del server sui prompt
-dell'utente, riducendo la superficie di attacco per l'estrazione di informazioni
-confidenziali.\\
-Ricerche indipendenti hanno evidenziato che implementazioni permissive possono essere
-vulnerabili a \emph{tool poisoning} e \emph{prompt injection} attraverso descrizioni
-malevole nei server \gls{mcp}. Per mitigare tali rischi, è consigliabile adottare meccanismi di autorizzazione granulari,
-in grado di limitare l’accesso ai dati sensibili e di ridurre la superficie di esposizione verso questi server.
+\gls{mcp} è un protocollo client-server basato su \emph{JSON-RPC 2.0} con
+connessioni \emph{stateful}, articolato su tre ruoli: l'\textbf{host}
+(l'applicazione che ospita l'\gls{llm}, responsabile del consenso dell'utente
+e del controllo degli accessi), il \textbf{client} (il componente che gestisce
+la connessione verso un server specifico) e il \textbf{server \gls{mcp}} (il
+servizio, locale o remoto, che espone dati e funzionalità all'\gls{llm}).
+Prima di qualsiasi scambio applicativo, client e server negoziano le proprie
+capacità in una fase di \emph{handshake}, garantendo la retrocompatibilità
+tra versioni diverse del protocollo.\\
+Sul piano funzionale, il server può esporre tre tipi di primitive: le
+\textbf{Resources} (dati consultabili, identificati da URI), i \textbf{Tools}
+(funzioni invocabili dal modello per agire nel mondo, che richiedono consenso
+esplicito dell'utente) e i \textbf{Prompts} (template predefiniti per
+workflow ricorrenti). Simmetricamente, il client può offrire al server tre
+capacità: il \textbf{Sampling} (che delega all'utente il controllo su quali
+prompt vengono inviati al modello), i \textbf{Roots} (i confini del filesystem
+o degli URI entro cui il server può operare) e l'\textbf{Elicitation} (la
+possibilità per il server di richiedere informazioni aggiuntive in modo
+strutturato).\\
+Data l'ampiezza dei permessi che un server \gls{mcp} può richiedere, la
+specifica affronta la sicurezza attraverso quattro principi: consenso
+esplicito dell'utente prima di ogni invocazione di tool (con cautela verso le
+descrizioni provenienti da server non verificati, vettore noto di
+\emph{prompt injection}); privacy dei dati, che non devono essere trasmessi
+ai server senza consenso; controllo sul sampling, con visibilità
+dell'utente sui prompt inviati al modello; e separazione dei contesti, per
+limitare l'esposizione di informazioni confidenziali. Ricerche indipendenti
+hanno comunque evidenziato vulnerabilità concrete a \emph{tool poisoning} e
+\emph{prompt injection} in implementazioni permissive, da cui l'indicazione
+di adottare meccanismi di autorizzazione granulari.
 
 \subsection{Applicazione nel progetto}
 

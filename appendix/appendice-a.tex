@@ -8,76 +8,76 @@ sezione~\ref{sec:codice-requisiti}.
 
 
 \begin{longtable}{|C{2cm}|C{8.5cm}|C{2.5cm}|}
-\caption{Tracciamento dei requisiti funzionali} \label{tab:requisiti-funzionali}\\
-\hline
-\textbf{Requisito} & \textbf{Descrizione} & \textbf{Use Case}\\
-\hline
-RFO-1  & Tracciamento del percorso completo di ogni richiesta HTTP in ingresso, incluse le operazioni di accesso al database & UC5, UC6 \\
-\hline
-RFO-2  & Le operazioni \gls{crud} verso il database devono essere riconoscibili tramite attributi che espongono il metodo e la \emph{repository} da cui è stata scatenata la richiesta & UC5, UC6 \\
-\hline
-RFO-3  & Esposizione di metriche operative per i moduli centrali del \emph{framework} (autenticazione, componenti \emph{Angular} come griglie e \emph{form}, prestazioni hardware, accesso al database) & UC5, UC6 \\
-\hline
-RFO-4  & I \emph{log} devono essere correlabili alle \emph{trace} tramite \texttt{TraceId} e \texttt{SpanId} & UC6, UC7 \\
-\hline
-RFO-5  & Il sistema deve essere attivabile e disattivabile tramite configurazione, senza richiedere modifiche al codice & UC5 \\
-\hline
-RFD-6  & Configurazione indipendente del campionamento per ciascuna sorgente di \emph{trace} & UC5 \\
-\hline
-RFO-7  & Visualizzazione di \emph{trace} e metriche raggruppate in dashboard \emph{Grafana} costruite sullo stack \emph{LGTM} & UC6, UC9 \\
-\hline
-RFO-8  & Le dashboard di \emph{Grafana} devono raccogliere i dati da più servizi e installazioni di clienti diversi, e permettere di filtrare per gli stessi & UC6 \\
-\hline
-RFD-9  & Il sistema deve arricchire automaticamente ogni \emph{span} con l'identità dell'utente autenticato (\texttt{enduser.id}, \texttt{enduser.name}) senza richiedere modifiche ai singoli moduli applicativi & UC8 \\
-\hline
-RFO-10 & Le metriche di tipo \emph{Histogram} devono esporre \emph{exemplar} (puntatori al \texttt{TraceId} del campione) per abilitare la navigazione dalla metrica aggregata alla \emph{trace} corrispondente & UC7 \\
-\hline
-RFO-11 & Devono essere prodotti \emph{unit test} per la logica di business dei moduli core del \emph{framework backend}, eseguibili in modo automatizzato & UC1, UC4 \\
-\hline
-RFO-12 & Devono essere prodotti \emph{integration test} per la verifica dell'attendibilità dei dati presenti nel database, delle procedure SQL e delle prospettive di configurazione dei componenti & UC2, UC4 \\
-\hline
-RFO-13 & Devono essere prodotti \emph{unit test} lato \emph{frontend} per la verifica della logica applicativa dei componenti \emph{Angular} & UC3, UC4 \\
-\hline
-RFO-14 & Devono essere prodotti test \emph{end-to-end} lato \emph{frontend} per verificare il corretto comportamento e la corretta visualizzazione dell'applicazione dal punto di vista dell'utente finale & UC3, UC4 \\
-\hline
-RFO-15 & La suite di test deve essere integrabile nel processo di \emph{build} e fornire un report di copertura del codice & UC4 \\
-\hline
-RFO-16 & Devono essere realizzati agenti AI specializzati e \emph{skill} procedurali per propagare in modo uniforme telemetria e test ai diversi moduli del \emph{framework} & UC1, UC2, UC3, UC5, UC9 \\
-\hline
+      \caption{Tracciamento dei requisiti funzionali} \label{tab:requisiti-funzionali}                                                                                                                                                                        \\
+      \hline
+      \textbf{Requisito} & \textbf{Descrizione}                                                                                                                                                                                     & \textbf{Use Case}       \\
+      \hline
+      RFO-1              & Tracciamento del percorso completo di ogni richiesta HTTP in ingresso, incluse le operazioni di accesso al database                                                                                      & UC5, UC6                \\
+      \hline
+      RFO-2              & Le operazioni \gls{crud} verso il database devono essere riconoscibili tramite attributi che espongono il metodo e la \emph{repository} da cui è stata scatenata la richiesta                            & UC5, UC6                \\
+      \hline
+      RFO-3              & Esposizione di metriche operative per i moduli centrali del \emph{framework} (autenticazione, componenti \emph{Angular} come griglie e \emph{form}, prestazioni hardware, accesso al database)           & UC5, UC6                \\
+      \hline
+      RFO-4              & I \emph{log} devono essere correlabili alle \emph{trace} tramite \texttt{TraceId} e \texttt{SpanId}                                                                                                      & UC6, UC7                \\
+      \hline
+      RFO-5              & Il sistema deve essere attivabile e disattivabile tramite configurazione, senza richiedere modifiche al codice                                                                                           & UC5                     \\
+      \hline
+      RFD-6              & Configurazione indipendente del campionamento per ciascuna sorgente di \emph{trace}                                                                                                                      & UC5                     \\
+      \hline
+      RFO-7              & Visualizzazione di \emph{trace} e metriche raggruppate in dashboard \emph{Grafana} costruite sullo stack \emph{LGTM}                                                                                     & UC6, UC9                \\
+      \hline
+      RFO-8              & Le dashboard di \emph{Grafana} devono raccogliere i dati da più servizi e installazioni di clienti diversi, e permettere di filtrare per gli stessi                                                      & UC6                     \\
+      \hline
+      RFD-9              & Il sistema deve arricchire automaticamente ogni \emph{span} con l'identità dell'utente autenticato (\texttt{enduser.id}, \texttt{enduser.name}) senza richiedere modifiche ai singoli moduli applicativi & UC8                     \\
+      \hline
+      RFO-10             & Le metriche di tipo \emph{Histogram} devono esporre \emph{exemplar} (puntatori al \texttt{TraceId} del campione) per abilitare la navigazione dalla metrica aggregata alla \emph{trace} corrispondente   & UC7                     \\
+      \hline
+      RFO-11             & Devono essere prodotti \emph{unit test} per la logica di business dei moduli core del \emph{framework backend}, eseguibili in modo automatizzato                                                         & UC1, UC4                \\
+      \hline
+      RFO-12             & Devono essere prodotti \emph{integration test} per la verifica dell'attendibilità dei dati presenti nel database, delle procedure SQL e delle prospettive di configurazione dei componenti               & UC2, UC4                \\
+      \hline
+      RFO-13             & Devono essere prodotti \emph{unit test} lato \emph{frontend} per la verifica della logica applicativa dei componenti \emph{Angular}                                                                      & UC3, UC4                \\
+      \hline
+      RFO-14             & Devono essere prodotti test \emph{end-to-end} lato \emph{frontend} per verificare il corretto comportamento e la corretta visualizzazione dell'applicazione dal punto di vista dell'utente finale        & UC3, UC4                \\
+      \hline
+      RFO-15             & La suite di test deve essere integrabile nel processo di \emph{build} e fornire un report di copertura del codice                                                                                        & UC4                     \\
+      \hline
+      RFO-16             & Devono essere realizzati agenti AI specializzati e \emph{skill} procedurali per propagare in modo uniforme telemetria e test ai diversi moduli del \emph{framework}                                      & UC1, UC2, UC3, UC5, UC9 \\
+      \hline
 \end{longtable}
 
 \begin{longtable}{|C{2cm}|C{8.5cm}|C{2.5cm}|}
-\caption{Tracciamento dei requisiti qualitativi} \label{tab:requisiti-qualitativi}\\
-\hline
-\textbf{Requisito} & \textbf{Descrizione} & \textbf{Fonte}\\
-\hline
-RQO-1 & La telemetria non deve degradare sensibilmente le prestazioni in produzione & Aziendale \\
-\hline
-RQO-2 & Le metriche devono essere progettate per non generare un numero eccessivo di serie temporali in Prometheus; i tag ad alta variabilità (es.\ identificativi utente o di record) non devono essere usati come attributi di metriche & Aziendale \\
-\hline
-RQO-3 & Le dashboard Grafana devono essere versionabili insieme al codice del modulo che instrumentano & Aziendale \\
-\hline
+      \caption{Tracciamento dei requisiti qualitativi} \label{tab:requisiti-qualitativi}                                                                                                                                                                                      \\
+      \hline
+      \textbf{Requisito} & \textbf{Descrizione}                                                                                                                                                                                                              & \textbf{Fonte} \\
+      \hline
+      RQO-1              & La telemetria non deve degradare sensibilmente le prestazioni in produzione                                                                                                                                                       & Aziendale      \\
+      \hline
+      RQO-2              & Le metriche devono essere progettate per non generare un numero eccessivo di serie temporali in Prometheus; i tag ad alta variabilità (es.\ identificativi utente o di record) non devono essere usati come attributi di metriche & Aziendale      \\
+      \hline
+      RQO-3              & Le dashboard Grafana devono essere versionabili insieme al codice del modulo che strumentano                                                                                                                                      & Aziendale      \\
+      \hline
 \end{longtable}
 
 \begin{longtable}{|C{2cm}|C{8.5cm}|C{2.5cm}|}
-\caption{Tracciamento dei requisiti di vincolo} \label{tab:requisiti-vincolo}\\
-\hline
-\textbf{Requisito} & \textbf{Descrizione} & \textbf{Fonte}\\
-\hline
-RVD-1 & I segnali prodotti devono essere compatibili con qualsiasi backend \gls{otel}-compatibile & Aziendale \\
-\hline
-RVO-2 & Per lo sviluppo dei test di unità e integrazione del backend devono essere utilizzati dei pacchetti NuGet standard di .NET & Aziendale \\
-\hline
-RVO-3 & I test di unità del frontend devono utilizzare Vitest come tecnologia di sviluppo & Aziendale \\
-\hline
-RVO-4 & I test end-to-end del frontend devono utilizzare Playwright come tecnologia di sviluppo & Aziendale \\
-\hline
-RVO-5 & Lo stack di osservabilità deve utilizzare OpenTelemetry come protocollo di raccolta dei segnali & Stagista \\
-\hline
-RVO-6 & La piattaforma di visualizzazione deve essere Grafana con stack \emph{LGTM} & Stagista \\
-\hline
-RVO-7 & Le impostazioni devono essere modificabili per ambiente (sviluppo, \emph{staging}, produzione) tramite \emph{appsettings} & Aziendale \\
-\hline
+      \caption{Tracciamento dei requisiti di vincolo} \label{tab:requisiti-vincolo}                                                                                    \\
+      \hline
+      \textbf{Requisito} & \textbf{Descrizione}                                                                                                       & \textbf{Fonte} \\
+      \hline
+      RVD-1              & I segnali prodotti devono essere compatibili con qualsiasi backend \gls{otel}-compatibile                                  & Aziendale      \\
+      \hline
+      RVO-2              & Per lo sviluppo dei test di unità e integrazione del backend devono essere utilizzati dei pacchetti NuGet standard di .NET & Aziendale      \\
+      \hline
+      RVO-3              & I test di unità del frontend devono utilizzare Vitest come tecnologia di sviluppo                                          & Aziendale      \\
+      \hline
+      RVO-4              & I test end-to-end del frontend devono utilizzare Playwright come tecnologia di sviluppo                                    & Aziendale      \\
+      \hline
+      RVO-5              & Lo stack di osservabilità deve utilizzare OpenTelemetry come protocollo di raccolta dei segnali                            & Stagista       \\
+      \hline
+      RVO-6              & La piattaforma di visualizzazione deve essere Grafana con stack \emph{LGTM}                                                & Stagista       \\
+      \hline
+      RVO-7              & Le impostazioni devono essere modificabili per ambiente (sviluppo, \emph{staging}, produzione) tramite \emph{appsettings}  & Aziendale      \\
+      \hline
 \end{longtable}
 
 \chapter{Diagrammi delle classi del sistema di telemetria}
@@ -90,48 +90,48 @@ membri salienti, frecce tratteggiate per le dipendenze d'uso, freccia con
 triangolo vuoto per la relazione di implementazione di interfaccia.
 
 \section{Pipeline condiviso in \texttt{BaseApplicationBuilder}}
-  \label{app:diag-pipeline}
+\label{app:diag-pipeline}
 
-  La figura~\ref{fig:diag-pipeline} mostra il pipeline \gls{otel} centralizzato:
-  i tre provider \texttt{TracerProvider}, \texttt{MeterProvider} e
-  \texttt{LoggerProvider} sono costruiti una sola volta da
-  \texttt{BaseApplication\\Builder.ConfigureBuilder}. 
-  \\Sul \texttt{TracerProvider} viene installato
-  il \texttt{SiaParentBasedSampler} (con \texttt{SamplingRatio} globale e
-  override per-source via \texttt{SamplingRatios}), seguito dal
-  \texttt{BaggageActivityProcessor} che copia i valori di \gls{baggageg} con
-  prefisso \texttt{"enduser."} come tag su ogni \emph{span} figlia; le route
-  rumorose (es. \texttt{api/base-hub}) sono soppresse tramite
-  \texttt{options.Filter} sull'instrumentation ASP.NET Core e tramite il
-  middleware \texttt{SuppressOptionsActivityMiddleware}.
-  \\Il \texttt{LoggerProvider} corrisponde al
-  \emph{sink} \gls{otlp} di Serilog, con \texttt{LogsMinimumLevel} configurabile e
-  \texttt{IncludedData} comprendente \texttt{TraceId}, \texttt{SpanId} e
-  \emph{message template} (testo del log). 
-  \\Sul \texttt{MeterProvider} \`e attivo l'\emph{exemplar filter}
-  \texttt{TraceBased} e quattro configurazioni custom:
+La figura~\ref{fig:diag-pipeline} mostra la pipeline \gls{otel} centralizzato:
+i tre provider \texttt{TracerProvider}, \texttt{MeterProvider} e
+\texttt{LoggerProvider} sono costruiti una sola volta da
+\texttt{BaseApplication\\Builder.ConfigureBuilder}.
+\\Sul \texttt{TracerProvider} viene installato
+il \texttt{SiaParentBasedSampler} (con \texttt{SamplingRatio} globale e
+override per-source via \texttt{SamplingRatios}), seguito dal
+\texttt{BaggageActivityProcessor} che copia i valori di \gls{baggageg} con
+prefisso \texttt{"enduser."} come tag su ogni \emph{span} figlia; le route
+rumorose (es. \texttt{api/base-hub}) sono soppresse tramite
+\texttt{options.Filter} sull'instrumentation ASP.NET Core e tramite il
+middleware \texttt{SuppressOptionsActivityMiddleware}.
+\\Il \texttt{LoggerProvider} corrisponde al
+\emph{sink} \gls{otlp} di Serilog, con \texttt{LogsMinimumLevel} configurabile e
+\texttt{IncludedData} comprendente \texttt{TraceId}, \texttt{SpanId} e
+\emph{message template} (testo del log).
+\\Sul \texttt{MeterProvider} \`e attivo l'\emph{exemplar filter}
+\texttt{TraceBased} e quattro configurazioni custom:
 \texttt{ExplicitBucketHistogramConfiguration} per estendere la coda dei bucket
-  oltre il default da 10s.
-  \\Tutti i segnali condividono lo
-  stesso \texttt{Resource} con gli attributi \texttt{service.name},
-  \texttt{sia.product\_type} e \texttt{sia.customer\_name}, ed esportano verso
-  il \emph{Collector} via \texttt{OtlpExporter} gRPC sull'endpoint
-  \texttt{OpenTelemetry:OtlpEndpoint}. 
-  \\Due middleware completano il pipeline a
-  runtime: \texttt{SuppressOptionsActivityMiddleware} (soppressione preflight)
-  e \texttt{EnrichActivityWithUserMiddleware} (arricchimento con
-  \texttt{enduser.id} dalla claim \texttt{userId}); opzionalmente
-  \texttt{HttpRequestBodyTagActionFilter} cattura il \emph{body} della
-  \emph{request} HTTP (GET e POST) come tag \texttt{sia.request.body} sulla root span.
+oltre il default da 10s.
+\\Tutti i segnali condividono lo
+stesso \texttt{Resource} con gli attributi \texttt{service.name},
+\texttt{sia.product\_type} e \texttt{sia.customer\_name}, ed esportano verso
+il \emph{Collector} via \texttt{OtlpExporter} gRPC sull'endpoint
+\texttt{OpenTelemetry:OtlpEndpoint}.
+\\Due middleware completano la pipeline a
+runtime: \texttt{SuppressOptionsActivityMiddleware} (soppressione preflight)
+e \texttt{EnrichActivityWithUserMiddleware} (arricchimento con
+\texttt{enduser.id} dalla claim \texttt{userId}); opzionalmente
+\texttt{HttpRequestBodyTagActionFilter} cattura il \emph{body} della
+\emph{request} HTTP (GET e POST) come tag \texttt{sia.request.body} sulla root span.
 \newpage
 
 \begin{figure}[h]
-    \centering
-    \makebox[\textwidth][c]{%
-        \includegraphics[width=1.25\textwidth]{../images/UMLClassi/OtelPipeline.png}
-    }
-    \caption{Diagramma delle classi della Pipeline OpenTelemetry}
-  \label{fig:diag-pipeline}
+      \centering
+      \makebox[\textwidth][c]{%
+            \includegraphics[width=1.25\textwidth]{../images/UMLClassi/OtelPipeline.png}
+      }
+      \caption{Diagramma delle classi della Pipeline OpenTelemetry}
+      \label{fig:diag-pipeline}
 \end{figure}
 \newpage
 
@@ -150,10 +150,10 @@ implementa il contratto condiviso \texttt{IControllerDiagnostics} (pattern
 concreta.
 
 \begin{figure}[h]
-    \centering
-    \includegraphics[width=0.8\linewidth]{../images/UMLClassi/UMLSiaDiagnostics.png}
-    \caption{Diagramma delle classi del pattern di diagnostica}    
-    \label{fig:diag-diagnostics-pattern}
+      \centering
+      \includegraphics[width=0.8\linewidth]{../images/UMLClassi/UMLSiaDiagnostics.png}
+      \caption{Diagramma delle classi del pattern di diagnostica}
+      \label{fig:diag-diagnostics-pattern}
 \end{figure}
 \newpage
 \section{Arricchimento del contesto utente}
@@ -169,15 +169,15 @@ nel \texttt{TracerProvider}, copia ogni \emph{entry} di \gls{baggageg} con
 prefisso "\texttt{enduser.}" come \emph{tag} sull'\texttt{Activity} nel proprio
 \emph{hook} \texttt{OnStart}. L'effetto è che qualsiasi \texttt{Activity}
 creata durante la richiesta, sia dalle classi
-\texttt{Sia\{Modulo\}Diagnostics}, sia dalle instrumentazioni automatiche di
+\texttt{Sia\{Modulo\}Diagnostics}, sia dalle strumentazioni automatiche di
 ASP.NET Core e \texttt{SqlClient}, riceve i \emph{tag} utente senza
 modifiche al codice del modulo.
 
 \begin{figure}[h]
-    \centering
-    \includegraphics[width=0.8\linewidth]{../images/UMLClassi/EnrichEnduserTag.png}
-    \caption{Diagramma delle classi dell'arrichimento trace con dati utente}    
-    \label{fig:diag-enduser}
+      \centering
+      \includegraphics[width=0.8\linewidth]{../images/UMLClassi/EnrichEnduserTag.png}
+      \caption{Diagramma delle classi dell'arricchimento trace con dati utente}
+      \label{fig:diag-enduser}
 \end{figure}
 
 \chapter{Listati di codice rappresentativi}
