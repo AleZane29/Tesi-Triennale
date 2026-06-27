@@ -128,17 +128,17 @@ riporta i casi più significativi.
       \centering
       \caption{Endpoint HTTP più lenti osservati in 7 giorni (durata $>2$\,s)}
       \label{tab:top-endpoint-lenti}
-      \begin{tabular}{|l|r|r|r|}
+      \begin{tabular}{|l|r|r|r|r|}
             \hline
-            \textbf{Endpoint}                     & \textbf{Occorrenze} & \textbf{Massimo} & \textbf{p95} \\
+            \textbf{Endpoint}                     & \textbf{Occorrenze} & \textbf{Massimo} & \textbf{p95} & \textbf{Avg} \\
             \hline
-            \texttt{GET api/Layout/layout}        & 535                 & 47.7\,s          & 40.6\,s      \\
+            \texttt{GET api/Layout/layout}        & 535                 & 47.7\,s          & 40.6\,s      & 13.2\,s      \\
             \hline
-            \texttt{POST api/grid-core/page}      & 101                 & 77.4\,s          & 68.6\,s      \\
+            \texttt{POST api/grid-core/page}      & 101                 & 77.4\,s          & 68.6\,s      & 22.7\,s      \\
             \hline
-            \texttt{POST api/calendar/activities} & 39                  & 150.3\,s         & 148.7\,s     \\
+            \texttt{POST api/calendar/activities} & 39                  & 150.3\,s         & 148.7\,s     & 22.9\,s      \\
             \hline
-            \texttt{GET api/WidgetData/fullkvp}   & 120                 & 68.3\,s          & 38.5\,s      \\
+            \texttt{GET api/WidgetData/fullkvp}   & 120                 & 68.3\,s          & 38.5\,s      & 10\,s        \\
             \hline
       \end{tabular}
 \end{table}\\

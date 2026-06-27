@@ -70,7 +70,7 @@ così che ogni nuovo test risulti coerente con quelli già esistenti.\\
 Sul \emph{backend} l'agente copre le categorie di test unitari, \emph{smoke},
 \emph{lifecycle} e \emph{summary}, ed è affiancato da due \emph{skill} specifiche per la creazione di
 nuovi \emph{lifecycle test}, essendo quest'ultimo il pattern più ripetitivo della \emph{suite}.
-Una \emph{skill} è orientata al modulo \gls{crud}, nella quale viene spiegato al \gls{llm} a cosa serve quel test, vincoli specifici
+Una \emph{skill} è orientata al modulo \gls{crud}, nella quale viene spiegato all'\gls{llm} a cosa serve quel test, vincoli specifici
 dei test e dove raccogliere i dati necessari per la scrittura dei test; un'altra è specifica del modulo Grid e
 ricopre le stesse funzioni della \emph{skill} precedente ma relative ai componenti griglia.
 Sul \emph{frontend} l'agente è invece focalizzato sui test di usabilità
@@ -237,10 +237,18 @@ Un beneficio analogo si è ottenuto con l'integrazione di \emph{Playwright} e
 \emph{mssql}: in entrambi i casi, l'accesso diretto agli strumenti tramite \gls{mcp} ha
 permesso all'agente di operare su dati reali anziché su assunzioni, riducendo il numero
 di iterazioni necessarie per ottenere un risultato corretto.
+L'accesso al database ha permesso all'\gls{llm} di apportare modifiche direttamente a tabelle,
+viste e \emph{stored procedure}, oltre a recuperare dati utili per il \emph{debugging} o per
+ricostruire la struttura delle entità coinvolte, condizione necessaria per scrivere query
+corrette senza doverla descrivere manualmente a ogni richiesta. Il collegamento di
+\emph{Playwright} tramite \gls{mcp} ha reso possibile all'\gls{llm} non solo di eseguire
+direttamente i test E2E, ma anche di aprire schede del browser per validare visivamente le
+modifiche apportate e ispezionare bug grafici, comprendendone la causa e intervenendo di
+conseguenza.
 
 \section{Considerazioni conclusive}
 
-L’utilizzo di un agente AI come supporto allo sviluppo, insieme all’adozione del protocollo \gls{mcp},
+L’utilizzo di un agente AI come supporto allo sviluppo, insieme all’adozione del protocollo \gls{mcpg},
 ha contribuito in modo significativo al miglioramento della qualità del prodotto,
 alla riduzione dei tempi di sviluppo e al superamento delle iniziali lacune tecniche.\\
 Tuttavia, il ruolo dell’agente AI non deve essere interpretato come sostitutivo di quello dello sviluppatore.
